@@ -1,0 +1,14 @@
+@gameId:0
+@templateId:1
+@ownerId:null
+@title:answer is the question
+@maxAttempts:2
+@isPublic:false
+@scoreCategories
+1.0|General|0.0|Quiz Game Finished.
+@scoreCategories
+@questions
+d|{1.0},d
+m|{1.0},m
+@questions
+
