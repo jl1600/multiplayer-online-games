@@ -22,9 +22,12 @@ public class CommandPromptUIApp {
     private final IClientPresenter presenter;
     private UserRole currentUserRole;
 
+    public static void main(String[] args) {
+        CommandPromptUIApp app = new CommandPromptUIApp("localhost", 4444);
+    }
     /**
      * Constructor for Command-Prompt User Interface
-     * @param system the system that process given request
+     * @param
      */
     public CommandPromptUIApp(String hostAddress, int port) {
         IServerCommunicator communicator = new ServerSocketCommunicator(hostAddress, port);
