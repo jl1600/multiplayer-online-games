@@ -1,9 +1,11 @@
 package shared;
 
+import java.io.Serializable;
+
 /**
  * DataPackage Class
  */
-public abstract class DataPackage {
+public abstract class DataPackage implements Serializable {
     protected final String sessionID;
 
     /**

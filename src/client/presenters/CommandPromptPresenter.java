@@ -15,6 +15,7 @@ import shared.response.template.TemplateInfoMapResponse;
 import shared.response.user.LoginResponse;
 import shared.response.user.UserRoleResponse;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class CommandPromptPresenter implements IClientPresenter {

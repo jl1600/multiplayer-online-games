@@ -1,24 +1,41 @@
 package client.gateways;
 
-import client.gateways.IServerCommunicator;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import shared.request.Request;
 import shared.response.Response;
 import system.controllers.WordGameSystem;
 
-public class ServerSocketCommunicator implements IServerCommunicator {
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+
+public class ServerSocketCommunicator implements IServerCommunicator, AutoCloseable {
 
     private Response currentResponse;
-    private final WordGameSystem server;
+    private Socket socket;
     private final String sessionID;
-
+    ObjectOutputStream outStream;
+    ObjectInputStream inStream;
 
     /**
      * Constructor for ServerSocketCommunicator
-     * @param system the server that it will be communicating with
+     * @param
      */
-    public ServerSocketCommunicator(WordGameSystem system) {
-        this.server = system;
-        this.sessionID = server.connect();
+    public ServerSocketCommunicator(String hostAddress, int channel) {
+        try {
+            socket = new Socket(hostAddress, channel);
+            outStream = new ObjectOutputStream(socket.getOutputStream());
+            inStream = new ObjectInputStream(socket.getInputStream());
+            sessionID = inStream.readUTF();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("Error: Unidentified host. Make sure the server ip address and the port are valid.");
+        } catch (IOException e) {
+            throw new RuntimeException("Server I/O error!");
+        }
+
     }
 
     /**
@@ -27,7 +44,11 @@ public class ServerSocketCommunicator implements IServerCommunicator {
      */
     @Override
     public void sendRequest(Request request) {
-        currentResponse = server.processRequest(request);
+        try {
+            outStream.writeObject(request);
+        } catch (IOException e) {
+            throw new RuntimeException("Error: Cannot write the request to the output stream.");
+        }
     }
 
     /**
@@ -36,7 +57,14 @@ public class ServerSocketCommunicator implements IServerCommunicator {
      */
     @Override
     public Response getResponse() {
-        return currentResponse;
+        try {
+            currentResponse = (Response) inStream.readObject();
+            return currentResponse;
+        } catch (IOException e) {
+            throw new RuntimeException("I/O problem. Cannot read the server response from the input stream.");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Error: Class not found");
+        }
     }
 
 
@@ -47,5 +75,12 @@ public class ServerSocketCommunicator implements IServerCommunicator {
     @Override
     public String getSessionID() {
         return sessionID;
+    }
+
+    @Override
+    public void close() throws IOException {
+        outStream.close();
+        inStream.close();
+        socket.close();
     }
 }

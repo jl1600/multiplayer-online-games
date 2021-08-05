@@ -26,8 +26,8 @@ public class CommandPromptUIApp {
      * Constructor for Command-Prompt User Interface
      * @param system the system that process given request
      */
-    public CommandPromptUIApp(WordGameSystem system) {
-        IServerCommunicator communicator = new ServerSocketCommunicator(system);
+    public CommandPromptUIApp(String hostAddress, int port) {
+        IServerCommunicator communicator = new ServerSocketCommunicator(hostAddress, port);
         controller = new ClientController(communicator);
         presenter = new CommandPromptPresenter(communicator);
 
