@@ -84,7 +84,7 @@ public class WordGameSystem implements AutoCloseable {
                     Response res = processRequest((Request) ois.readObject());
                     oos.writeObject(res);
                 } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException("Cannot get I/O streams of client.");
+                    return;
                 }
             }
         }
