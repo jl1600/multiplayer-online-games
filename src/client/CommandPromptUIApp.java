@@ -24,6 +24,7 @@ public class CommandPromptUIApp {
 
     public static void main(String[] args) {
         CommandPromptUIApp app = new CommandPromptUIApp("localhost", 4444);
+        app.startup();
     }
     /**
      * Constructor for Command-Prompt User Interface
