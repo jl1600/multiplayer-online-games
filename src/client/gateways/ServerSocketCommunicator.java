@@ -26,17 +26,13 @@ public class ServerSocketCommunicator implements IServerCommunicator, AutoClosea
             socket = new Socket(hostAddress, channel);
             outStream = new ObjectOutputStream(socket.getOutputStream());
             inStream = new ObjectInputStream(socket.getInputStream());
-            Response res = (Response) inStream.readObject();
-            this.sessionID = res.getSessionID();
+            this.sessionID = "0"; // Temporary session ID, may change later.
         } catch (UnknownHostException e) {
             e.printStackTrace();
             throw new RuntimeException("Error: Unidentified host. Make sure the server ip address and the port are valid.");
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Server I/O error!");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Cannot identify the class of the response");
         }
 
     }

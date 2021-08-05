@@ -9,7 +9,6 @@ import client.presenters.IClientPresenter;
 import shared.constants.UserRole;
 import shared.exceptions.entities_exception.UnaccountedUserRoleException;
 import shared.exceptions.use_case_exceptions.IncorrectResponseTypeException;
-import system.controllers.WordGameSystem;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -328,7 +327,8 @@ public class CommandPromptUIApp {
 
     private void onJoinGameMatch() {
         cls();
-        printMessage("Feature is under development for phase2.");
+        String match = getMatchChoice();
+        printMessage("Feature is still under development.");
         onMainMenu();
     }
 
