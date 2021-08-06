@@ -1,5 +1,7 @@
 package system.controllers;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
 import shared.request.Request;
@@ -15,9 +17,10 @@ import system.use_cases.managers.TemplateManager;
 import system.use_cases.managers.UserManager;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Set;
 
-public class GameRequestHandler implements RequestHandler {
+public class GameRequestHandler implements RequestHandler, HttpHandler {
 
     private final GameManager gameManager;
     private final TemplateManager templateManager;
@@ -204,6 +207,27 @@ public class GameRequestHandler implements RequestHandler {
             return new SimpleTextResponse(request.getSessionID(), gameManager.getDesignQuestion(request.getSenderID()));
         } catch (NoCreationInProgressException e) {
             return new ErrorMessageResponse(request.getSessionID(), "Error: No game creation is in progress.");
+        }
+    }
+
+    private void handleGetRequest(HttpExchange exchange) throws IOException {
+        System.out.println(exchange.getRequestURI().toString());
+        String jsonData = handleGetAllPublicGamesRequest();
+        OutputStream outputStream = exchange.getResponseBody();
+        exchange.sendResponseHeaders(200, jsonData.length());
+        outputStream.write(jsonData.getBytes());
+        outputStream.flush();
+        outputStream.close();
+    }
+
+    private String handleGetAllPublicGamesRequest() {
+        return gameManager.getAllPublicIdAndTitles().toString();
+    }
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        if("GET".equals(exchange.getRequestMethod())) {
+            handleGetRequest(exchange);
         }
     }
 }
