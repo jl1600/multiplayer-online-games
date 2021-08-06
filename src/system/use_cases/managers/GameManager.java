@@ -5,6 +5,7 @@ import shared.exceptions.entities_exception.IDNotYetSetException;
 import shared.exceptions.entities_exception.UnknownGameTypeException;
 import shared.exceptions.use_case_exceptions.*;
 
+import system.data_transfer_objects.GameData;
 import system.entities.template.Template;
 import system.entities.game.Game;
 import system.gateways.GameDataGateway;
@@ -13,6 +14,7 @@ import system.use_cases.factories.GameBuilderFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -175,14 +177,18 @@ public class GameManager {
     /**
      * Returns a mapping of ID-to-title of all public games in the system.
      * */
-    public Map<String, String> getAllPublicIdAndTitles() {
-        Map<String, String> idToTile = new HashMap<>();
+    public Set<GameData> getAllPublicGameData() {
+        Set<GameData> dataSoFar = new HashSet<>();
         for (String id: games.keySet()) {
             if (games.get(id).isPublic()) {
-                idToTile.put(id, games.get(id).getTitle());
+                GameData data = new GameData();
+                data.ownerId = games.get(id).getOwnerId();
+                data.title = games.get(id).getTitle();
+                data.id = id;
+                dataSoFar.add(data);
             }
         }
-        return idToTile;
+        return dataSoFar;
     }
 
     /**
@@ -206,7 +212,7 @@ public class GameManager {
      * Returns a mapping of public game ids to game titles corresponding to a set of game IDs.
      * @param gameIDs The set of game IDs.
      * */
-    public Map<String, String> getPublicGameTilesFromIdSet(Set<String> gameIDs) throws InvalidGameIDException {
+    public Map<String, String> getPublicGameTitlesFromIdSet(Set<String> gameIDs) throws InvalidGameIDException {
         Map<String, String> idToTitle = new HashMap<>();
 
         for (String id: gameIDs) {
@@ -224,7 +230,7 @@ public class GameManager {
      * Returns a mapping of game ids to game titles corresponding to a set of game IDs.
      * @param gameIDs The set of game IDs.
      * */
-    public Map<String, String> getAllGameTilesFromIdSet(Set<String> gameIDs) throws InvalidGameIDException {
+    public Map<String, String> getAllGameTitlesFromIdSet(Set<String> gameIDs) throws InvalidGameIDException {
         Map<String, String> idToTitle = new HashMap<>();
 
         for (String id : gameIDs) {

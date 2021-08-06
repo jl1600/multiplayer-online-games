@@ -12,6 +12,7 @@ import shared.response.game.GameInfoMapResponse;
 import shared.response.game.NewGameMatchResponse;
 import shared.response.misc.ErrorMessageResponse;
 import shared.response.misc.SimpleTextResponse;
+import system.data_transfer_objects.GameData;
 import system.use_cases.managers.GameManager;
 import system.use_cases.managers.MatchManager;
 import system.use_cases.managers.TemplateManager;
@@ -50,8 +51,6 @@ public class GameRequestHandler implements RequestHandler, HttpHandler {
             return handlePlayMoveRequest((PlayGameMoveRequest) request);
         } else if (request instanceof NewGameMatchRequest) {
             return handleNewMatchRequest((NewGameMatchRequest) request);
-        } else if (request instanceof GetAllPublicGamesInfoRequest) {
-            return handleGetPublicGamesInfoRequest((GetAllPublicGamesInfoRequest) request);
         } else  if (request instanceof DeleteGameRequest){
             return handleDeleteGameRequest((DeleteGameRequest) request);
         } else  if (request instanceof GetOwnedGameInfoRequest) {
@@ -84,10 +83,10 @@ public class GameRequestHandler implements RequestHandler, HttpHandler {
         try {
             if (request.getTargetUserID().equals(request.getSenderID())) {
                 return new GameInfoMapResponse(request.getSessionID(),
-                        gameManager.getAllGameTilesFromIdSet(userManager.getOwnedGamesID(request.getTargetUserID())));
+                        gameManager.getAllGameTitlesFromIdSet(userManager.getOwnedGamesID(request.getTargetUserID())));
             } else {
                 return new GameInfoMapResponse(request.getSessionID(),
-                        gameManager.getPublicGameTilesFromIdSet(userManager.getOwnedGamesID(request.getTargetUserID())));
+                        gameManager.getPublicGameTitlesFromIdSet(userManager.getOwnedGamesID(request.getTargetUserID())));
             }
         } catch (InvalidUserIDException e) {
             return new ErrorMessageResponse(request.getSessionID(), "Error: Invalid user ID");
@@ -112,9 +111,6 @@ public class GameRequestHandler implements RequestHandler, HttpHandler {
 
     }
 
-    private Response handleGetPublicGamesInfoRequest(GetAllPublicGamesInfoRequest request) {
-        return new GameInfoMapResponse(request.getSessionID(), gameManager.getAllPublicIdAndTitles());
-    }
 
     private Response handleNewGameRequest(NewGameRequest request) {
 
@@ -213,19 +209,32 @@ public class GameRequestHandler implements RequestHandler, HttpHandler {
     }
 
     private void handleGetRequest(HttpExchange exchange) throws IOException {
-        System.out.println(exchange.getRequestURI().toString());
-        String jsonData = handleGetAllPublicGamesRequest();
+        String specification = exchange.getRequestURI().toString().split("/")[2];
+        String jsonData;
         OutputStream outputStream = exchange.getResponseBody();
+        switch (specification) {
+            case "all-public-games":
+                jsonData = getAllPublicGamesData();
+                break;
+            default:
+                jsonData = "Unidentified Request.";
+                exchange.sendResponseHeaders(404, jsonData.length());
+                outputStream.write(jsonData.getBytes());
+                outputStream.flush();
+                outputStream.close();
+                return;
+        }
+
         exchange.sendResponseHeaders(200, jsonData.length());
         outputStream.write(jsonData.getBytes());
         outputStream.flush();
         outputStream.close();
     }
 
-    private String handleGetAllPublicGamesRequest() {
+    private String getAllPublicGamesData() {
         Gson gson = new Gson();
-        Map<String, Map<String, String>> dataMap = new HashMap<>();
-        dataMap.put("data", gameManager.getAllPublicIdAndTitles());
+        Map<String, Set<GameData>> dataMap = new HashMap<>();
+        dataMap.put("data", gameManager.getAllPublicGameData());
         return gson.toJson(dataMap);
     }
 
