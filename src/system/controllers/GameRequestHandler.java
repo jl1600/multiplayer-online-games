@@ -1,5 +1,6 @@
 package system.controllers;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import shared.constants.UserRole;
@@ -15,9 +16,10 @@ import system.use_cases.managers.GameManager;
 import system.use_cases.managers.MatchManager;
 import system.use_cases.managers.TemplateManager;
 import system.use_cases.managers.UserManager;
-
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class GameRequestHandler implements RequestHandler, HttpHandler {
@@ -221,7 +223,10 @@ public class GameRequestHandler implements RequestHandler, HttpHandler {
     }
 
     private String handleGetAllPublicGamesRequest() {
-        return gameManager.getAllPublicIdAndTitles().toString();
+        Gson gson = new Gson();
+        Map<String, Map<String, String>> dataMap = new HashMap<>();
+        dataMap.put("data", gameManager.getAllPublicIdAndTitles());
+        return gson.toJson(dataMap);
     }
 
     @Override
