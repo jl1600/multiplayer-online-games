@@ -148,7 +148,7 @@ public class CommandPromptUIApp {
             onRegister(); // repeat
         } else {
 
-            if (role == UserRole.MEMBER) {
+            if (role == UserRole.MEMBER | role == UserRole.TEMP) {
                 controller.sendRegisterNormalUserRequest(username, password);
             } else {
                 controller.sendRegisterAdminUserRequest(username, password);
@@ -161,7 +161,7 @@ public class CommandPromptUIApp {
                 printMessage(presenter.getTextFromResponse());
                 currentUserRole = role;
                 onAdminMainMenu();
-            } else if (role == UserRole.MEMBER) {
+            } else if (role == UserRole.MEMBER | role == UserRole.TEMP) {
                 printMessage(presenter.getTextFromResponse());
                 currentUserRole = role;
                 onNormalMainMenu();
@@ -178,13 +178,15 @@ public class CommandPromptUIApp {
     // Helper for onRegister
     private UserRole getUserRoleInput() {
 
-        String userTypeStr = getInput("Please enter user type (admin/member):");
+        String userTypeStr = getInput("Please enter user type (admin/member/temporary):");
 
         switch (userTypeStr) {
             case "admin":
                 return UserRole.ADMIN;
             case "member":
                 return UserRole.MEMBER;
+            case "temporary":
+                return  UserRole.TEMP;
             default:
                 return getUserRoleInput();
         }
@@ -202,6 +204,9 @@ public class CommandPromptUIApp {
                 onTrialMainMenu();
                 break;
             case MEMBER:
+                onNormalMainMenu();
+                break;
+            case TEMP:
                 onNormalMainMenu();
                 break;
             default:
@@ -474,7 +479,7 @@ public class CommandPromptUIApp {
         }
 
         printMessage(presenter.getTextFromResponse());
-        if (currentUserRole == UserRole.MEMBER) {
+        if (currentUserRole == UserRole.MEMBER | currentUserRole == UserRole.TEMP) {
             onNormalMainMenu();
         } else {
             onTrialMainMenu();
