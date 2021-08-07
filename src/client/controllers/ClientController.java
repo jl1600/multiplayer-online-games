@@ -48,6 +48,17 @@ public class ClientController implements IClientController {
     }
 
     /**
+     * Sends a register temporary user request to server
+     * @param username
+     * @param password
+     */
+    @Override
+    public void sendRegisterTemporaryUserRequest(String username, String password) {
+        communicator.sendRequest(new NewTempUserRequest(communicator.getSessionID(), username, password));
+
+    }
+
+    /**
      * Sends a register admin user request to server
      * @param username the username received from input
      * @param password the password received from input

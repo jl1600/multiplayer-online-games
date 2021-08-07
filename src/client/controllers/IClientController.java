@@ -5,6 +5,7 @@ public interface IClientController {
     // User requests
     void sendLoginRequest(String username, String password);
     void sendRegisterNormalUserRequest(String username, String password);
+    void sendRegisterTemporaryUserRequest(String username, String password);
     void sendRegisterTrialUserRequest();
     void sendRegisterAdminUserRequest(String username, String password);
     void sendDeleteUserRequest(String password);
@@ -36,4 +37,6 @@ public interface IClientController {
     void sendCancelTemplateEditRequest(String templateID);
     void sendSaveTemplateEditRequest(String templateID);
     void sendDeleteTemplateRequest(String templateID);
+
+
 }

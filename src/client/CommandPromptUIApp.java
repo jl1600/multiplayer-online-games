@@ -150,7 +150,9 @@ public class CommandPromptUIApp {
 
             if (role == UserRole.MEMBER | role == UserRole.TEMP) {
                 controller.sendRegisterNormalUserRequest(username, password);
-            } else {
+            } else if (role == UserRole.TEMP){
+                controller.sendRegisterTemporaryUserRequest(username, password);
+            }else {
                 controller.sendRegisterAdminUserRequest(username, password);
             }
 

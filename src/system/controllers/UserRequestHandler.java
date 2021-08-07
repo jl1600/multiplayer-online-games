@@ -52,12 +52,31 @@ public class UserRequestHandler implements RequestHandler {
             return handleNewAdminUserRequest((NewAdminUserRequest) request);
         } else if (request instanceof NewTrialUserRequest) {
             return handleNewTrialUserRequest((NewTrialUserRequest) request);
+        } else if (request instanceof  NewTempUserRequest){
+            return handleNewTempUserRequest((NewTempUserRequest) request);
         } else if (request instanceof PromoteTrialUserRequest) {
             return handlePromoteTrialUserRequest((PromoteTrialUserRequest) request);
         } else if (request instanceof GetUserRoleRequest) {
             return handleGetUserRoleRequest((GetUserRoleRequest) request);
         } else {
             return new ErrorMessageResponse(request.getSessionID(), "Error: unidentified request");
+        }
+    }
+
+    private Response handleNewTempUserRequest(NewTempUserRequest request) {
+        String sessionID = request.getSessionID();
+        String username = request.getUsername();
+        String password = request.getPassword();
+
+        try {
+            userManager.createUser(username, password, UserRole.TEMP);
+            return new SimpleTextResponse(request.getSessionID(), "Successfully created the account!");
+        } catch (DuplicateUsernameException e) {
+            return new ErrorMessageResponse(sessionID, "Error: Username already taken");
+        } catch (IOException e){
+            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
+        } catch (UnaccountedUserRoleException e) {
+            throw new RuntimeException("This will never happen because we are passing in UserRole.TEMP as the role parameter");
         }
     }
 
