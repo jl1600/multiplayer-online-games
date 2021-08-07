@@ -1,5 +1,6 @@
 package system.use_cases.game_matches;
 
+import shared.constants.MatchStatus;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.game.Game;
 import system.entities.game.hangman.HangmanGame;
@@ -54,12 +55,18 @@ public class HangmanMatch extends GameMatch {
     }
 
     @Override
-    public Game getGame() {
-        return this.game;
+    public String getGameId() {
+        return this.game.getID();
     }
+
 
     @Override
     public void addPlayer(String playerID) throws DuplicateUserIDException {
+
+    }
+
+    @Override
+    public void removePlayer(String playerID) throws InvalidUserIDException {
 
     }
 
@@ -79,14 +86,14 @@ public class HangmanMatch extends GameMatch {
         guessChar(moveChar);
 
         if (this.remainingLives == 0) {
-            this.setFinished(true);
+            setFinishedStatus();
             output = "YOU LOSE!!!"
                     + "\n" + String.valueOf(gameState)
                     + "\nguesses: " + mistakes.toString()
                     + "\nlives: " + remainingLives
                     + "\nhints: " + remainingHints;
         } else if (this.isSolved()) {
-            this.setFinished(true);
+            setFinishedStatus();
             output = "YOU WIN!!!"
                     + "\n" + String.valueOf(gameState)
                     + "\nguesses: " + mistakes.toString()
@@ -161,7 +168,7 @@ public class HangmanMatch extends GameMatch {
         System.out.println(hm.getTextContent("1"));
         System.out.println();
         int i = 0;
-        while (!hm.isFinished()) {
+        while (!(hm.getStatus() == MatchStatus.FINISHED)) {
             String str = test1[i];
             System.out.println("move: " + str);
             hm.playMove("1", str);

@@ -2,10 +2,8 @@ package system.use_cases.managers;
 
 import shared.exceptions.entities_exception.DuplicateGameIDException;
 import shared.exceptions.entities_exception.IDNotYetSetException;
-import shared.exceptions.entities_exception.UnknownGameTypeException;
 import shared.exceptions.use_case_exceptions.*;
 
-import system.data_transfer_objects.GameData;
 import system.entities.template.Template;
 import system.entities.game.Game;
 import system.gateways.GameDataGateway;
@@ -123,7 +121,7 @@ public class GameManager {
     /**
      * Add the game to the system and stores it in database.
      * */
-    public void addGame(Game game) throws IOException {
+    private void addGame(Game game) throws IOException {
 
         if (games.containsKey(game.getID())) {
             throw new DuplicateGameIDException();
@@ -166,29 +164,21 @@ public class GameManager {
     /**
      * Returns a mapping of all Game Ids to game titles.
      * */
-    public Map<String, String> getAllIdAndTitles() {
-        Map<String, String> idToTile = new HashMap<>();
-        for (String id: games.keySet()) {
-            idToTile.put(id, games.get(id).getTitle());
-        }
-        return idToTile;
+    public Set<String> getAllGamesID() {
+        return new HashSet<>(games.keySet());
     }
 
     /**
-     * Returns a mapping of ID-to-title of all public games in the system.
+     * Returns a set of public game ids.
      * */
-    public Set<GameData> getAllPublicGameData() {
-        Set<GameData> dataSoFar = new HashSet<>();
+    public Set<String> getAllPublicGamesID() {
+        Set<String> publicIDs = new HashSet<>();
         for (String id: games.keySet()) {
             if (games.get(id).isPublic()) {
-                GameData data = new GameData();
-                data.ownerId = games.get(id).getOwnerId();
-                data.title = games.get(id).getTitle();
-                data.id = id;
-                dataSoFar.add(data);
+                publicIDs.add(id);
             }
         }
-        return dataSoFar;
+        return publicIDs;
     }
 
     /**
@@ -209,36 +199,37 @@ public class GameManager {
     }
 
     /**
-     * Returns a mapping of public game ids to game titles corresponding to a set of game IDs.
-     * @param gameIDs The set of game IDs.
+     * Returns whether the game is a public game
+     * @param gameID The unique string identifier of the game
      * */
-    public Map<String, String> getPublicGameTitlesFromIdSet(Set<String> gameIDs) throws InvalidGameIDException {
-        Map<String, String> idToTitle = new HashMap<>();
-
-        for (String id: gameIDs) {
-            if(!games.containsKey(id)){
-                throw new InvalidGameIDException();
-            }
-            if(games.get(id).isPublic()) {
-                idToTitle.put(id, games.get(id).getTitle());
-            }
+    public boolean checkIsPublic(String gameID) throws InvalidGameIDException {
+        if(!games.containsKey(gameID)) {
+            throw new InvalidGameIDException();
         }
-        return idToTitle;
+        return games.get(gameID).isPublic();
     }
 
     /**
-     * Returns a mapping of game ids to game titles corresponding to a set of game IDs.
-     * @param gameIDs The set of game IDs.
+     * Returns the title of a game
+     * @param gameID The unique string identifier of the game
      * */
-    public Map<String, String> getAllGameTitlesFromIdSet(Set<String> gameIDs) throws InvalidGameIDException {
-        Map<String, String> idToTitle = new HashMap<>();
+    public String getGameTitle(String gameID) {
+        return games.get(gameID).getTitle();
+    }
 
-        for (String id : gameIDs) {
-            if (!games.containsKey(id)) {
-                throw new InvalidGameIDException();
-            }
-            idToTitle.put(id, games.get(id).getTitle());
-        }
-        return idToTitle;
+    /**
+     * Returns the template ID of a game
+     * @param gameID The unique string identifier of the game
+     * */
+    public String getTemplateID(String gameID) {
+        return games.get(gameID).getTemplateID();
+    }
+
+    /**
+     * Returns the owner ID of a game
+     * @param gameID The unique string identifier of the game
+     * */
+    public String getOwnerID(String gameID) {
+        return games.get(gameID).getOwnerId();
     }
 }

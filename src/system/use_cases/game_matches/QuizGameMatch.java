@@ -1,5 +1,6 @@
 package system.use_cases.game_matches;
 
+import shared.constants.MatchStatus;
 import shared.exceptions.use_case_exceptions.DuplicateUserIDException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
@@ -97,6 +98,11 @@ public class QuizGameMatch extends GameMatch {
         playerStats.put(userID, new PlayerStat());
     }
 
+    @Override
+    public void removePlayer(String playerID) throws InvalidUserIDException {
+
+    }
+
     private boolean containPlayer(String playerID) {
         return playerStats.containsKey(playerID);
     }
@@ -108,19 +114,19 @@ public class QuizGameMatch extends GameMatch {
             throw new InvalidUserIDException();
         }
 
-        if (!isFinished() && template.isMultipleChoice()) {
+        if (!(getStatus() == MatchStatus.FINISHED) && template.isMultipleChoice()) {
             if (template.isChooseAllThatApply())
                 return game.getQuestion(currQuestionIndex).toString() + "\n Enter all answers that apply, " +
                         "separated by space: ";
             return game.getQuestion(currQuestionIndex).toString();
         }
-        else if (!isFinished()) {
+        else if (!(getStatus() == MatchStatus.FINISHED)) {
             return "\nNumber of correct answers so far: " +
                     playerStats.get(playerID).getHighestScore().toString() + "\n\nQuestion " +
                     (currQuestionIndex + 1) + ": " +
                     game.getQuestion(currQuestionIndex).getQuestionData() + "\n Enter exact answer: ";
         }
-        else if (isFinished() && template.isMultipleChoice() && template.hasMultipleScoreCategories()){
+        else if ((getStatus() == MatchStatus.FINISHED) && template.isMultipleChoice() && template.hasMultipleScoreCategories()){
             return "\n" + game.getEndingMessage(playerStats.get(playerID).getCategoryWithHighestScore());
         }
         else {
@@ -129,9 +135,10 @@ public class QuizGameMatch extends GameMatch {
     }
 
     @Override
-    public Game getGame() {
-        return this.game;
+    public String getGameId() {
+        return null;
     }
+
 
     @Override
     public void playMove(String playerID, String move) throws InvalidUserIDException, InvalidInputException {
@@ -154,7 +161,7 @@ public class QuizGameMatch extends GameMatch {
             currQuestionIndex += 1;
         }
         else {
-            setFinished(true);
+            setFinishedStatus();
         }
     }
 

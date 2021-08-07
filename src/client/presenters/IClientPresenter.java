@@ -1,7 +1,6 @@
 package client.presenters;
 
 import shared.constants.UserRole;
-import shared.exceptions.use_case_exceptions.IncorrectResponseTypeException;
 
 import java.util.Map;
 

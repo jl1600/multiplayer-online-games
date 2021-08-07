@@ -1,12 +1,6 @@
 package system.controllers;
 
 import com.sun.net.httpserver.HttpServer;
-import shared.request.Request;
-import shared.request.game_request.GameRequest;
-import shared.request.template_request.TemplateRequest;
-import shared.request.user_request.UserRequest;
-import shared.response.misc.ErrorMessageResponse;
-import shared.response.Response;
 import system.gateways.*;
 import system.use_cases.managers.*;
 
@@ -52,20 +46,6 @@ public class WordGameSystem {
         server.start();
         System.out.println(" Server started on port 4444");
     }
-
-    private Response processRequest(Request request) {
-        if (request instanceof GameRequest) {
-            return gameRH.handleRequest(request);
-        }
-        else if (request instanceof TemplateRequest) {
-            return templateRH.handleRequest(request);
-        }
-        else if (request instanceof UserRequest) {
-            return userRH.handleRequest(request);
-        }
-        else return new ErrorMessageResponse(request.getSessionID(), "Error: Unidentified request.");
-    }
-
 
     public static void main(String[] args) {
         try {

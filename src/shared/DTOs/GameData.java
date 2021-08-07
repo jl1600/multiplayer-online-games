@@ -1,4 +1,4 @@
-package system.data_transfer_objects;
+package shared.DTOs;
 
 public class GameData {
     public String id;

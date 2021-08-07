@@ -2,20 +2,17 @@ package client.presenters;
 
 import client.gateways.IServerCommunicator;
 import shared.constants.UserRole;
-import shared.exceptions.use_case_exceptions.IncorrectResponseTypeException;
 import shared.response.*;
 import shared.response.game.GameInfoMapResponse;
 import shared.response.game.MatchInfoMapResponse;
 import shared.response.game.NewGameMatchResponse;
 import shared.response.misc.ErrorMessageResponse;
-import shared.response.misc.FinishStateResponse;
 import shared.response.misc.SimpleTextResponse;
 import shared.response.template.StartTemplateEditResponse;
 import shared.response.template.TemplateInfoMapResponse;
 import shared.response.user.LoginResponse;
 import shared.response.user.UserRoleResponse;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class CommandPromptPresenter implements IClientPresenter {
