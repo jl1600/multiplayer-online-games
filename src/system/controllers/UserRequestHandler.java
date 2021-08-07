@@ -156,6 +156,8 @@ public class UserRequestHandler implements RequestHandler {
             return new ErrorMessageResponse(sessionID, "Error: User does not exist");
         } catch (IncorrectPasswordException e) {
             return new ErrorMessageResponse(sessionID, "Error: Incorrect password");
+        } catch (ExpiredUserException e){
+            return  new ErrorMessageResponse(sessionID, "Error: This temporary user has expired");
         }
     }
 
