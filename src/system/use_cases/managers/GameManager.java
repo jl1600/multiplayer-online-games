@@ -1,5 +1,6 @@
 package system.use_cases.managers;
 
+import shared.constants.GameAccessLevel;
 import shared.exceptions.entities_exception.DuplicateGameIDException;
 import shared.exceptions.entities_exception.IDNotYetSetException;
 import shared.exceptions.entities_exception.UnknownGameTypeException;
@@ -178,7 +179,7 @@ public class GameManager {
     public Map<String, String> getAllPublicIdAndTitles() {
         Map<String, String> idToTile = new HashMap<>();
         for (String id: games.keySet()) {
-            if (games.get(id).isPublic()) {
+            if (games.get(id).getGameAccessLevel() == GameAccessLevel.PUBLIC) {
                 idToTile.put(id, games.get(id).getTitle());
             }
         }
@@ -188,13 +189,13 @@ public class GameManager {
     /**
      * Set the public status of the game to the specified value.
      * @param gameID The ID of the game.
-     * @param isPublic The boolean value representing whether the game is public.
+     * @param gameAccessLevel The value representing whether the game is public, private, friends only, deleted
      * */
-    public void setPublicStatus(String gameID, boolean isPublic) throws InvalidGameIDException {
+    public void setGameAccessLevel(String gameID, GameAccessLevel gameAccessLevel) throws InvalidGameIDException {
         if(!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
-        games.get(gameID).setIsPublic(isPublic);
+        games.get(gameID).setGameAccessLevel(gameAccessLevel);
         try {
             gateway.updateGame(games.get(gameID));
         } catch (IOException e) {
@@ -213,7 +214,7 @@ public class GameManager {
             if(!games.containsKey(id)){
                 throw new InvalidGameIDException();
             }
-            if(games.get(id).isPublic()) {
+            if(games.get(id).getGameAccessLevel() == GameAccessLevel.PUBLIC) {
                 idToTitle.put(id, games.get(id).getTitle());
             }
         }

@@ -1,5 +1,6 @@
 package system.entities.game;
 
+import shared.constants.GameAccessLevel;
 import shared.exceptions.entities_exception.IDAlreadySetException;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ public abstract class Game {
     protected String gameId;
     protected String ownerId;
     protected String templateId;
-    protected Boolean isPublic;
+    protected GameAccessLevel gameAccessLevel;
     private String title;
 
     /**
@@ -20,7 +21,7 @@ public abstract class Game {
      */
     public Game() {
         gameId = null;
-        isPublic = false;
+        gameAccessLevel = GameAccessLevel.PRIVATE;
     }
 
     /**
@@ -111,8 +112,8 @@ public abstract class Game {
      *
      * @return boolean if game is public
      */
-    public Boolean isPublic() {
-        return this.isPublic;
+    public GameAccessLevel getGameAccessLevel() {
+        return this.gameAccessLevel;
     }
 
     /**
@@ -120,8 +121,8 @@ public abstract class Game {
      * @param b boolean indicating public or not
      * @return True indicating success
      */
-    public void setIsPublic(Boolean b) {
-        this.isPublic = b;
+    public void setGameAccessLevel(GameAccessLevel b) {
+        this.gameAccessLevel = b;
     }
 
 }

@@ -66,7 +66,7 @@ public class GameRequestHandler implements RequestHandler {
                     userManager.getUserRole(request.getSenderID())!= UserRole.ADMIN) {
                 return new ErrorMessageResponse(request.getSessionID(), "You don't have the permission to do this.");
             }
-            gameManager.setPublicStatus(request.getGameID(), request.isPublic());
+            gameManager.setGameAccessLevel(request.getGameID(), request.getGameAccessLevel());
             return new SimpleTextResponse(request.getSessionID(),"Success.");
         } catch (InvalidUserIDException e) {
             return new ErrorMessageResponse(request.getSessionID(),"Error: Invalid user ID");

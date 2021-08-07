@@ -1,5 +1,7 @@
 package shared.request.game_request;
 
+import shared.constants.GameAccessLevel;
+
 /**
  * SetGamePublicStatusRequest Class
  */
@@ -7,6 +9,7 @@ public class SetGamePublicStatusRequest extends GameRequest{
 
     private final boolean isPublic;
     private final String gameID;
+    private final GameAccessLevel gameAccessLevel;
 
     /**
      * SetGamePublicStatusRequest Constructor
@@ -19,6 +22,11 @@ public class SetGamePublicStatusRequest extends GameRequest{
         super(sessionID, senderID);
         this.gameID = gameID;
         this.isPublic = isPublic;
+        if (isPublic){
+            this.gameAccessLevel = GameAccessLevel.PUBLIC;
+        } else {
+            this.gameAccessLevel = null;
+        }
     }
 
     /**
@@ -36,4 +44,5 @@ public class SetGamePublicStatusRequest extends GameRequest{
     public String getGameID() {
         return gameID;
     }
+    public GameAccessLevel getGameAccessLevel(){return gameAccessLevel;}
 }

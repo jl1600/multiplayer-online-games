@@ -1,5 +1,6 @@
 package system.use_cases.game_matches;
 
+import shared.constants.GameAccessLevel;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.game.Game;
 import system.entities.game.hangman.HangmanGame;
@@ -140,7 +141,7 @@ public class HangmanMatch extends GameMatch {
         builder.setGameId("hangmanGameId3432141");
         builder.setTemplateId("templ8-3421");
         builder.setOwnerId("zach01111");
-        builder.setIsPublic(true);
+        builder.setGameAccessLevel(GameAccessLevel.PUBLIC);
         builder.addPuzzle("Star Wars - Episode 1: The Phantom Menace", "The one with JarJar");
         builder.setTitle("Zach's Starwars Hangman Game");
         HangmanGame game = builder.toHangmanGame();

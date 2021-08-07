@@ -1,5 +1,6 @@
 package system.use_cases.builders.normal_builders;
 
+import shared.constants.GameAccessLevel;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
 import system.entities.game.quiz.QuizGame;
 import system.entities.game.quiz.QuizQuestion;
@@ -11,7 +12,7 @@ public class QuizGameBuilder {
     private boolean hasTemplateId;
     private boolean hasOwnerId;
     private boolean hasTitle;
-    private boolean hasIsPublic;
+    private boolean hasGameAccessLevel;
     private boolean hasMaxAttempts;
     private boolean hasScoreCategories;
     private boolean hasQuestions;
@@ -22,7 +23,7 @@ public class QuizGameBuilder {
         hasTemplateId = false;
         hasOwnerId = false;
         hasTitle = false;
-        hasIsPublic = false;
+        hasGameAccessLevel = false;
         hasMaxAttempts = false;
         hasScoreCategories = false;
         hasQuestions = false;
@@ -74,11 +75,11 @@ public class QuizGameBuilder {
     /**
      * Changes whether the quiz is public or private
      *
-     * @param isPublic True means public, false means private
+     * @param gameAccessLevel PUBLIC means public, PRIVATE means private
      */
-    public void setIsPublic(Boolean isPublic) {
-        this.currentGame.setIsPublic(isPublic);
-        this.hasIsPublic = true;
+    public void setGameAccessLevel(GameAccessLevel gameAccessLevel) {
+        this.currentGame.setGameAccessLevel(gameAccessLevel);
+        this.hasGameAccessLevel = true;
     }
 
     /**
@@ -127,7 +128,7 @@ public class QuizGameBuilder {
                 hasTemplateId &
                 hasOwnerId &
                 hasTitle &
-                hasIsPublic &
+                hasGameAccessLevel &
                 hasMaxAttempts &
                 hasScoreCategories &
                 hasQuestions;
