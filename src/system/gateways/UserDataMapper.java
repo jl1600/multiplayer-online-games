@@ -5,8 +5,10 @@ import system.entities.User;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.HashSet;
-import java.util.Objects;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class UserDataMapper implements UserDataGateway {
     /**
@@ -73,15 +75,25 @@ public class UserDataMapper implements UserDataGateway {
         return new Integer(rd.readLine());
     }
 
-    private User stringToUser(String userString) {
+    private User stringToUser(String userString){
         String[] userDetails = userString.split(",");
         String userId = userDetails[0].trim();
         String username = userDetails[1].trim();
         String password = userDetails[2].trim();
         String roleString = userDetails[3].trim();
-        User user = new User(userId, username, password, resolveUserRole(roleString));
 
-        String gameCreationString = userDetails[4].trim();
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
+        Date registerDate = null;
+        try{
+            registerDate = sdf.parse(userDetails[4].trim());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+        User user = new User(userId, username, password, resolveUserRole(roleString),registerDate);
+
+        String gameCreationString = userDetails[5].trim();
         gameCreationString = gameCreationString.substring(1, gameCreationString.length() - 1);
         for (String gameId : gameCreationString.split("\\|")) {
             user.addGameID(gameId);
@@ -91,10 +103,13 @@ public class UserDataMapper implements UserDataGateway {
     }
 
     private String userToString(User user) {
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
+
         return user.getUserId() + "," +
                 user.getUsername() + "," +
                 user.getPassword() + "," +
-                user.getRole() + ",{" +
+                user.getRole() + "," +
+                sdf.format(user.getRegisterDate()) +",{" +
                 String.join("|", user.getGameCreationSet()) + "}" +
                 System.getProperty("line.separator").replace("{|", "{");
     }
