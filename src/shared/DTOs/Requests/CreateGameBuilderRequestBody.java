@@ -1,6 +1,6 @@
 package shared.DTOs.Requests;
 
-public class CreateGameBuilderData {
+public class CreateGameBuilderRequestBody {
     public String templateID;
     public String userID;
 }

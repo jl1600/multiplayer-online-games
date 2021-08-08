@@ -1,6 +1,5 @@
 package shared.DTOs.Requests;
 
-public class JoinMatchData {
+public class BuildRequestBody {
     public String userID;
-    public String matchID;
 }

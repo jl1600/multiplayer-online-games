@@ -9,6 +9,7 @@ import system.entities.game.quiz.QuizGame;
 import system.entities.template.QuizTemplate;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class QuizGameMatch extends GameMatch {
 
@@ -74,7 +75,7 @@ public class QuizGameMatch extends GameMatch {
     private int currQuestionIndex;
 
     public QuizGameMatch(String matchID, String userID, QuizGame game, QuizTemplate template){
-        super(matchID, userID);
+        super(matchID, userID, 10); // temporary player limit
         this.game = game;
         this.template = template;
         this.playerStats = new HashMap<>();
@@ -132,6 +133,21 @@ public class QuizGameMatch extends GameMatch {
         else {
             return "\n Total Score: " + playerStats.get(playerID).getHighestScore();
         }
+    }
+
+    @Override
+    public String getPlayerStats(String playerID) throws InvalidUserIDException {
+        return null;
+    }
+
+    @Override
+    public Set<String> getAllPlayerIds() {
+        return null;
+    }
+
+    @Override
+    public int getPlayerCount() {
+        return 0;
     }
 
     @Override

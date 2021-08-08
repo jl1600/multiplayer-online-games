@@ -1,5 +1,5 @@
 package shared.DTOs.Requests;
 
-public class BuildData {
+public class CancelBuilderRequestBody {
     public String userID;
 }

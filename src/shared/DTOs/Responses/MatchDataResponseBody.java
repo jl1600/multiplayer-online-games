@@ -1,6 +1,6 @@
 package shared.DTOs.Responses;
 
-public class MatchData {
+public class MatchDataResponseBody {
     public String gameTitle;
     public String matchId;
     public String hostName;

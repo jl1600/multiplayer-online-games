@@ -3,15 +3,16 @@ package system.controllers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import shared.DTOs.Responses.MatchData;
+import shared.DTOs.Requests.CreateGameBuilderRequestBody;
+import shared.DTOs.Responses.MatchDataResponseBody;
 import shared.exceptions.use_case_exceptions.*;
-import shared.DTOs.Responses.GameData;
+import shared.DTOs.Responses.GameDataResponseBody;
 import system.use_cases.managers.GameManager;
 import system.use_cases.managers.MatchManager;
 import system.use_cases.managers.TemplateManager;
 import system.use_cases.managers.UserManager;
-import java.io.IOException;
-import java.io.OutputStream;
+
+import java.io.*;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -84,7 +85,8 @@ public class GameRequestHandler implements HttpHandler {
     }
 
     private void handleCreateBuilder(HttpExchange exchange) {
-
+        InputStream inStream = exchange.getRequestBody();
+        Gson gson = new Gson();
     }
 
     private void handleGetPublicGamesByTemplate(HttpExchange exchange) throws IOException {
@@ -105,17 +107,17 @@ public class GameRequestHandler implements HttpHandler {
 
     private String getPublicGameDataByTemplate(String templateID) {
         Set<String> allPublicGames = gameManager.getAllPublicGamesID();
-        Set<GameData> dataSet = new HashSet<>();
+        Set<GameDataResponseBody> dataSet = new HashSet<>();
         for (String gameID: allPublicGames) {
             if (gameManager.getTemplateID(gameID).equals(templateID)) {
-                GameData data = new GameData();
+                GameDataResponseBody data = new GameDataResponseBody();
                 data.id = gameID;
                 data.ownerId = gameManager.getOwnerID(gameID);
                 data.title = gameManager.getGameTitle(gameID);
                 dataSet.add(data);
             }
         }
-        Map<String, Set<GameData>> dataMap = new HashMap<>();
+        Map<String, Set<GameDataResponseBody>> dataMap = new HashMap<>();
         dataMap.put("data", dataSet);
 
         Gson gson = new Gson();
@@ -128,9 +130,9 @@ public class GameRequestHandler implements HttpHandler {
 
     private String getAvailableGameMatchesData() {
         Set<String> preparingMatches = matchManager.getAllPreparingMatchIds();
-        Set<MatchData> dataSet = new HashSet<>();
+        Set<MatchDataResponseBody> dataSet = new HashSet<>();
         for (String id: preparingMatches) {
-            MatchData data = new MatchData();
+            MatchDataResponseBody data = new MatchDataResponseBody();
             try {
                 String gameId = matchManager.getGameIdFromMatch(id);
                 data.gameTitle = gameManager.getGameTitle(gameId);
@@ -143,7 +145,7 @@ public class GameRequestHandler implements HttpHandler {
                 throw new RuntimeException("The match ID returned from match manager doesn't exist anymore");
             }
         }
-        Map<String, Set<MatchData>> dataMap = new HashMap<>();
+        Map<String, Set<MatchDataResponseBody>> dataMap = new HashMap<>();
         dataMap.put("data", dataSet);
 
         Gson gson = new Gson();
@@ -197,11 +199,11 @@ public class GameRequestHandler implements HttpHandler {
 
     private String getPublicOwnedGamesData(String userID) throws InvalidUserIDException {
         Set<String> ownedIds = userManager.getOwnedGamesID(userID);
-        Set<GameData> dataSet = new HashSet<>();
+        Set<GameDataResponseBody> dataSet = new HashSet<>();
         for (String id: ownedIds) {
             try {
                 if (gameManager.checkIsPublic(id)){
-                    GameData data = new GameData();
+                    GameDataResponseBody data = new GameDataResponseBody();
                     data.ownerId = userID;
                     data.id = id;
                     data.title = gameManager.getGameTitle(id);
@@ -211,7 +213,7 @@ public class GameRequestHandler implements HttpHandler {
                 throw new RuntimeException("Fatal Error: The user contains an invalid game ID.");
             }
         }
-        Map<String, Set<GameData>> dataMap = new HashMap<>();
+        Map<String, Set<GameDataResponseBody>> dataMap = new HashMap<>();
         dataMap.put("data", dataSet);
 
         Gson gson = new Gson();
@@ -226,17 +228,32 @@ public class GameRequestHandler implements HttpHandler {
         outputStream.close();
     }
 
+    private String getRequestBody(HttpExchange exchange) throws IOException {
+        InputStreamReader isr =  new InputStreamReader(exchange.getRequestBody(),"utf-8");
+        BufferedReader br = new BufferedReader(isr);
+
+        int b;
+        StringBuilder buf = new StringBuilder();
+        while ((b = br.read()) != -1) {
+            buf.append((char) b);
+        }
+        buf.delete(0, 8); // Eliminating the {"data":
+        buf.deleteCharAt(buf.length() - 1); // Eliminating the last }
+        br.close();
+        isr.close();
+        return buf.toString();
+    }
     private String getOwnedGamesData(String userID) throws InvalidUserIDException {
             Set<String> ownedIds = userManager.getOwnedGamesID(userID);
-            Set<GameData> dataSet = new HashSet<>();
+            Set<GameDataResponseBody> dataSet = new HashSet<>();
             for (String id: ownedIds) {
-                GameData data = new GameData();
+                GameDataResponseBody data = new GameDataResponseBody();
                 data.ownerId = userID;
                 data.id = id;
                 data.title = gameManager.getGameTitle(id);
                 dataSet.add(data);
             }
-            Map<String, Set<GameData>> dataMap = new HashMap<>();
+            Map<String, Set<GameDataResponseBody>> dataMap = new HashMap<>();
             dataMap.put("data", dataSet);
 
             Gson gson = new Gson();
@@ -244,21 +261,21 @@ public class GameRequestHandler implements HttpHandler {
     }
 
     private String getAllPublicGamesData() {
-        Set<GameData> dataSet = new HashSet<>();
+        Set<GameDataResponseBody> dataSet = new HashSet<>();
         Set<String> publicGames = gameManager.getAllPublicGamesID();
 
         for (String id: publicGames) {
-            GameData game = new GameData();
+            GameDataResponseBody game = new GameDataResponseBody();
             game.id = id;
             game.title = gameManager.getGameTitle(id);
             game.ownerId = gameManager.getOwnerID(id);
             dataSet.add(game);
         }
-        Map<String, Set<GameData>> dataMap = new HashMap<>();
+        Map<String, Set<GameDataResponseBody>> dataMap = new HashMap<>();
         dataMap.put("data", dataSet);
 
         Gson gson = new Gson();
-        return gson.toJson(dataMap);
+        return gson.toJson(dataSet);
     }
 
 

@@ -8,6 +8,7 @@ import system.entities.template.HangmanTemplate;
 import system.use_cases.builders.normal_builders.HangmanGameBuilder;
 
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class HangmanMatch extends GameMatch {
@@ -26,7 +27,7 @@ public class HangmanMatch extends GameMatch {
 
 
     public HangmanMatch(String matchID, String userID, HangmanGame game, HangmanTemplate template) throws InvalidInputException {
-        super(matchID, userID);
+        super(matchID, userID, 10); //temporary player limit
         this.template = template;
         this.game = game;
         this.remainingLives = template.getNumLives();
@@ -52,6 +53,21 @@ public class HangmanMatch extends GameMatch {
     @Override
     public String getTextContent(String playerID) throws InvalidUserIDException {
         return output;
+    }
+
+    @Override
+    public String getPlayerStats(String playerID) throws InvalidUserIDException {
+        return null;
+    }
+
+    @Override
+    public Set<String> getAllPlayerIds() {
+        return null;
+    }
+
+    @Override
+    public int getPlayerCount() {
+        return 0;
     }
 
     @Override

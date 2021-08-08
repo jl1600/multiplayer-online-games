@@ -1,6 +1,6 @@
 package shared.DTOs.Requests;
 
-public class CreateMatchData {
+public class CreateMatchRequestBody {
     public String gameID;
     public String userID;
 }

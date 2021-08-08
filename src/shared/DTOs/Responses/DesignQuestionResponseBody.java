@@ -1,5 +1,5 @@
 package shared.DTOs.Responses;
 
-public class DesignQuestion {
+public class DesignQuestionResponseBody {
     public String designQuestion;
 }
