@@ -17,9 +17,11 @@ public class UserManager {
     private final IdManager idManager;
     private final HashMap<String, String> userIds; // username to userId
     private final UserDataGateway gateway;
+    private final HashMap<String, Date> bannedUsers;
 
     public UserManager(UserDataGateway gateway) throws IOException {
         users = new HashMap<>();
+        bannedUsers = new HashMap<>();
         userIds = new HashMap<>();
         this.gateway = gateway;
 
@@ -124,8 +126,18 @@ public class UserManager {
      */
     public String login(String username, String password)
             throws InvalidUsernameException, IncorrectPasswordException, InvalidUserIDException, ExpiredUserException {
+        Date currentTime = Calendar.getInstance().getTime();
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
+
+        if (bannedUsers.containsKey(username)) {
+            if (bannedUsers.get(username).before(currentTime)) {
+                throw new BannedUserException();
+            }
+            else {
+                bannedUsers.remove(username);
+            }
+        }
 
         String userId = getUserId(username);
         if (isPasswordIncorrect(userId, password)) throw new IncorrectPasswordException();
@@ -313,5 +325,17 @@ public class UserManager {
      */
     public ArrayList<User> getAllUsers() {
         return (ArrayList<User>) users.values();
+    }
+
+    public void banUser(String adminID, String userID, int duration) throws InvalidUserIDException{
+        if (!users.containsKey(userID) || !users.containsKey(adminID))
+            throw new InvalidUserIDException();
+
+        if (users.get(adminID).getRole() != UserRole.ADMIN)
+            throw new InsufficientPrivilegeException();
+
+        Calendar date = Calendar.getInstance();
+        date.add(Calendar.DAY_OF_YEAR, duration);
+        bannedUsers.put(userID, date.getTime());
     }
 }

@@ -58,6 +58,8 @@ public class UserRequestHandler implements RequestHandler {
             return handlePromoteTrialUserRequest((PromoteTrialUserRequest) request);
         } else if (request instanceof GetUserRoleRequest) {
             return handleGetUserRoleRequest((GetUserRoleRequest) request);
+        } else if (request instanceof BanUserRequest) {
+            return handleBanUserRequest((BanUserRequest) request);
         } else {
             return new ErrorMessageResponse(request.getSessionID(), "Error: unidentified request");
         }
@@ -267,6 +269,18 @@ public class UserRequestHandler implements RequestHandler {
             return new ErrorMessageResponse(sessionID, "Error: User is not a trial user");
         } catch (IOException e){
             return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
+        }
+    }
+
+    private Response handleBanUserRequest(BanUserRequest request) {
+        String sessionID = request.getSessionID();
+
+        try {
+            userManager.banUser(request.getAdminId(), request.getUserId(), request.getBanLength());
+            return new SimpleTextResponse(sessionID, "Successfully banned user");
+        }
+        catch (InvalidUserIDException e) {
+            return new ErrorMessageResponse(sessionID, "Error: Invalid Id");
         }
     }
 }

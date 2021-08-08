@@ -14,7 +14,7 @@ public interface IClientController {
     void sendLogoutRequest();
     void sendPromoteTrialUserRequest(String username, String password);
     void sendGetUserRoleRequest();
-
+    void sendBanUserRequest(String userToBanId, int duration);
     // Game requests
     void sendNewGameRequest(String TemplateID);
     void sendMakeGameDesignChoiceRequest(String designChoice);

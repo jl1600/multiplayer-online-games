@@ -222,12 +222,15 @@ public class ClientController implements IClientController {
         communicator.sendRequest(new DeleteTemplateRequest(sessionID, userID, templateID));
     }
 
+    @Override
+    public void sendBanUserRequest(String userToBanID, int duration) {
+        communicator.sendRequest(new BanUserRequest(sessionID, userID, userToBanID, duration));
+    }
+
     private void receiveUserId() {
         if (communicator.getResponse() instanceof LoginResponse) {
             LoginResponse res = (LoginResponse) communicator.getResponse();
             this.userID = res.getUserId();
         }
     }
-
-
 }

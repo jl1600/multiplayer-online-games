@@ -1,5 +1,7 @@
 package shared.request.user_request;
 
+import java.util.Date;
+
 /**
  * LoginRequest Class
  */
