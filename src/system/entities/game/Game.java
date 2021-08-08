@@ -14,6 +14,7 @@ public abstract class Game {
     protected String ownerId;
     protected String templateId;
     protected GameAccessLevel gameAccessLevel;
+    protected GameAccessLevel previousGameAccessLevel;
     private String title;
 
     /**
@@ -22,6 +23,7 @@ public abstract class Game {
     public Game() {
         gameId = null;
         gameAccessLevel = GameAccessLevel.PRIVATE;
+        previousGameAccessLevel = gameAccessLevel;
     }
 
     /**
@@ -117,12 +119,27 @@ public abstract class Game {
     }
 
     /**
-     * set if game is public or not
+     * set the game access level
      * @param b boolean indicating public or not
      * @return True indicating success
      */
     public void setGameAccessLevel(GameAccessLevel b) {
+        setPreviousGameAccessLevel(this.gameAccessLevel);
         this.gameAccessLevel = b;
     }
 
+    public boolean isPublic(){
+        if (this.gameAccessLevel.equals(GameAccessLevel.PUBLIC)){
+            return true;
+        }
+        return false;
+    }
+
+    public GameAccessLevel getPreviousGameAccessLevel() {
+        return previousGameAccessLevel;
+    }
+
+    public void setPreviousGameAccessLevel(GameAccessLevel previousGameAccessLevel) {
+        this.previousGameAccessLevel = previousGameAccessLevel;
+    }
 }

@@ -203,6 +203,18 @@ public class GameManager {
         }
     }
 
+    public void undoSetGameAccessLevel(String gameID) throws InvalidGameIDException {
+        if(!games.containsKey(gameID)) {
+            throw new InvalidGameIDException();
+        }
+        games.get(gameID).setGameAccessLevel(games.get(gameID).getPreviousGameAccessLevel());
+        try {
+            gateway.updateGame(games.get(gameID));
+        } catch (IOException e) {
+            throw new RuntimeException("Dysfunctional Database.");
+        }
+    }
+
     /**
      * Returns a mapping of public game ids to game titles corresponding to a set of game IDs.
      * @param gameIDs The set of game IDs.

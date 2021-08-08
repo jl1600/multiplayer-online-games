@@ -216,7 +216,7 @@ public class QuizGameDataMapper {
         textData = textData[1].split("\n", 2);
         int maxAttempts = Integer.parseInt(textData[0]);
 
-        textData = textData[1].split("@isPublic:");
+        textData = textData[1].split("@GameAccessLevel:");
         textData = textData[1].split("\n", 2);
         String gameAccessLevelString = textData[0];
         GameAccessLevel gameAccessLevel = resolveGameAccessLevel(gameAccessLevelString);
