@@ -1,4 +1,4 @@
-package shared.DTOs;
+package shared.DTOs.Responses;
 
 public class GameData {
     public String id;

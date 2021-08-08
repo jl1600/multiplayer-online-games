@@ -1,4 +1,4 @@
-package shared.DTOs;
+package shared.DTOs.Responses;
 
 public class MatchData {
     public String gameTitle;
