@@ -248,4 +248,17 @@ public class GameManager {
         }
         return idToTitle;
     }
+
+    public void setPublicStatus(String gameID) throws InvalidGameIDException {
+        setGameAccessLevel(gameID,GameAccessLevel.PUBLIC);
+    }
+    public void setPrivateStatus(String gameID) throws InvalidGameIDException {
+        setGameAccessLevel(gameID,GameAccessLevel.PRIVATE);
+    }
+    public void setFriendOnlyStatus(String gameID) throws InvalidGameIDException {
+        setGameAccessLevel(gameID,GameAccessLevel.FRIEND);
+    }
+    public void setDeletedStatus(String gameID) throws InvalidGameIDException {
+        setGameAccessLevel(gameID,GameAccessLevel.DELETED);
+    }
 }
