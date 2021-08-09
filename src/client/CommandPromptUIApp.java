@@ -541,25 +541,34 @@ public class CommandPromptUIApp {
     // Helper
     private String getSelfOwnedGameChoice() {
         cls();
+        try {
+            controller.sendGetSelfOwnedGameInfoRequest();
+            Map<String, String> gamesInfo = presenter.getGameInfoMapFromResponse();
 
-        controller.sendGetSelfOwnedGameInfoRequest();
-        Map<String, String> gamesInfo = presenter.getGameInfoMapFromResponse();
+            System.out.println("List of all games created by you:\n");
+            for (String id : gamesInfo.keySet()) {
+                System.out.println("ID: " + id + " - " + gamesInfo.get(id));
+            }
 
-        System.out.println("List of all games created by you:\n");
-        for (String id: gamesInfo.keySet()) {
-            System.out.println("ID: " + id + " - " + gamesInfo.get(id));
-        }
-
-        String chosenID = getInput("Please enter one of the numbers above or enter 'back'/'b' to go back.");
-        if (chosenID.equals("back") | chosenID.equals("b")) {
-            onMainMenu();
-        }
-        if (!gamesInfo.containsKey(chosenID)) {
-            printMessage("Error: Invalid input.");
-            return getSelfOwnedGameChoice();
-        }
-        else {
-            return chosenID;
+            String chosenID = getInput("Please enter one of the numbers above or enter 'back'/'b' to go back.");
+            if (chosenID.equals("back") | chosenID.equals("b")) {
+                onMainMenu();
+            }
+            if (!gamesInfo.containsKey(chosenID)) {
+                printMessage("Error: Invalid input.");
+                return getSelfOwnedGameChoice();
+            } else {
+                return chosenID;
+            }
+        } catch (RuntimeException e){
+            System.out.println("This account has no games created!");
+            String goBack = getInput("Please enter 'back'/'b' to go back.");
+            if (goBack.equals("back") | goBack.equals("b")) {
+                onMainMenu();
+                return "This account has no games created!";
+            } else{
+                return getSelfOwnedGameChoice();
+            }
         }
     }
 
