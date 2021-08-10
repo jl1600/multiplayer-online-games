@@ -47,6 +47,16 @@ public class HangmanGameBuilder {
         this.hasPuzzle = true;
     }
 
+    public void addAnswer(int puzzleIndex, String answer) throws InsufficientInputException {
+        this.currentGame.addAnswer(puzzleIndex, answer);
+        this.hasPuzzle = true;
+    }
+
+    public void addPrompt(int puzzleIndex, String prompt) throws InsufficientInputException {
+        this.currentGame.addPrompt(puzzleIndex, prompt);
+        this.hasPuzzle = true;
+    }
+
     public boolean isReadyToBuild() {
         return hasGameId &
                 hasTemplateId &

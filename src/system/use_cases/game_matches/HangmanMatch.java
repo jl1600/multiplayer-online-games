@@ -78,7 +78,7 @@ public class HangmanMatch extends GameMatch {
      * @param move     The string representing the player input
      */
     @Override
-    public void playMove(String PlayerID, String move) throws InvalidInputException{
+    public void playMove(String PlayerID, String move) {
         char moveChar = Character.toLowerCase(move.charAt(0));
         switch (parseMove(move)) {
             case INVALID:

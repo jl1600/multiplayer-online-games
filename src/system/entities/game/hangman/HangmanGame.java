@@ -46,7 +46,6 @@ public class HangmanGame extends Game {
      * @throws InsufficientInputException when parameters are illegal and passed a null value
      */
     public void addPuzzle(String answer, String prompt) throws InsufficientInputException {
-        assert answer != null;
         if (answer == null | prompt == null) {
             throw new InsufficientInputException();
         }
@@ -54,6 +53,26 @@ public class HangmanGame extends Game {
         combined.add(answer);
         combined.add(prompt);
         this.puzzles.add(combined);
+    }
+
+    public void addAnswer(int puzzleIndex, String answer) throws InsufficientInputException {
+        if (answer == null | answer.equals("")) {
+            throw new InsufficientInputException();
+        }
+        if (puzzleIndex >= puzzles.size()) {
+            puzzles.add(new ArrayList<>());
+        }
+        puzzles.get(puzzleIndex).set(0, answer);
+    }
+
+    public void addPrompt(int puzzleIndex, String prompt) throws InsufficientInputException {
+        if (prompt == null | prompt.equals("")) {
+            throw new InsufficientInputException();
+        }
+        if (puzzleIndex >= puzzles.size()) {
+            puzzles.add(new ArrayList<>());
+        }
+        puzzles.get(puzzleIndex).set(1, prompt);
     }
 
     /**
