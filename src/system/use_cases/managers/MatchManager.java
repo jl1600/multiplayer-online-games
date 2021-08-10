@@ -7,8 +7,7 @@ import system.use_cases.game_matches.GameMatch;
 import system.entities.template.Template;
 import system.use_cases.factories.GameMatchFactory;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -37,8 +36,8 @@ public class MatchManager {
      *
      * @return The ID of the newly created match.
      * */
-    public String newMatch(String userID, Game game, Template template) {
-        GameMatch newMatch = matchFactory.getGameMatch(matchIdMgr.getNextId(), userID, game, template);
+    public String newMatch(String userID, String username, Game game, Template template) {
+        GameMatch newMatch = matchFactory.getGameMatch(matchIdMgr.getNextId(), userID, username, game, template);
         preparingMatches.put(newMatch.getID(), newMatch);
         return newMatch.getID();
     }
@@ -64,9 +63,10 @@ public class MatchManager {
      * @throws InvalidMatchIDException When there is no match with the given ID is having PREPARING status.
      * @throws DuplicateUserIDException When the user is already in the match.
      * */
-    public void addPlayer(String userID, String matchID) throws InvalidMatchIDException, DuplicateUserIDException {
+    public void addPlayer(String userID, String username, String matchID) throws InvalidMatchIDException, DuplicateUserIDException,
+            MaxPlayerReachedException {
         if (preparingMatches.containsKey(matchID)) {
-            preparingMatches.get(matchID).addPlayer(userID);
+            preparingMatches.get(matchID).addPlayer(userID, username);
         }
         else {
             throw new InvalidMatchIDException();
@@ -84,6 +84,21 @@ public class MatchManager {
         } else {
             throw new InvalidMatchIDException();
         }
+    }
+
+    /**
+     * Add an observer to a match.
+     *
+     * @param o the observer
+     * @param matchID The ID of the match.
+     * @throws InvalidMatchIDException When there is no preparing match with the given ID.
+     * */
+    public void addObserver(Observer o, String matchID) throws InvalidMatchIDException {
+            if (preparingMatches.containsKey(matchID)) {
+                preparingMatches.get(matchID).addObserver(o);
+            } else {
+                throw new InvalidMatchIDException();
+            }
     }
 
     /**
@@ -192,42 +207,26 @@ public class MatchManager {
 
     /**
      * Returns the text content of a game match.
-     *
-     * @param playerID The ID of the player.
      * @param matchID The ID of the match.
      * @throws InvalidMatchIDException When there is no such ONGOING match.
-     * @throws InvalidUserIDException When there is no such player in the match.
      * */
-    public String getMatchTextContent(String playerID, String matchID) throws
-            InvalidMatchIDException, InvalidUserIDException{
+    public String getMatchTextContent(String matchID) throws
+            InvalidMatchIDException {
         if (ongoingMatches.containsKey(matchID)) {
-            return ongoingMatches.get(matchID).getTextContent(playerID);
+            return ongoingMatches.get(matchID).getTextContent();
         }
         else throw new InvalidMatchIDException();
     }
 
     /**
-     * Update all the ongoing and finished matches.
-     * Finished matches with no player left will be removed from the system.
+     * Returns a mapping of player's name to their last moves.
      * */
-    public void update() {
-        Set<String> toBeRemoved = new HashSet<>();
-        Set<String> finished = new HashSet<>();
-        for (String id: ongoingMatches.keySet()) {
-            if(ongoingMatches.get(id).getStatus() == MatchStatus.FINISHED) {
-                finished.add(id);
-            }
+    public Map<String, String> getPlayersLastMove(String matchID) throws InvalidMatchIDException {
+        if (ongoingMatches.containsKey(matchID)) {
+            return ongoingMatches.get(matchID).getPlayersLastMove();
+        } else if (preparingMatches.containsKey(matchID)) {
+            return new HashMap<>();
         }
-        for (String id: finishedMatches.keySet()) {
-            if(finishedMatches.get(id).getPlayerCount() == 0) {
-                toBeRemoved.add(id);
-            }
-        }
-        for (String id: finished) {
-            finishedMatches.put(id, ongoingMatches.remove(id));
-        }
-        for (String id: toBeRemoved) {
-            finishedMatches.remove(id);
-        }
+        else throw new InvalidMatchIDException();
     }
 }

@@ -8,6 +8,7 @@ import system.entities.template.HangmanTemplate;
 import system.use_cases.builders.normal_builders.HangmanGameBuilder;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -26,8 +27,9 @@ public class HangmanMatch extends GameMatch {
     private String output;
 
 
-    public HangmanMatch(String matchID, String userID, HangmanGame game, HangmanTemplate template) throws InvalidInputException {
-        super(matchID, userID, 10); //temporary player limit
+    public HangmanMatch(String matchID, String userID, String username, HangmanGame game, HangmanTemplate template)
+            throws InvalidInputException {
+        super(matchID, userID, username, 10); //temporary player limit
         this.template = template;
         this.game = game;
         this.remainingLives = template.getNumLives();
@@ -51,19 +53,15 @@ public class HangmanMatch extends GameMatch {
 
 
     @Override
-    public String getTextContent(String playerID) throws InvalidUserIDException {
+    public String getTextContent() {
         return output;
     }
 
     @Override
-    public String getPlayerStats(String playerID) throws InvalidUserIDException {
+    public Map<String, String> getPlayersLastMove() {
         return null;
     }
 
-    @Override
-    public Set<String> getAllPlayerIds() {
-        return null;
-    }
 
     @Override
     public int getPlayerCount() {
@@ -75,9 +73,14 @@ public class HangmanMatch extends GameMatch {
         return this.game.getID();
     }
 
+    @Override
+    public void startMatch() {
+
+    }
+
 
     @Override
-    public void addPlayer(String playerID) throws DuplicateUserIDException {
+    public void addPlayer(String playerID, String playerName) throws DuplicateUserIDException {
 
     }
 
@@ -102,14 +105,14 @@ public class HangmanMatch extends GameMatch {
         guessChar(moveChar);
 
         if (this.remainingLives == 0) {
-            setFinishedStatus();
+            setStatus(MatchStatus.FINISHED);
             output = "YOU LOSE!!!"
                     + "\n" + String.valueOf(gameState)
                     + "\nguesses: " + mistakes.toString()
                     + "\nlives: " + remainingLives
                     + "\nhints: " + remainingHints;
         } else if (this.isSolved()) {
-            setFinishedStatus();
+            setStatus(MatchStatus.FINISHED);
             output = "YOU WIN!!!"
                     + "\n" + String.valueOf(gameState)
                     + "\nguesses: " + mistakes.toString()
@@ -173,7 +176,7 @@ public class HangmanMatch extends GameMatch {
         t.setNumLives(3);
         t.setNumPuzzles(1);
 
-        HangmanMatch hm = new HangmanMatch("1", "1", game, t);
+        HangmanMatch hm = new HangmanMatch("1", "1", "bro", game, t);
 
         String[] test1 = {
                 "a", "b", "c", "r", "ab", "a", "$"
@@ -181,14 +184,14 @@ public class HangmanMatch extends GameMatch {
         };
 
 
-        System.out.println(hm.getTextContent("1"));
+        System.out.println(hm.getTextContent());
         System.out.println();
         int i = 0;
         while (!(hm.getStatus() == MatchStatus.FINISHED)) {
             String str = test1[i];
             System.out.println("move: " + str);
             hm.playMove("1", str);
-            System.out.println(hm.getTextContent("1"));
+            System.out.println(hm.getTextContent());
             System.out.println();
             i++;
         }

@@ -3,7 +3,7 @@ package system.controllers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import shared.DTOs.Requests.CreateGameBuilderRequestBody;
+import shared.DTOs.Requests.CreateMatchRequestBody;
 import shared.DTOs.Responses.MatchDataResponseBody;
 import shared.exceptions.use_case_exceptions.*;
 import shared.DTOs.Responses.GameDataResponseBody;
@@ -12,9 +12,16 @@ import system.use_cases.managers.MatchManager;
 import system.use_cases.managers.TemplateManager;
 import system.use_cases.managers.UserManager;
 
+import javax.xml.bind.DatatypeConverter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.io.*;
 
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +33,7 @@ public class GameRequestHandler implements HttpHandler {
     private final TemplateManager templateManager;
     private final UserManager userManager;
     private final MatchManager matchManager;
+    private final ServerSocket serverSocket;
 
     public GameRequestHandler(GameManager gameManager,
                               TemplateManager templateManager,
@@ -35,6 +43,11 @@ public class GameRequestHandler implements HttpHandler {
         this.templateManager = templateManager;
         this.userManager = userManager;
         this.matchManager = matchManager;
+        try {
+            serverSocket = new ServerSocket(8888);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot create server socket, IO problem.");
+        }
     }
 
     @Override
@@ -52,8 +65,7 @@ public class GameRequestHandler implements HttpHandler {
     }
 
     private void handleGetRequest(HttpExchange exchange) throws IOException {
-        String specification = exchange.getRequestURI().toString().split("/")[2];
-
+        String specification = exchange.getRequestURI().getPath().split("/")[2];
         switch (specification) {
             case "all-public-games":
                 handleGetAllPublicGames(exchange);
@@ -75,18 +87,81 @@ public class GameRequestHandler implements HttpHandler {
         }
     }
 
-    private void handlePostRequest(HttpExchange exchange) {
+    private void handlePostRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().toString().split("/")[2];
         switch (specification) {
             case "create-builder":
                 handleCreateBuilder(exchange);
                 break;
+            case "create-match":
+                handleCreateMatch(exchange);
+                break;
+            default:
+                sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
 
-    private void handleCreateBuilder(HttpExchange exchange) {
-        InputStream inStream = exchange.getRequestBody();
+    private void handleCreateMatch(HttpExchange exchange) throws IOException {
+
+        String data = getRequestBody(exchange);
         Gson gson = new Gson();
+        CreateMatchRequestBody body  = gson.fromJson(data, CreateMatchRequestBody.class);
+
+        try {
+            String templateID = gameManager.getTemplateID(body.gameID);
+            String matchID = matchManager.newMatch(body.userID, userManager.getUsername(body.userID),
+                                    gameManager.getGame(body.gameID),
+                                    templateManager.getTemplate(templateID));
+            sendResponse(exchange, 204, null);
+
+            Socket newPlayer = serverSocket.accept();
+            handShake(newPlayer);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(newPlayer.getInputStream()));
+            System.out.println("trying to read the player's ID");
+            String playerID = String.valueOf(reader.read());
+            System.out.println(playerID);
+            PlayerInputListener inputListener = new PlayerInputListener(newPlayer, matchManager, matchID, playerID);
+            MatchOutputDispatcher outputDispatcher = new MatchOutputDispatcher(matchManager, matchID);
+            outputDispatcher.addPlayerOutput(newPlayer);
+            inputListener.start();
+
+        } catch (InvalidUserIDException | InvalidIDException e) {
+            sendResponse(exchange, 400, "One of the provided IDs is invalid.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handShake(Socket client) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+        reader.readLine();
+        reader.readLine();
+        String key = reader.readLine().split(" ")[1];
+        PrintWriter printWriter = new PrintWriter(client.getOutputStream());
+        printWriter.println("HTTP/1.1 101 Switching Protocols");
+        printWriter.println("Upgrade: websocket");
+        printWriter.println("Connection: Upgrade");
+        printWriter.println("Sec-WebSocket-Accept: " + encode(key));
+        printWriter.println();
+        printWriter.flush();
+    }
+    private String encode(String key) throws Exception {
+        key += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+        byte[] bytes = MessageDigest.getInstance("SHA-1").digest(key.getBytes());
+        return DatatypeConverter.printBase64Binary(bytes);
+    }
+
+    private static String byteArrayToHexString(byte[] b) {
+        String result = "";
+        for (int i=0; i < b.length; i++) {
+            result +=
+                    Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+        }
+        return result;
+    }
+    // NOT IMPLEMENTED
+    private void handleCreateBuilder(HttpExchange exchange) {
+
     }
 
     private void handleGetPublicGamesByTemplate(HttpExchange exchange) throws IOException {
@@ -221,11 +296,15 @@ public class GameRequestHandler implements HttpHandler {
     }
 
     private void sendResponse(HttpExchange exchange, int responseCode, String body) throws IOException {
-        OutputStream outputStream = exchange.getResponseBody();
-        exchange.sendResponseHeaders(responseCode, body.length());
-        outputStream.write(body.getBytes());
-        outputStream.flush();
-        outputStream.close();
+        if (responseCode != 204) {
+            OutputStream outputStream = exchange.getResponseBody();
+            exchange.sendResponseHeaders(responseCode, body.length());
+            outputStream.write(body.getBytes());
+            outputStream.flush();
+            outputStream.close();
+        } else {
+            exchange.sendResponseHeaders(204, -1);
+        }
     }
 
     private String getRequestBody(HttpExchange exchange) throws IOException {
@@ -275,7 +354,7 @@ public class GameRequestHandler implements HttpHandler {
         dataMap.put("data", dataSet);
 
         Gson gson = new Gson();
-        return gson.toJson(dataSet);
+        return gson.toJson(dataMap);
     }
 
 

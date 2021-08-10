@@ -142,6 +142,12 @@ public class UserManager {
         getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
     }
 
+    public String getUsername(String userId) throws InvalidUserIDException {
+        if (!users.containsKey(userId))
+            throw new InvalidUserIDException();
+        return users.get(userId).getUsername();
+    }
+
     /**
      * Changes the password of the user with the specified id.
      * This changes the data within this class and in the database

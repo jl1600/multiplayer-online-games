@@ -1,7 +1,7 @@
 package system.entities.game.quiz;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /** QuizAnswer Class
  *
@@ -35,8 +35,8 @@ public class QuizAnswer {
      *
      * @return copy of scores associated to each category
      */
-    public HashMap<String, Double> getScoresRewardsByCategory() {
-        HashMap<String, Double> copy = new HashMap<>();
+    public Map<String, Double> getScoresRewardsByCategory() {
+        Map<String, Double> copy = new HashMap<>();
         copy.putAll(this.scoresRewardsByCategory);
         return copy;
     }

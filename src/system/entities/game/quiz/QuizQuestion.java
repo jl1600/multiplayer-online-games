@@ -2,6 +2,7 @@ package system.entities.game.quiz;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Quiz Question Class
@@ -31,14 +32,6 @@ public class QuizQuestion {
     }
 
     /**
-     * Set Question to Quiz Question
-     * @param question Question that must be set
-     */
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-    /**
      * Add Answer to Quiz Question
      * @param answer that must be added to the answer choices
      */
@@ -52,7 +45,19 @@ public class QuizQuestion {
     public int getAnswerNum() {
         return answerChoices.size();
     }
-
+    /**
+     * Returns the index of the correct answer if answers in this question only have one score category: general.
+     * Otherwise returns -1;
+     * */
+    public int getCorrectAnswerIndex() {
+        if(answerChoices.get(0).getScoresRewardsByCategory().containsKey("General")) {
+            for (int i = 0; i < answerChoices.size(); i++) {
+                if (answerChoices.get(i).getScoresRewardsByCategory().get("General") == 1.0)
+                    return i;
+            }
+        }
+        return -1;
+    }
     /**
      *
      * @param index of answer
@@ -99,7 +104,7 @@ public class QuizQuestion {
      * @return the scores associated with each category for answer at index
      * @throws IndexOutOfBoundsException when answer index is more than the total answers
      */
-    public HashMap<String, Double> getAnswerScoreRewards (int answerIndex) throws IndexOutOfBoundsException {
+    public Map<String, Double> getAnswerScoreRewards (int answerIndex) throws IndexOutOfBoundsException {
         return answerChoices.get(answerIndex).getScoresRewardsByCategory();
     }
 

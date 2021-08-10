@@ -4,31 +4,43 @@ import shared.constants.MatchStatus;
 import shared.exceptions.use_case_exceptions.DuplicateUserIDException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
-import system.entities.game.Game;
+import shared.exceptions.use_case_exceptions.MaxPlayerReachedException;
 import system.entities.game.quiz.QuizGame;
 import system.entities.template.QuizTemplate;
 
 import java.util.HashMap;
-import java.util.Set;
+import java.util.Map;
 
 public class QuizGameMatch extends GameMatch {
 
+    private final Map<String, PlayerStat> playerStats;
+    private final QuizGame game;
+    private final QuizTemplate template;
+    private int numMovedPlayers = 0;
+    private int currQuestionIndex;
+
     private class PlayerStat {
 
-        private final HashMap<String, Double> scoresByCategory;
+        private final String username;
+        private final Map<String, Double> scoresByCategory;
+        private String lastInput;
+        private int numAttempted = 0;
 
-        public PlayerStat() {
+        public PlayerStat(String username) {
+            this.username = username;
             this.scoresByCategory = new HashMap<>();
             for (String cat: game.getScoreCategories()) {
                 scoresByCategory.put(cat, 0.0);
             }
         }
 
-        public HashMap<String, Double> getScores() {
-            return scoresByCategory;
+        public void clearLastTurn() {
+            lastInput = null;
+            numAttempted = 0;
         }
 
-        public void increaseScores(HashMap<String, Double> valuesToAdd) {
+
+        public void increaseScores(Map<String, Double> valuesToAdd) {
             for (String category: valuesToAdd.keySet()) {
                 increaseScore(category, valuesToAdd.get(category));
             }
@@ -42,9 +54,6 @@ public class QuizGameMatch extends GameMatch {
             this.increaseScores(game.getQuestion(currQuestionIndex).getAnswerScoreRewards(answerIndex));
         }
 
-        public Double getScoreByCategory(String category) {
-            return scoresByCategory.get(category);
-        }
 
         public String getCategoryWithHighestScore() {
             Double max = -1.0;
@@ -69,39 +78,30 @@ public class QuizGameMatch extends GameMatch {
         }
     }
 
-    private final HashMap<String, PlayerStat> playerStats;
-    private final QuizGame game;
-    private final QuizTemplate template;
-    private int currQuestionIndex;
 
-    public QuizGameMatch(String matchID, String userID, QuizGame game, QuizTemplate template){
-        super(matchID, userID, 10); // temporary player limit
+    public QuizGameMatch(String matchID, String userID, String username, QuizGame game, QuizTemplate template){
+        super(matchID, userID, username, 10); // temporary player limit
         this.game = game;
         this.template = template;
         this.playerStats = new HashMap<>();
-        initialize();
     }
 
-    private void initialize() {
-        this.currQuestionIndex = 0;
-        try {
-            this.addPlayer(getHostID());
-        }
-        catch (DuplicateUserIDException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void addPlayer(String userID) throws DuplicateUserIDException {
+    @Override
+    public void addPlayer(String userID, String username) throws DuplicateUserIDException, MaxPlayerReachedException {
         if (playerStats.containsKey(userID)) {
             throw new DuplicateUserIDException();
+        } else if (getPlayerCount() >= getPlayerLimit()) {
+            throw new MaxPlayerReachedException();
         }
-        playerStats.put(userID, new PlayerStat());
+
+        playerStats.put(userID, new PlayerStat(username));
     }
 
     @Override
     public void removePlayer(String playerID) throws InvalidUserIDException {
-
+        if (playerStats.containsKey(playerID))
+            this.playerStats.remove(playerID);
+        else throw  new InvalidUserIDException();
     }
 
     private boolean containPlayer(String playerID) {
@@ -109,50 +109,101 @@ public class QuizGameMatch extends GameMatch {
     }
 
     @Override
-    public String getTextContent(String playerID) throws InvalidUserIDException {
+    public String getTextContent()  {
 
-        if (!containPlayer(playerID)) {
-            throw new InvalidUserIDException();
+
+        if (getStatus() == MatchStatus.FINISHED) {
+            return getEndingContent();
         }
 
-        if (!(getStatus() == MatchStatus.FINISHED) && template.isMultipleChoice()) {
-            if (template.isChooseAllThatApply())
-                return game.getQuestion(currQuestionIndex).toString() + "\n Enter all answers that apply, " +
+        String currQuestion = game.getQuestion(currQuestionIndex).toString();
+
+        if (template.isMultipleChoice() && template.isChooseAllThatApply()) {
+                return currQuestion + "\nEnter all answers that apply, " +
                         "separated by space: ";
-            return game.getQuestion(currQuestionIndex).toString();
+        } else if (template.isMultipleChoice() && template.hasMultipleScoreCategories()) {
+            return currQuestion + "\nEnter the number corresponding to your choice:";
+        } else { // One correct answer multiple choice or Exact answer
+            int correctAnswerIndex = game.getQuestion(currQuestionIndex).getCorrectAnswerIndex();
+            return "Correct answer is: " + game.getQuestion(currQuestionIndex).getAnswer(correctAnswerIndex)
+                    + Integer.toString(currQuestionIndex + 1) + ". " + currQuestion;
         }
-        else if (!(getStatus() == MatchStatus.FINISHED)) {
-            return "\nNumber of correct answers so far: " +
-                    playerStats.get(playerID).getHighestScore().toString() + "\n\nQuestion " +
-                    (currQuestionIndex + 1) + ": " +
-                    game.getQuestion(currQuestionIndex).getQuestionData() + "\n Enter exact answer: ";
-        }
-        else if ((getStatus() == MatchStatus.FINISHED) && template.isMultipleChoice() && template.hasMultipleScoreCategories()){
-            return "\n" + game.getEndingMessage(playerStats.get(playerID).getCategoryWithHighestScore());
-        }
-        else {
-            return "\n Total Score: " + playerStats.get(playerID).getHighestScore();
+    }
+
+    private String getEndingContent() {
+        StringBuilder result = new StringBuilder();
+        if (template.isMultipleChoice() && template.hasMultipleScoreCategories() && !template.isChooseAllThatApply()) {
+            for (PlayerStat player: playerStats.values()) {
+                result.append("\n").append(player.username).
+                        append(": ").append(game.getEndingMessage(player.getCategoryWithHighestScore()));
+            }
+            return result.toString();
+        } else if (template.isChooseAllThatApply()) {
+            result.append("Quiz ended. Player scores are:");
+            for (PlayerStat player: playerStats.values()) {
+                result.append("\n").append(player.username).
+                        append(": ").
+                        append(player.getHighestScore());
+            }
+            return  result.toString();
+        } else { // Simple Multiple choice or simple exact answer.
+            int correctAnswerIndex = game.getQuestion(currQuestionIndex).getCorrectAnswerIndex();
+            result.append("Correct answer: ").append(game.getQuestion(currQuestionIndex).getAnswer(correctAnswerIndex));
+            result.append("Quiz ended. Player scores are:");
+            for (PlayerStat player : playerStats.values()) {
+                result.append("\n").append(player.username).
+                        append(": ").
+                        append(player.getHighestScore()).
+                        append("/").append(game.getNumQuestions());
+            }
+            return result.toString();
         }
     }
 
     @Override
-    public String getPlayerStats(String playerID) throws InvalidUserIDException {
-        return null;
-    }
-
-    @Override
-    public Set<String> getAllPlayerIds() {
-        return null;
+    public Map<String, String> getPlayersLastMove(){
+        Map<String, String> playersMove = new HashMap<>();
+        for (PlayerStat player: playerStats.values()) {
+            playersMove.put(player.username, player.lastInput);
+        }
+        return playersMove;
     }
 
     @Override
     public int getPlayerCount() {
-        return 0;
+        return playerStats.size();
     }
 
     @Override
     public String getGameId() {
-        return null;
+        return game.getID();
+    }
+
+    @Override
+    public void startMatch() {
+        if (getStatus() == MatchStatus.PREPARING) {
+            setStatus(MatchStatus.FINISHED);
+            this.currQuestionIndex = 0;
+            try {
+                addPlayer(getHostID(), getHostName());
+            } catch (DuplicateUserIDException | MaxPlayerReachedException e) {
+                throw new RuntimeException("Error: Cannot add the first player to the match");
+            }
+        }
+    }
+
+
+    private void nextTurn() {
+        for(PlayerStat player: playerStats.values()) {
+            player.clearLastTurn();
+        }
+        numMovedPlayers = 0;
+        if (currQuestionIndex < game.getNumQuestions() - 1) {
+            currQuestionIndex += 1;
+        } else {
+            setStatus(MatchStatus.FINISHED);
+        }
+        notifyObservers();
     }
 
 
@@ -162,6 +213,9 @@ public class QuizGameMatch extends GameMatch {
         if (!containPlayer(playerID)) {
             throw new InvalidUserIDException();
         }
+        PlayerStat player = playerStats.get(playerID);
+        if (player.numAttempted >= game.getMaxAttempts())
+            return;
 
         if (template.isMultipleChoice()) {
             handleMultipleChoiceMove(playerID, move);
@@ -169,17 +223,17 @@ public class QuizGameMatch extends GameMatch {
         else {
             handleExactAnswerMove(playerID, move);
         }
-        goNextQuestion();
+        player.numAttempted++;
+        player.lastInput = move;
+        if (player.numAttempted == 1){
+            numMovedPlayers ++;
+        }
+        notifyObservers();
+
+        if (numMovedPlayers == getPlayerCount())
+            nextTurn();
     }
 
-    private void goNextQuestion() {
-        if (currQuestionIndex < game.getNumQuestions() - 1) {
-            currQuestionIndex += 1;
-        }
-        else {
-            setFinishedStatus();
-        }
-    }
 
     private void handleExactAnswerMove(String playerID, String move) {
         if (move.equals(game.getQuestion(currQuestionIndex).getAnswer(0).toString())) {

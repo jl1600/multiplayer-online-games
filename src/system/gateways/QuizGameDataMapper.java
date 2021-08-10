@@ -176,7 +176,7 @@ public class QuizGameDataMapper {
             result.append("{");
             int j = 0;
             for (String category : categoriesInOrder) {
-                HashMap<String, Double> scoreData = ans.getScoresRewardsByCategory();
+                Map<String, Double> scoreData = ans.getScoresRewardsByCategory();
                 result.append(scoreData.get(category));
                 if (j < categoriesInOrder.size() - 1) {
                     result.append(",");
