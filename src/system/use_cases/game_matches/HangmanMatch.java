@@ -4,27 +4,29 @@ import shared.exceptions.use_case_exceptions.*;
 import system.entities.game.Game;
 import system.entities.game.hangman.HangmanGame;
 import system.entities.template.HangmanTemplate;
-import system.use_cases.builders.normal_builders.HangmanGameBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class HangmanMatch extends GameMatch {
 
-    private final HangmanGame game;
-    private final HangmanTemplate template;
+    private HangmanGame game;
+    private HangmanTemplate template;
 
-    private final ArrayList<Character> mistakes;
-    private final ArrayList<Character> guesses;
-    private final char[] puzzle;
-    private final char[] gameState;
-    private final String prompt;
+    private int currentPuzzleIndex;
+    private char[] currentAnswer;
+    private char[] gameState;
     private int remainingLives;
-    private final int remainingHints;
+    private int remainingHints;
+    private List<Character> mistakes;
+    private List<Character> guesses;
     private String output;
 
+    private enum MoveType {HINT, INVALID, USED, NORMAL}
 
-    public HangmanMatch(String matchID, String userID, HangmanGame game, HangmanTemplate template) throws InvalidInputException {
+    public HangmanMatch(String matchID, String userID, HangmanGame game, HangmanTemplate template) {
         super(matchID, userID);
         this.template = template;
         this.game = game;
@@ -33,142 +35,185 @@ public class HangmanMatch extends GameMatch {
         this.guesses = new ArrayList<>();
         this.mistakes = new ArrayList<>();
 
-        this.prompt = game.getPuzzle(0).get(1);
-
-        String puzzleString = game.getPuzzle(0).get(0);
-        this.puzzle = puzzleString.toCharArray();
-        String gameStateString = puzzleString.replaceAll("[a-zA-Z0-9]", "_");
-        this.gameState = gameStateString.toCharArray();
-
-        output = prompt
-                + "\n" + String.valueOf(gameState)
-                + "\nguesses: " + mistakes.toString()
-                + "\nlives: " + remainingLives
-                + "\nhints: " + remainingHints;
+        this.currentPuzzleIndex = 0;
+        this.loadPuzzle();
+        output = this.gameStatus();
     }
 
-
+    /**
+     * Returns the current game state as a string.
+     *
+     * @param playerID The unique string identifier of the player.
+     * @return the current game state as a string.
+     */
     @Override
-    public String getTextContent(String playerID) throws InvalidUserIDException {
+    public String getTextContent(String playerID) {
         return output;
     }
 
+    /**
+     * Return the HangmanGame object inside this GameMatch.
+     *
+     * @return the HangmanGame object inside this GameMatch.
+     */
     @Override
     public Game getGame() {
         return this.game;
     }
 
+
     @Override
-    public void addPlayer(String playerID) throws DuplicateUserIDException {
+    public void addPlayer(String playerID) {
 
     }
 
+    /**
+     * Advances the game state according to the input move.
+     * <p>
+     * The first alphanumeric character of the input is taken as the guessed letter.
+     * "hint" is a special phrase that will consume a remaining hint and reveal an alphanumeric
+     * character in the Answer.
+     *
+     * @param PlayerID the userId of the player making this move
+     * @param move     The string representing the player input
+     */
     @Override
-    public void playMove(String PlayerID, String move) throws InvalidUserIDException, InvalidInputException {
+    public void playMove(String PlayerID, String move) throws InvalidInputException{
         char moveChar = Character.toLowerCase(move.charAt(0));
-        String move1 = move.substring(0, 1);
-
-        if (!Pattern.matches("[a-zA-Z0-9]", move1)) {
-            return;
-        }
-
-        if (this.guesses.contains(moveChar)) { // if the letter has already been guessed
-            return;
-        }
-
-        guessChar(moveChar);
-
-        if (this.remainingLives == 0) {
-            this.setFinished(true);
-            output = "YOU LOSE!!!"
-                    + "\n" + String.valueOf(gameState)
-                    + "\nguesses: " + mistakes.toString()
-                    + "\nlives: " + remainingLives
-                    + "\nhints: " + remainingHints;
-        } else if (this.isSolved()) {
-            this.setFinished(true);
-            output = "YOU WIN!!!"
-                    + "\n" + String.valueOf(gameState)
-                    + "\nguesses: " + mistakes.toString()
-                    + "\nlives: " + remainingLives
-                    + "\nhints: " + remainingHints;
-        } else {
-            output = prompt
-                    + "\n" + String.valueOf(gameState)
-                    + "\nguesses: " + mistakes.toString()
-                    + "\nlives: " + remainingLives
-                    + "\nhints: " + remainingHints;
+        switch (parseMove(move)) {
+            case INVALID:
+                output = "'" + moveChar + "'" + " invalid character. Try again." + "\n\n"
+                        + this.gameStatus();
+                return;
+            case USED:
+                output = "'" + moveChar + "'" + " already guessed. Try again." + "\n\n"
+                        + this.gameStatus();
+                return;
+            case HINT:
+                if (this.remainingHints > 0) {
+                    remainingHints--;
+                    guessChar(getHint(), MoveType.HINT);
+                } else {
+                    output = "No more hints remaining. Try again." + "\n\n"
+                            + this.gameStatus();
+                }
+                return;
+            case NORMAL:
+                guessChar(moveChar, MoveType.NORMAL);
+                return;
         }
     }
 
-    private void guessChar(char c) {
-        this.guesses.add(c);
-        boolean found = false;
+    private MoveType parseMove(String move) {
+        char moveChar = Character.toLowerCase(move.charAt(0));
+
+        if (Pattern.matches(".*hint.*", move.toLowerCase())) {
+            return MoveType.HINT;
+        } else if (!Pattern.matches("[a-zA-Z0-9]", move.substring(0, 1))) {
+            return MoveType.INVALID;
+        } else if (guesses.contains(moveChar)) {
+            return MoveType.USED;
+        }
+        return MoveType.NORMAL;
+    }
+
+    private char getHint() {
+        List<Character> remaining = new ArrayList<>();
+        for (int i = 0; i < gameState.length; i++) {
+            if (gameState[i] == '_') {
+                remaining.add(currentAnswer[i]);
+            }
+        }
+        Collections.shuffle(remaining);
+        return Character.toLowerCase(remaining.get(0));
+    }
+
+    private void guessChar(char moveChar, MoveType type) {
+        this.guesses.add(moveChar);
+        int found = findAndRevealChar(moveChar);
+        if (found == 0) {
+            this.mistakes.add(moveChar);
+            this.remainingLives--;
+        }
+        if (remainingLives == 0) {
+            this.setFinished(true);
+            output = "You Lose! Better luck next time.\n"
+                    + this.gameStatus();
+        } else if (this.isPuzzleSolved()) {
+            if (this.hasNextPuzzle()) {
+                currentPuzzleIndex++;
+                this.loadPuzzle();
+                output = "Puzzle complete!\n"
+                        + game.getAnswer(currentPuzzleIndex - 1) + "\n\n"
+                        + "Next puzzle:\n"
+                        + this.gameStatus();
+            } else {
+                this.setFinished(true);
+                output = "YOU WIN!!!\n"
+                        + this.gameStatus();
+            }
+        } else if (type == MoveType.HINT) {
+            output = "Hint used, " + found + " '" + moveChar + "'" + " found!\n\n"
+                    + this.gameStatus();
+        } else if (found > 0) {
+            output = "" + found + " '" + moveChar + "'" + " found!\n\n"
+                    + this.gameStatus();
+        } else {
+            output = "'" + moveChar + "'" + " not found.\n\n"
+                    + this.gameStatus();
+        }
+    }
+
+    private int findAndRevealChar(char c) {
+        int found = 0;
         if (c >= '0' && c <= '9') {  // 0-9
-            for (int i = 0; i < this.puzzle.length; i++) {
-                if (this.puzzle[i] == c) {
-                    this.gameState[i] = this.puzzle[i];
-                    found = true;
+            for (int i = 0; i < this.currentAnswer.length; i++) {
+                if (this.currentAnswer[i] == c) {
+                    this.gameState[i] = this.currentAnswer[i];
+                    found++;
                 }
             }
         } else if (c >= 'a' && c <= 'z') {  // a-z
-            for (int i = 0; i < this.puzzle.length; i++) {
-                if (this.puzzle[i] == c | this.puzzle[i] == c - 32) { //treat 'a' and 'A' as the same
-                    this.gameState[i] = this.puzzle[i];
-                    found = true;
+            for (int i = 0; i < this.currentAnswer.length; i++) {
+                if (this.currentAnswer[i] == c | this.currentAnswer[i] == c - 32) { //treat 'a' and 'A' as the same
+                    this.gameState[i] = this.currentAnswer[i];
+                    found++;
                 }
             }
         }
-        if (!found) {
-            this.mistakes.add(c);
-            this.remainingLives--;
-        }
+        return found;
     }
 
-    private boolean isSolved() {
-        for (int i = 0; i < puzzle.length; i++) {
-            if (puzzle[i] != gameState[i]) {
+    private boolean isPuzzleSolved() {
+        for (int i = 0; i < currentAnswer.length; i++) {
+            if (currentAnswer[i] != gameState[i]) {
                 return false;
             }
         }
         return true;
     }
 
-    public static void main(String[] args) throws InsufficientInputException, CreationInProgressException, InvalidInputException, InvalidUserIDException {
+    private boolean hasNextPuzzle() {
+        return currentPuzzleIndex + 1 < this.template.getNumPuzzles();
+    }
 
-        HangmanGameBuilder builder = new HangmanGameBuilder();
-        builder.setGameId("hangmanGameId3432141");
-        builder.setTemplateId("templ8-3421");
-        builder.setOwnerId("zach01111");
-        builder.setIsPublic(true);
-        builder.addPuzzle("Star Wars - Episode 1: The Phantom Menace", "The one with JarJar");
-        builder.setTitle("Zach's Starwars Hangman Game");
-        HangmanGame game = builder.toHangmanGame();
+    private void loadPuzzle() {
+        mistakes.clear();
+        guesses.clear();
+        String answerString = game.getAnswer(currentPuzzleIndex);
+        currentAnswer = answerString.toCharArray();
+        String gameStateString = answerString.replaceAll("[a-zA-Z0-9]", "_");
+        gameState = gameStateString.toCharArray();
+    }
 
-        HangmanTemplate t = new HangmanTemplate();
-        t.setNumHints(1);
-        t.setNumLives(3);
-        t.setNumPuzzles(1);
-
-        HangmanMatch hm = new HangmanMatch("1", "1", game, t);
-
-        String[] test1 = {
-                "a", "b", "c", "r", "ab", "a", "$"
-                , "s", "t", "e", "i", "t", "n", "o", "p", "A", "z", "q"
-        };
-
-
-        System.out.println(hm.getTextContent("1"));
-        System.out.println();
-        int i = 0;
-        while (!hm.isFinished()) {
-            String str = test1[i];
-            System.out.println("move: " + str);
-            hm.playMove("1", str);
-            System.out.println(hm.getTextContent("1"));
-            System.out.println();
-            i++;
-        }
-
+    private String gameStatus() {
+        return "(" + (currentPuzzleIndex + 1) + "/" + this.template.getNumPuzzles() + ") "
+                + game.getPrompt(currentPuzzleIndex) + "\n"
+                + "\n"
+                + String.valueOf(gameState) + "\n"
+                + "\n"
+                + "wrong guesses: " + mistakes.toString() + "\n"
+                + "lives left: " + remainingLives + "\n"
+                + "hints left: " + remainingHints;
     }
 }

@@ -5,13 +5,14 @@ import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.Game;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /** Hangman Game
  *
  */
 public class HangmanGame extends Game {
     private String title;
-    private ArrayList<ArrayList<String>> puzzles;
+    private List<List<String>> puzzles;
 
     /** Hangman Game Constructor
      *
@@ -40,17 +41,17 @@ public class HangmanGame extends Game {
 
     /** add a puzzle
      *
-     * @param puzzle the puzzle to be added
+     * @param answer the puzzle to be added
      * @param prompt the prompt of the puzzle
      * @throws InsufficientInputException when parameters are illegal and passed a null value
      */
-    public void addPuzzle(String puzzle, String prompt) throws InsufficientInputException {
-        assert puzzle != null;
-        if (puzzle == null | prompt == null) {
+    public void addPuzzle(String answer, String prompt) throws InsufficientInputException {
+        assert answer != null;
+        if (answer == null | prompt == null) {
             throw new InsufficientInputException();
         }
-        ArrayList<String> combined = new ArrayList<>();
-        combined.add(puzzle);
+        List<String> combined = new ArrayList<>();
+        combined.add(answer);
         combined.add(prompt);
         this.puzzles.add(combined);
     }
@@ -61,14 +62,23 @@ public class HangmanGame extends Game {
      * @return a String ArrayList representative of the Puzzle
      * @throws InvalidInputException when the index is larger than total puzzle size
      */
-    public ArrayList<String> getPuzzle(int index) throws InvalidInputException {
+    public List<String> getPuzzle(int index) throws InvalidInputException {
         if (index >= this.puzzles.size()) {
             throw new InvalidInputException();
         }
-        ArrayList<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<>();
         result.addAll(this.puzzles.get(index));
         return result;
     }
+
+    public String getAnswer(int puzzleIndex) {
+        return puzzles.get(puzzleIndex).get(0);
+    }
+
+    public String getPrompt(int puzzleIndex) {
+        return puzzles.get(puzzleIndex).get(1);
+    }
+
 
     /**
      * Remove a puzzle
@@ -86,9 +96,9 @@ public class HangmanGame extends Game {
      * Get All Puzzles
      * @return Nested ArrayList that represents all the puzzles
      */
-    public ArrayList<ArrayList<String>> getPuzzles() {
-        ArrayList<ArrayList<String>> result = new ArrayList<>();
-        for (ArrayList<String> set : this.puzzles) {
+    public List<List<String>> getPuzzles() {
+        List<List<String>> result = new ArrayList<>();
+        for (List<String> set : this.puzzles) {
             ArrayList<String> entry = new ArrayList<>();
             entry.addAll(set);
             result.add(entry);
