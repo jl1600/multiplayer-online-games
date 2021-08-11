@@ -9,7 +9,8 @@ function login(username, password) {
 			const data = JSON.parse(xhr.response);
 			sessionStorage.setItem("userId", data.userId);
 			sessionStorage.setItem("userType", data.userType);
-			window.location ="http://localho.st:8080/pages/matches";
+
+			window.location = data.userType === "admin" ? "http://localho.st:8080/pages/edit-template" : "http://localho.st:8080/pages/matches";
 			document.getElementById("header").contentWindow.updateHeader();
 		}
 	};
