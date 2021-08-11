@@ -26,6 +26,22 @@ public class HangmanMatch extends GameMatch {
 
     private enum MoveType {HINT, INVALID, USED, NORMAL}
 
+    private final String[] OUTPUT_STRINGS = {
+            " invalid character. Try again."
+            , " already guessed. Try again."
+            , "No more hints remaining. Try again."
+            , "You Lose! Better luck next time."
+            , "YOU WIN!!!"
+            , "Puzzle complete!"
+            , "Next puzzle:"
+            , "wrong guesses: "
+            , "lives left: "
+            , "hints left: "
+            , "Hint used, "
+            , " found!"
+            , " not found."
+    };
+
     public HangmanMatch(String matchID, String userID, HangmanGame game, HangmanTemplate template) {
         super(matchID, userID);
         this.template = template;
@@ -82,11 +98,11 @@ public class HangmanMatch extends GameMatch {
         char moveChar = Character.toLowerCase(move.charAt(0));
         switch (parseMove(move)) {
             case INVALID:
-                output = "'" + moveChar + "'" + " invalid character. Try again." + "\n\n"
+                output = "'" + moveChar + "'" + OUTPUT_STRINGS[0] + "\n\n"
                         + this.gameStatus();
                 return;
             case USED:
-                output = "'" + moveChar + "'" + " already guessed. Try again." + "\n\n"
+                output = "'" + moveChar + "'" + OUTPUT_STRINGS[1] + "\n\n"
                         + this.gameStatus();
                 return;
             case HINT:
@@ -94,7 +110,7 @@ public class HangmanMatch extends GameMatch {
                     remainingHints--;
                     guessChar(getHint(), MoveType.HINT);
                 } else {
-                    output = "No more hints remaining. Try again." + "\n\n"
+                    output = OUTPUT_STRINGS[2] + "\n\n"
                             + this.gameStatus();
                 }
                 return;
@@ -117,6 +133,7 @@ public class HangmanMatch extends GameMatch {
         return MoveType.NORMAL;
     }
 
+    //returns a hidden letter in the current puzzle
     private char getHint() {
         List<Character> remaining = new ArrayList<>();
         for (int i = 0; i < gameState.length; i++) {
@@ -128,6 +145,7 @@ public class HangmanMatch extends GameMatch {
         return Character.toLowerCase(remaining.get(0));
     }
 
+    // searches the current puzzle for the input char. deducts a life if nothing is found
     private void guessChar(char moveChar, MoveType type) {
         this.guesses.add(moveChar);
         int found = findAndRevealChar(moveChar);
@@ -137,33 +155,35 @@ public class HangmanMatch extends GameMatch {
         }
         if (remainingLives == 0) {
             this.setFinished(true);
-            output = "You Lose! Better luck next time.\n"
+            output = OUTPUT_STRINGS[3] + "\n"
                     + this.gameStatus();
         } else if (this.isPuzzleSolved()) {
             if (this.hasNextPuzzle()) {
                 currentPuzzleIndex++;
                 this.loadPuzzle();
-                output = "Puzzle complete!\n"
+                output = OUTPUT_STRINGS[5] + "\n"
                         + game.getAnswer(currentPuzzleIndex - 1) + "\n\n"
-                        + "Next puzzle:\n"
+                        + OUTPUT_STRINGS[6] + "\n"
                         + this.gameStatus();
             } else {
                 this.setFinished(true);
-                output = "YOU WIN!!!\n"
+                output = OUTPUT_STRINGS[4] + "\n"
                         + this.gameStatus();
             }
-        } else if (type == MoveType.HINT) {
-            output = "Hint used, " + found + " '" + moveChar + "'" + " found!\n\n"
+        } else if (type == MoveType.HINT) {     //if a hint was used
+            output = OUTPUT_STRINGS[10] + found + " '" + moveChar + "'" + OUTPUT_STRINGS[11] + "\n\n"
                     + this.gameStatus();
-        } else if (found > 0) {
-            output = "" + found + " '" + moveChar + "'" + " found!\n\n"
+        } else if (found > 0) {     // if the guessed letter was found
+            output = "" + found + " '" + moveChar + "'" + OUTPUT_STRINGS[11] + "\n\n"
                     + this.gameStatus();
-        } else {
-            output = "'" + moveChar + "'" + " not found.\n\n"
+        } else {    // if nothing was found
+            output = "'" + moveChar + "'" + OUTPUT_STRINGS[12] + "\n\n"
                     + this.gameStatus();
         }
     }
 
+    // searches the current puzzle for the input char (not case sensitive)
+    // uncovers any that are found, and returns the amount of uncovered letters.
     private int findAndRevealChar(char c) {
         int found = 0;
         if (c >= '0' && c <= '9') {  // 0-9
@@ -212,8 +232,8 @@ public class HangmanMatch extends GameMatch {
                 + "\n"
                 + String.valueOf(gameState) + "\n"
                 + "\n"
-                + "wrong guesses: " + mistakes.toString() + "\n"
-                + "lives left: " + remainingLives + "\n"
-                + "hints left: " + remainingHints;
+                + OUTPUT_STRINGS[7] + mistakes.toString() + "\n"
+                + OUTPUT_STRINGS[8] + remainingLives + "\n"
+                + OUTPUT_STRINGS[9] + remainingHints;
     }
 }
