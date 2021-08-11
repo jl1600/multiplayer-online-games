@@ -1,0 +1,17 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
+
+body {
+	margin: 0;
+	background-color: #f5d5c0;
+	color: #23272a;
+	font-family: "Open Sans", sans-serif;
+}
+iframe {
+	border: none;
+	margin: 0;
+	height: 81px;
+}
+main {
+    width: 90%;
+    margin: auto;
+}

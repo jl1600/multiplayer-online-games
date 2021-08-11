@@ -1,0 +1,87 @@
+<html lang="en">
+	<head>
+		<base href="http://localho.st:8080/" />
+		<style>
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
+body {
+	margin: 0;
+}
+a {
+	text-decoration: none;
+	color: white;
+}
+header {
+	background-color: #7289da;
+	padding: 16px 60px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-family: "Open Sans", sans-serif;
+	font-weight: 700;
+}
+header .logo {
+	font-weight: 700;
+	font-size: 36px;
+	color: white;
+}
+header .menu a {
+	margin: 0 25px;
+	transition-duration: 0.2s;
+}
+header .menu a:hover {
+	filter: brightness(0.85);
+}
+header .user a {
+	background-color: white;
+	padding: 12px 20px;
+	margin: 0 10px;
+	border-radius: 30px;
+	color: #23272a;
+	transition-duration: 0.2s;
+}
+header .user a:hover {
+	filter: brightness(0.85);
+}
+header .user a#signup {
+	background-color: #36393f;
+	color: white;
+}
+#my-account {
+	color: white;
+	width: 146px;
+	text-align: right;
+}
+		</style>
+	</head>
+
+	<body>
+		<header>
+			<div class="logo">
+				<a href="/" target="_parent">CSC207 Project</a>
+			</div>
+			<div class="menu">
+				<a href="pages/matches" target="_parent">Play a match</a>
+				<a href="pages/my-games" target="_parent">My games</a>
+			</div>
+			<span class="user">
+				<a id="signup" href="../pages/signup" target="_parent">Sign up</a>
+				<a href="pages/login" target="_parent">Log in</a>
+			</span>
+			<a id="my-account" href="../pages/profile" target="_parent">My account</a>
+		</header>
+
+		<script>
+			updateHeader();
+
+			function updateHeader() {
+				if (sessionStorage.getItem("userType") === "trial") {
+					document.getElementsByClassName("user")[0].hidden = false;
+					document.getElementById("my-account").hidden = true;
+				} else {
+					document.getElementsByClassName("user")[0].hidden = true;
+					document.getElementById("my-account").hidden = false;
+				}
+			}
+		</script>
+	</body>
+</html>

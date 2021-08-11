@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel="icon" href="../static/favicon.ico" type="image/x-icon" />
+		<link href="../stylesheets/general.css" rel="stylesheet" />
+		<link href="../stylesheets/form.css" rel="stylesheet" />
+		<script src="../scripts/requests/newTrial.js"></script>
+		<title>Log in to [Title of our app]</title>
+	</head>
+
+	<body>
+		<iframe src="../components/header.html" width="100%"></iframe>
+
+		<form onsubmit="login(this.username.value, this.password.value); return false">
+			<h1>Log in</h1>
+			<input type="text" name="username" placeholder="Username">
+			<input type="password" name="password" placeholder="Password">
+			<button type="submit">Log in</button>
+		</form>
+
+		<script src="../scripts/requests/login.js"></script>
+	</body>
+</html>

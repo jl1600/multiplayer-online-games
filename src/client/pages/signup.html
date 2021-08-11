@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel="icon" href="../static/favicon.ico" type="image/x-icon" />
+		<link href="../stylesheets/general.css" rel="stylesheet" />
+		<link href="../stylesheets/form.css" rel="stylesheet" />
+		<script src="../scripts/requests/newTrial.js"></script>
+		<title>Sign up for [Title of our app]</title>
+	</head>
+
+	<body>
+		<iframe src="../components/header.html" width="100%"></iframe>
+
+		<form onsubmit="signup(this.username.value, this.password.value); return false">
+			<h1>Sign up</h1>
+			<input type="text" name="username" placeholder="Username">
+			<input id="password" type="password" name="password" placeholder="Password">
+			<input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm password" onfocusout="checkPassword()">
+			<div id="errorMessage"></div>
+			<button type="submit">Sign up</button>
+		</form>
+
+		<script src="../scripts/requests/signup.js"></script>
+	</body>
+</html>
