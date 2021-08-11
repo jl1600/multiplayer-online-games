@@ -112,17 +112,19 @@ public class GameRequestHandler implements HttpHandler {
             String matchID = matchManager.newMatch(body.userID, userManager.getUsername(body.userID),
                                     gameManager.getGame(body.gameID),
                                     templateManager.getTemplate(templateID));
+            System.out.println(matchID);
             sendResponse(exchange, 204, null);
 
             Socket newPlayer = serverSocket.accept();
-            handShake(newPlayer);
+            // handShake(newPlayer);
             BufferedReader reader = new BufferedReader(new InputStreamReader(newPlayer.getInputStream()));
             System.out.println("trying to read the player's ID");
-            String playerID = String.valueOf(reader.read());
+            String playerID = reader.readLine();
             System.out.println(playerID);
             PlayerInputListener inputListener = new PlayerInputListener(newPlayer, matchManager, matchID, playerID);
             MatchOutputDispatcher outputDispatcher = new MatchOutputDispatcher(matchManager, matchID);
             outputDispatcher.addPlayerOutput(newPlayer);
+            matchManager.addObserver(outputDispatcher, matchID);
             inputListener.start();
 
         } catch (InvalidUserIDException | InvalidIDException e) {

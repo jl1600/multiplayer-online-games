@@ -40,6 +40,7 @@ public class MatchOutputDispatcher implements Observer {
      * */
     @Override
     public void update(Observable o, Object arg) {
+        System.out.println("Trying to update");
         for (PrintWriter out: outputWriters) {
             MatchOutput matchOutput = new MatchOutput();
             try {
@@ -50,7 +51,9 @@ public class MatchOutputDispatcher implements Observer {
                 throw new RuntimeException("Invalid match ID. This should never happen.");
             }
             Gson gson = new Gson();
-            out.write(gson.toJson(matchOutput));
+            System.out.println("Trying to output:" + gson.toJson(matchOutput));
+            out.println(gson.toJson(matchOutput));
+            out.flush();
         }
     }
 }

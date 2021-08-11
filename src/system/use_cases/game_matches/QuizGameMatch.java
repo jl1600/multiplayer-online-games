@@ -182,13 +182,15 @@ public class QuizGameMatch extends GameMatch {
     @Override
     public void startMatch() {
         if (getStatus() == MatchStatus.PREPARING) {
-            setStatus(MatchStatus.FINISHED);
+            setStatus(MatchStatus.ONGOING);
             this.currQuestionIndex = 0;
             try {
                 addPlayer(getHostID(), getHostName());
             } catch (DuplicateUserIDException | MaxPlayerReachedException e) {
                 throw new RuntimeException("Error: Cannot add the first player to the match");
             }
+            setChanged();
+            notifyObservers();
         }
     }
 
@@ -203,6 +205,7 @@ public class QuizGameMatch extends GameMatch {
         } else {
             setStatus(MatchStatus.FINISHED);
         }
+        setChanged();
         notifyObservers();
     }
 
@@ -228,6 +231,7 @@ public class QuizGameMatch extends GameMatch {
         if (player.numAttempted == 1){
             numMovedPlayers ++;
         }
+        setChanged();
         notifyObservers();
 
         if (numMovedPlayers == getPlayerCount())

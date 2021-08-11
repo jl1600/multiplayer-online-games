@@ -49,16 +49,21 @@ public class PlayerInputListener extends Thread {
                                     manager.startMatch(matchID);
                                 break;
                         }
-                        if (!inData.gameMove.equals(""))
+                        if (!inData.gameMove.equals("")) {
+                            System.out.println("trying to play move");
                             manager.playGameMove(playerID, matchID, inData.gameMove);
+                        }
                     }
                 }
-            } catch (InvalidMatchIDException | IOException e) {
-                throw new RuntimeException("Match ID is invalid or IO problem. This should never happen.");
+            } catch (InvalidMatchIDException e) {
+                throw new RuntimeException("Match ID is invalid. This should never happen.");
             } catch (InvalidInputException e) {
-                writer.write("Error: Invalid input.");
+                writer.println("Error: Invalid input.");
+                writer.flush();
             } catch (InvalidUserIDException e) {
                 throw new RuntimeException("Invalid player ID. This should never happen.");
+            } catch (IOException e) {
+                return;
             }
         }
     }
