@@ -48,7 +48,7 @@ function createElement(className) {
 function createOverlayButtons(type, publicity) {
 	const imgs = createElement("img-container");
 
-	if (type === "EDIT" && sessionStorage.getItem("userType") === "user") {
+	if (type === "EDIT" && sessionStorage.getItem("userType") !== "admin") {
 		createEditButtons(publicity).forEach(el => imgs.appendChild(el));
 	} else {
 		const btn = createElement("button");
