@@ -1,5 +1,6 @@
 package system.use_cases.builders.interactive_builders;
 
+import shared.constants.GameAccessLevel;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.quiz.QuizAnswer;
@@ -105,7 +106,10 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
 
     private String handleIsPublicDesignChoice(String designChoice) throws InvalidInputException{
         if (designChoice.equals("yes") || designChoice.equals("no")) {
-            currentGame.setIsPublic(designChoice.equals("yes"));
+            if (designChoice.equals("yes")){
+                currentGame.setGameAccessLevel(GameAccessLevel.PUBLIC);
+            }
+
             currentDesignSubject = DesignSubject.CONFIRMATION;
             return "Quiz is ready to build. Do you want to proceed? (yes/no)";
         } else {

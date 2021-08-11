@@ -3,7 +3,7 @@
 @ownerId:2
 @title:My First Game
 @maxAttempts:2
-@isPublic:false
+@GameAccessLevel:PRIVATE
 @scoreCategories
 1.0|General|0.0|Quiz Game Finished.
 @scoreCategories

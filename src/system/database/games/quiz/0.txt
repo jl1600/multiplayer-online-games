@@ -3,7 +3,7 @@
 @ownerId:null
 @title:answer is the question
 @maxAttempts:2
-@isPublic:false
+@GameAccessLevel:PRIVATE
 @scoreCategories
 1.0|General|0.0|Quiz Game Finished.
 @scoreCategories

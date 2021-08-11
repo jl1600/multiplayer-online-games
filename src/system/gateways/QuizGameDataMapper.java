@@ -1,6 +1,8 @@
 package system.gateways;
 
 
+import shared.constants.GameAccessLevel;
+import shared.constants.UserRole;
 import shared.exceptions.entities_exception.IDAlreadySetException;
 import shared.exceptions.entities_exception.UnknownGameTypeException;
 import shared.exceptions.use_case_exceptions.*;
@@ -131,7 +133,7 @@ public class QuizGameDataMapper {
         result.append("\n");
 
         result.append("@isPublic:");
-        result.append(g.isPublic().toString());
+        result.append(g.getGameAccessLevel().toString());
         result.append("\n");
 
         // Score Categories
@@ -214,9 +216,10 @@ public class QuizGameDataMapper {
         textData = textData[1].split("\n", 2);
         int maxAttempts = Integer.parseInt(textData[0]);
 
-        textData = textData[1].split("@isPublic:");
+        textData = textData[1].split("@GameAccessLevel:");
         textData = textData[1].split("\n", 2);
-        boolean isPublic = Boolean.parseBoolean(textData[0]);
+        String gameAccessLevelString = textData[0];
+        GameAccessLevel gameAccessLevel = resolveGameAccessLevel(gameAccessLevelString);
 
         QuizGameBuilder quizGameBuilder = new QuizGameBuilder();
         quizGameBuilder.setId(gameId);
@@ -224,7 +227,7 @@ public class QuizGameDataMapper {
         quizGameBuilder.setOwnerId(ownerId);
         quizGameBuilder.setTitle(title);
         quizGameBuilder.setMaxAttempts(maxAttempts);
-        quizGameBuilder.setIsPublic(isPublic);
+        quizGameBuilder.setGameAccessLevel(gameAccessLevel);
 
         // Score Categories
         textData = textData[1].split("@scoreCategories\n");
@@ -255,6 +258,18 @@ public class QuizGameDataMapper {
         }
         return quizGameBuilder.toQuizGame();
 
+    }
+
+    private GameAccessLevel resolveGameAccessLevel(String gameAccessLevelString) {
+        if (gameAccessLevelString.equals(GameAccessLevel.PUBLIC.name())){
+            return GameAccessLevel.PUBLIC;
+        } else if (gameAccessLevelString.equals(GameAccessLevel.PRIVATE.name())){
+            return GameAccessLevel.PRIVATE;
+        } else if (gameAccessLevelString.equals(GameAccessLevel.FRIEND.name())){
+            return GameAccessLevel.FRIEND;
+        } else{
+            return GameAccessLevel.DELETED;
+        }
     }
 
     private QuizQuestion quizQuestionFromString(String questionString, ArrayList<String> categoryNames) {

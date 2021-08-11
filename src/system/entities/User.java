@@ -4,6 +4,7 @@ import shared.constants.OnlineStatus;
 import shared.constants.UserRole;
 import shared.exceptions.entities_exception.UnaccountedUserRoleException;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ public class User {
     private UserRole role;
     private OnlineStatus onlineStatus;
     private final HashSet<String> gameCreations;
+    private Date registerDate;
 
     /**
      *
@@ -25,13 +27,14 @@ public class User {
      * @param password the password user use to prove their identity
      * @param role the user role that determines the appropriate action to take and rules to follow for this user
      */
-    public User(String userId, String username, String password, UserRole role) {
+    public User(String userId, String username, String password, UserRole role, Date registerDate) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.role = role;
         this.onlineStatus = OnlineStatus.OFFLINE;
         this.gameCreations = new HashSet<>();
+        this.registerDate = registerDate;
     }
 
     /**
@@ -124,4 +127,6 @@ public class User {
     public void removeGameID(String gameID) {
         gameCreations.remove(gameID);
     }
+
+    public Date getRegisterDate(){return registerDate;}
 }

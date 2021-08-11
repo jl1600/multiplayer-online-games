@@ -3,7 +3,7 @@
 @ownerId:2
 @title:What Harry Potter House Are you In?
 @maxAttempts:1
-@isPublic:true
+@GameAccessLevel:PUBLIC
 @scoreCategories
 1.0|Hufflepuff|0.0|You are a Hufflepuff
 1.0|Slytherin|0.0|You are a Slytherin!

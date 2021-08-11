@@ -9,9 +9,8 @@ import system.entities.User;
 import system.gateways.UserDataGateway;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class UserManager {
     private final HashMap<String, User> users;     // userId to User entity
@@ -88,7 +87,9 @@ public class UserManager {
             throw new DuplicateUsernameException();
 
         String userId = idManager.getNextId();
-        User user = new User(userId, username, password, role);
+        Date currentTime = Calendar.getInstance().getTime();
+
+        User user = new User(userId, username, password, role, currentTime);
         userIds.put(username, userId);
         users.put(userId, user);
         gateway.addUser(user);
@@ -103,7 +104,9 @@ public class UserManager {
         String userId = idManager.getNextId();
         String username = "TrialUser" + userId;
 
-        User user = new User(userId, username, null, UserRole.TRIAL);
+        Date currentTime = Calendar.getInstance().getTime();
+
+        User user = new User(userId, username, null, UserRole.TRIAL, currentTime);
 
         userIds.put(username, userId);
         users.put(userId, user);
@@ -120,15 +123,34 @@ public class UserManager {
      * @throws IncorrectPasswordException if the specified password does not match the user's password
      */
     public String login(String username, String password)
-            throws InvalidUsernameException, IncorrectPasswordException, InvalidUserIDException {
+            throws InvalidUsernameException, IncorrectPasswordException, InvalidUserIDException, ExpiredUserException {
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
 
         String userId = getUserId(username);
         if (isPasswordIncorrect(userId, password)) throw new IncorrectPasswordException();
+        if (getUserRole(userId) == UserRole.TEMP){
+            if (isExpiredUser(userId)){
+                throw new ExpiredUserException();
+            }
+        }
+
 
         getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
         return userId;
+    }
+
+    private boolean isExpiredUser(String userId) throws InvalidUserIDException {
+        Date currentTime = Calendar.getInstance().getTime();
+        //getTime return a long that is total millisec since Jan 1st 1970
+        //add 30 days in millisec gives the expiration date
+        // if current date > expiration date
+        //return true (expired)
+        if (currentTime.getTime() > getUser(userId).getRegisterDate().getTime() + TimeUnit.DAYS.toMillis(30)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /**
