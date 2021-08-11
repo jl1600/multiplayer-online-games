@@ -6,7 +6,7 @@ function fetchAllGames() {
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
 			JSON.parse(xhr.response).games.forEach(match => createCard(match, "CREATE"));
-            listenForClicks();
+			listenForClicks();
 		}
 	};
 
@@ -14,10 +14,10 @@ function fetchAllGames() {
 }
 
 function listenForClicks() {
-    document.querySelectorAll("#cards-container .card .overlay .img-container .button").forEach(el => {
-        el.addEventListener("click", () => {
-            window.location = "http://localho.st:8080/pages/create-match?gameId=" +
-                el.parentElement.parentElement.parentElement.getAttribute("data-id");
-        });
-    });
+	document.querySelectorAll("#cards-container .card .overlay .img-container .button").forEach(el => {
+		el.addEventListener("click", () => {
+			window.location = "http://localho.st:8080/pages/create-match?gameId=" +
+				el.parentElement.parentElement.parentElement.getAttribute("data-id");
+		});
+	});
 }

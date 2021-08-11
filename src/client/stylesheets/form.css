@@ -11,7 +11,7 @@ form {
 	padding: 25px;
 }
 form input[type="text"], form input[type="password"] {
-    background-color: whitesmoke;
+	background-color: whitesmoke;
 	outline-width: 0px;
 	outline: none;
 	border: none;
@@ -23,14 +23,14 @@ form input[type="text"], form input[type="password"] {
 	transition-duration: 0.1s;
 }
 form #user-type {
-    font-size: 20px;
-    width: 100%;
-    display: flex;
-    justify-content: space-evenly;
-    margin-bottom: 20px;
+	font-size: 20px;
+	width: 100%;
+	display: flex;
+	justify-content: space-evenly;
+	margin-bottom: 20px;
 }
 form input[type="radio"] {
-    width: auto;
+	width: auto;
 }
 form input:focus {
 	border-color: #36393f;
@@ -43,9 +43,12 @@ form button {
 	cursor: pointer;
 	padding: 5px 15px;
 	border-radius: 4px;
+	box-shadow: 1px 1px 2px gray;
+	transition-duration: 0.2s;
 }
-form button:hover {
-	background-color: #ffbbbb;
+button:hover {
+    filter: brightness(0.9);
+    transform: translate(1px, 1px);
 }
 
 #errorMessage {
@@ -55,10 +58,14 @@ form button:hover {
 }
 
 form label {
-    font-size: 20px;
+	font-size: 20px;
 }
 form label input {
-    font-size: 26px;
-    width: 200px;
-    margin-left: 10px;
+	font-size: 26px;
+	width: 200px;
+	margin-left: 10px;
+}
+#delete {
+    background-color: #ff6454;
+    color: whitesmoke;
 }
