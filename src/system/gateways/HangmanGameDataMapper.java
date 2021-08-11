@@ -2,32 +2,19 @@ package system.gateways;
 
 import shared.exceptions.entities_exception.IDAlreadySetException;
 import shared.exceptions.use_case_exceptions.*;
+import system.entities.game.Game;
 import system.entities.game.hangman.HangmanGame;
-import system.entities.game.quiz.QuizGame;
-import system.entities.template.HangmanTemplate;
 import system.use_cases.builders.normal_builders.HangmanGameBuilder;
-import system.use_cases.builders.normal_builders.QuizGameBuilder;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.nio.file.Files;
+import java.util.*;
 
 public class HangmanGameDataMapper {
     String folderPath = GameDataGateway.gameFolderPath + "hangman/";
 
     public void addGame(HangmanGame game) throws IOException {
         addGame(game, true);
-    }
-
-    private void addGame(HangmanGame game, boolean increment) throws IOException {
-        File templateFile = new File(folderPath + game.getID() + ".txt");
-        Writer wr = new FileWriter(templateFile);
-        wr.write(hangmanGameToTxt(game));
-        wr.close();
-
-        if (increment) incrementGameCount();
     }
 
     public void updateGame(HangmanGame game) throws InvalidGameIDException, IOException {
@@ -45,12 +32,34 @@ public class HangmanGameDataMapper {
         }
     }
 
-    public Set<HangmanGame> getAllGames() throws IDAlreadySetException {
-        return new HashSet<>();
+    public Set<Game> getAllGames() throws IDAlreadySetException {
+        File folder = new File(folderPath);
+        HashSet<Game> games = new HashSet<>();
+        try {
+            for (File file : Objects.requireNonNull(folder.listFiles())) {
+                String gameString = String.join("\n", Files.readAllLines(file.toPath()));
+                Game game = hangmanGameFromTxt(gameString);
+                games.add(game);
+            }
+        } catch (InsufficientInputException | CreationInProgressException | IOException e) {
+            throw new RuntimeException();
+        }
+        return games;
     }
 
-    public int getGameCount() {
-        return 0;
+    public int getGameCount() throws IOException {
+        BufferedReader rd = new BufferedReader(new FileReader(GameDataGateway.gameCountFile));
+        return new Integer(rd.readLine());
+    }
+
+
+    private void addGame(HangmanGame game, boolean increment) throws IOException {
+        File templateFile = new File(folderPath + game.getID() + ".txt");
+        Writer wr = new FileWriter(templateFile);
+        wr.write(hangmanGameToTxt(game));
+        wr.close();
+
+        if (increment) incrementGameCount();
     }
 
     private void incrementGameCount() throws IOException {
@@ -96,7 +105,7 @@ public class HangmanGameDataMapper {
         return result.toString();
     }
 
-    public HangmanGame gameFromString(String gameString) throws InsufficientInputException, CreationInProgressException {
+    public HangmanGame hangmanGameFromTxt(String gameString) throws InsufficientInputException, CreationInProgressException {
         String[] textData = gameString.split("@gameId:");
         textData = textData[1].split("\n", 2);
         String gameId = textData[0];

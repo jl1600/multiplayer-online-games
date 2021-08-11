@@ -61,7 +61,6 @@ public class GameDataMapper implements GameDataGateway {
     @Override
     public int getGameCount() throws IOException {
         int result = 0;
-        result += hangMapper.getGameCount();
         result += quizMapper.getGameCount();
         return result;
     }

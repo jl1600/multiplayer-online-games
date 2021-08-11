@@ -1,7 +1,6 @@
 package system.use_cases.builders.interactive_builders;
 
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
-import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.template.HangmanTemplate;
 import system.entities.template.Template;
 import java.util.regex.Pattern;
@@ -131,6 +130,4 @@ public class HangmanTemplateInteractiveBuilder extends TemplateInteractiveBuilde
             currentDesignQuestionText = "Invalid input. " + DESIGN_QUESTION_TEXT[4];
         }
     }
-
-
 }
