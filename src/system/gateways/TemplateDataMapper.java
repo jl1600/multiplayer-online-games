@@ -1,4 +1,6 @@
 package system.gateways;
+
+import shared.exceptions.use_case_exceptions.InsufficientInputException;
 import system.entities.template.HangmanTemplate;
 import system.entities.template.QuizTemplate;
 import system.entities.template.Template;
@@ -8,9 +10,10 @@ import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Objects;
 
-public class TemplateDataMapper implements TemplateDataGateway{
+public class TemplateDataMapper implements TemplateDataGateway {
     /**
      * Adds a template to the database and increases the total number of templates created by 1
+     *
      * @param template template to add to the database
      * @throws IOException if the database is not found
      */
@@ -20,6 +23,7 @@ public class TemplateDataMapper implements TemplateDataGateway{
 
     /**
      * Updates the user in the database
+     *
      * @param template template do update
      * @throws IOException if the database is not found
      */
@@ -30,6 +34,7 @@ public class TemplateDataMapper implements TemplateDataGateway{
 
     /**
      * Deletes the template with the specified id from the database
+     *
      * @param templateID id of the template to delete
      * @throws IOException if the database is not found
      */
@@ -77,7 +82,8 @@ public class TemplateDataMapper implements TemplateDataGateway{
     }
 
     private String quizTemplateToString(QuizTemplate template) {
-        return template.getID() + "," +
+        return "Quiz" + "," +
+                template.getID() + "," +
                 template.getTitle().replace(",", "-") + "," +
                 template.hasMultipleScoreCategories() + "," +
                 template.hasScoreWeight() + "," +
@@ -87,22 +93,53 @@ public class TemplateDataMapper implements TemplateDataGateway{
     }
 
     private String hangmanTemplateToString(HangmanTemplate template) {
-        return "";
+        return "Hangman" + "," +
+                template.getID() + "," +
+                template.getTitle().replace(",", "-") + "," +
+                template.getNumPuzzles() + "," +
+                template.getNumLives() + "," +
+                template.getNumHints();
     }
 
     private Template stringToTemplate(String templateString) {
+        String type = templateString.split(",", 2)[0];
+        if (type.equals("Quiz")) {
+            return stringToQuizTemplate(templateString);
+        } else if (type.equals("Hangman")) {
+            return stringToHangmanTemplate(templateString);
+        } else {
+            throw new RuntimeException();
+        }
+    }
+
+    private Template stringToQuizTemplate(String templateString) {
         String[] info = templateString.split(",");
         QuizTemplate template = new QuizTemplate();
-        String id = info[0];
-        template.setID(id);
-        template.setTitle(info[1]);
-        template.setHasMultipleScoreCategories(Boolean.parseBoolean(info[2]));
-        template.setHasScoreWeight(Boolean.parseBoolean(info[3]));
-        template.setHasCustomEndingMessage(Boolean.parseBoolean(info[4]));
-        template.setChooseAllThatApply(Boolean.parseBoolean(info[5]));
-        template.setMultipleChoice(Boolean.parseBoolean(info[6]));
+        template.setID(info[1]);
+        template.setTitle(info[2]);
+        template.setHasMultipleScoreCategories(Boolean.parseBoolean(info[3]));
+        template.setHasScoreWeight(Boolean.parseBoolean(info[4]));
+        template.setHasCustomEndingMessage(Boolean.parseBoolean(info[5]));
+        template.setChooseAllThatApply(Boolean.parseBoolean(info[6]));
+        template.setMultipleChoice(Boolean.parseBoolean(info[7]));
         return template;
     }
+
+    private Template stringToHangmanTemplate(String templateString) {
+        String[] info = templateString.split(",");
+        HangmanTemplate template = new HangmanTemplate();
+        template.setID(info[1]);
+        template.setTitle(info[2]);
+        try {
+            template.setNumPuzzles(Integer.parseInt(info[3]));
+            template.setNumLives(Integer.parseInt(info[4]));
+            template.setNumHints(Integer.parseInt(info[5]));
+        } catch (InsufficientInputException e) {
+            throw new RuntimeException();
+        }
+        return template;
+    }
+
 
     private void incrementTemplateCount() throws IOException {
         BufferedReader rd = new BufferedReader(new FileReader(templateCountFile));

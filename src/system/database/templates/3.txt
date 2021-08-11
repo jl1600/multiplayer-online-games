@@ -1,1 +1,1 @@
-3,Simple multiple choice quiz,false,false,false,false,true
+Quiz,3,Simple multiple choice quiz,false,false,false,false,true
