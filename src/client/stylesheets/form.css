@@ -65,7 +65,7 @@ form label input {
 	width: 200px;
 	margin-left: 10px;
 }
-#delete {
+#delete-button {
     background-color: #ff6454;
     color: whitesmoke;
 }

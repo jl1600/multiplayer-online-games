@@ -10,7 +10,7 @@ http.createServer((request, response) => {
 			console.log("POST: " + body);
 			response.writeHead(200, {"Content-Type": "application/json"});
 			response.end(`{"userId": 1,
-			"userType": "normal",
+			"userType": "admin",
 				"games": [
 					{
 						"type": "hangman",
@@ -68,7 +68,7 @@ http.createServer((request, response) => {
                     "title": "An uncool game",
                     "description": "made by username",
                     "id": 4,
-                    "accessLevel": "DELETED"
+                    "accessLevel": "FRIENDS"
                 }
 			],
 			"templates": [

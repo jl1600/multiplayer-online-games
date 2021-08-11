@@ -59,9 +59,13 @@ header .user a#signup {
 			<div class="logo">
 				<a href="/" target="_parent">CSC207 Project</a>
 			</div>
-			<div class="menu">
+			<div class="menu normal">
 				<a href="pages/matches" target="_parent">Play a match</a>
 				<a href="pages/my-games" target="_parent">My games</a>
+			</div>
+			<div class="menu admin">
+				<a href="pages/templates" target="_parent">Edit a template</a>
+				<a href="pages/users" target="_parent">Manage users</a>
 			</div>
 			<span class="user">
 				<a id="signup" href="../pages/signup" target="_parent">Sign up</a>
@@ -74,12 +78,25 @@ header .user a#signup {
 			updateHeader();
 
 			function updateHeader() {
-				if (sessionStorage.getItem("userType") === "trial") {
-					document.getElementsByClassName("user")[0].hidden = false;
-					document.getElementById("my-account").hidden = true;
-				} else {
-					document.getElementsByClassName("user")[0].hidden = true;
-					document.getElementById("my-account").hidden = false;
+				switch (sessionStorage.getItem("userType")) {
+					case "trial":
+						document.getElementsByClassName("normal")[0].hidden = false;
+						document.getElementsByClassName("admin")[0].hidden = true;
+						document.getElementsByClassName("user")[0].hidden = false;
+						document.getElementById("my-account").hidden = true;
+					break;
+					case "admin":
+						document.getElementsByClassName("normal")[0].hidden = true;
+						document.getElementsByClassName("admin")[0].hidden = false;
+						document.getElementsByClassName("user")[0].hidden = true;
+						document.getElementById("my-account").hidden = false;
+					break;
+					case "normal":
+						document.getElementsByClassName("normal")[0].hidden = false;
+						document.getElementsByClassName("admin")[0].hidden = true;
+						document.getElementsByClassName("user")[0].hidden = true;
+						document.getElementById("my-account").hidden = false;
+					break;
 				}
 			}
 		</script>

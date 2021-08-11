@@ -10,7 +10,7 @@ function login(username, password) {
 			sessionStorage.setItem("userId", data.userId);
 			sessionStorage.setItem("userType", data.userType);
 			window.location ="http://localho.st:8080/pages/matches";
-			document.getElementByTagName("header").contentWindow.updateHeader();
+			document.getElementById("header").contentWindow.updateHeader();
 		}
 	};
 

@@ -1,3 +1,5 @@
+if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
+
 document.addEventListener("DOMContentLoaded", fetchTemplates, false);
 
 function fetchTemplates() {

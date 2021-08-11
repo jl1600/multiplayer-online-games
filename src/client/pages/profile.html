@@ -9,7 +9,7 @@
 	</head>
 
 	<body>
-		<iframe src="../components/header.html" width="100%"></iframe>
+		<iframe id="header" src="../components/header.html" width="100%"></iframe>
 
 		<form onkeydown="return event.key !== 'Enter'">
 			<label>
@@ -28,8 +28,8 @@
 			</label>
 
 			<div style="display: flex; justify-content: space-evenly; width: 100%;">
-				<button id="logout" onclick="logout()" type="button">Log out</button>
-				<button id="delete" onclick="logout()" type="button">Delete account</button>
+				<button id="logout-button" onclick="logout()" type="button">Log out</button>
+				<button id="delete-button" onclick="logout()" type="button">Delete account</button>
 			</div>
 		</form>
 
