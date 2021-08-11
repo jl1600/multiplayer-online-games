@@ -47,15 +47,29 @@ http.createServer((request, response) => {
 					"title": "A public game",
 					"description": "My very first game!",
 					"id": 2,
-					"public": false
+					"accessLevel": "PRIVATE"
 				},
 				{
 					"type": "quiz",
 					"title": "Another public game",
 					"description": "A fun quiz",
 					"id": 3,
-					"public": true
-				}
+					"accessLevel": "PUBLIC"
+				},
+				{
+                    "type": "quiz",
+                    "title": "Another public game",
+                    "description": "A fun quiz",
+                    "id": 4,
+                    "accessLevel": "FRIENDS"
+                },
+                {
+                    "type": "quiz",
+                    "title": "An uncool game",
+                    "description": "made by username",
+                    "id": 4,
+                    "accessLevel": "DELETED"
+                }
 			],
 			"templates": [
 				{
