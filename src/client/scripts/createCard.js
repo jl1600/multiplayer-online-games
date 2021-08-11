@@ -3,11 +3,12 @@ function createCard(data, type) {
 	card.setAttribute("data-id", data.id);
 
 	const content = createContent(data);
-	const overlay = createOverlay(type, data.public);
+	const overlay = createOverlay(type, data.accessLevel);
 
 	card.appendChild(content);
 	card.appendChild(overlay);
-	document.getElementById("cards-container").appendChild(card);
+
+	document.getElementById(data.accessLevel === "DELETED" ? "deleted-cards" : "cards-container").appendChild(card);
 }
 
 function createImg(type, extension = "jpg") {
@@ -21,7 +22,7 @@ function createText(text, elementClass) {
 	return el;
 }
 function createContent(data) {
-    const content = createElement("content");
+	const content = createElement("content");
 
 	const img = createImg(data.type);
 	const title = createText(data.title, "title");
@@ -40,36 +41,33 @@ function createOverlay(type, publicity) {
 	return el;
 }
 function createElement(className) {
-    const el = document.createElement("div");
-    el.classList.add(className);
-    return el;
+	const el = document.createElement("div");
+	el.classList.add(className);
+	return el;
 }
 function createOverlayButtons(type, publicity) {
-    const imgs = createElement("img-container");
+	const imgs = createElement("img-container");
 
-    if (type === "EDIT") {
-        createEditButtons(publicity).forEach(el => imgs.appendChild(el));
+	if (type === "EDIT" && sessionStorage.getItem("userType") !== "admin") {
+		createEditButtons(publicity).forEach(el => imgs.appendChild(el));
 	} else {
-	    const btn = createElement("button");
-	    btn.innerHTML = type.toUpperCase();
+		const btn = createElement("button");
+		btn.innerHTML = type.toUpperCase();
 
-	    imgs.appendChild(btn);
+		imgs.appendChild(btn);
 	}
 
 	return imgs;
 }
 function createEditButtons(publicity) {
-    const editImg = createImg("edit", "png");
-    editImg.classList.add("button");
-    editImg.classList.add("edit");
+    const visibilityImg = createImg(publicity.toLowerCase(), "png");
+	visibilityImg.classList.add("button");
+	visibilityImg.classList.add("publicity");
 
-    const deleteImg = createImg("trash", "png");
-    deleteImg.classList.add("button");
-    deleteImg.classList.add("delete");
+    if (publicity === "DELETED") return [visibilityImg];
+	const deleteImg = createImg("trash", "png");
+	deleteImg.classList.add("button");
+	deleteImg.classList.add("delete");
 
-    const visibilityImg = createImg(publicity ? "public" : "private", "png");
-    visibilityImg.classList.add("button");
-    visibilityImg.classList.add("publicity");
-
-    return [editImg, deleteImg, visibilityImg];
+	return [visibilityImg, deleteImg];
 }

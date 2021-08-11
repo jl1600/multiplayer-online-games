@@ -14,10 +14,10 @@ function fetchMatches() {
 }
 
 function listenForClicks() {
-    document.querySelectorAll("#cards-container .card .overlay .img-container .button").forEach(el => {
-        el.addEventListener("click", () => {
-            window.location = "http://localho.st:8080/pages/play-match?matchId=" +
-                el.parentElement.parentElement.parentElement.getAttribute("data-id");
-        });
-    });
+	document.querySelectorAll("#cards-container .card .overlay .img-container .button").forEach(el => {
+		el.addEventListener("click", () => {
+			window.location = "http://localho.st:8080/pages/play-match?matchId=" +
+				el.parentElement.parentElement.parentElement.getAttribute("data-id");
+		});
+	});
 }

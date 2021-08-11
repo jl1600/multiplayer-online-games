@@ -1,85 +1,82 @@
-#cards-container {
+.cards-container {
 	display: flex;
 	width: 100%;
 	flex-wrap: wrap;
 }
-#cards-container .card {
+.cards-container .card {
 	margin: 0 20px 20px 0;
 	width: 250px;
 	height: 250px;
 	border: 1px solid #23272a;
 	border-radius: 4px;
 	text-align: center;
-	transition-duration: 0.2s;
 	position: relative;
 }
-#cards-container .card:hover {
-	transform: translateY(-2px);
+.cards-container .card:hover .content {
+    transition-duration: 0.3s;
+	filter: brightness(0.7) blur(1px);
 }
-#cards-container .card:hover .content {
-    filter: brightness(0.5);
+.cards-container .card .content {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: pink;
 }
-#cards-container .card .content {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: pink;
+.cards-container .card .content img {
+	width: 100%;
+	height: 150px;
 }
-#cards-container .card .content img {
-    width: 100%;
-    height: 150px;
+.cards-container .card .content .title {
+	font-weight: 700;
+	font-size: 20px;
+	color: #7289da;
+	padding: 5px;
 }
-#cards-container .card .content .title {
-    font-weight: 700;
-    font-size: 20px;
-    color: #7289da;
-    padding: 5px;
-}
-#cards-container .card .content .description {
-    padding: 5px;
+.cards-container .card .content .description {
+	padding: 5px;
 }
 
-#cards-container .card .overlay {
-    position: relative;
-    display: none;
-    width: 250px;
-    height: 250px;
+.cards-container .card .overlay {
+	position: relative;
+	display: none;
+	width: 250px;
+	height: 250px;
 }
-#cards-container .card .overlay .img-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    width: 90%;
-    justify-content: space-evenly;
+.cards-container .card .overlay .img-container {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: flex;
+	width: 90%;
+	justify-content: space-evenly;
 }
-#cards-container .card .overlay .img-container .button {
-    cursor: pointer;
+.cards-container .card .overlay .img-container .button {
+	cursor: pointer;
 }
-#cards-container .card .overlay .img-container button.button {
-    width: 48px;
-    height: 48px;
+.cards-container .card .overlay .img-container button.button {
+	width: 48px;
+	height: 48px;
 }
-#cards-container .card .overlay .img-container div.button {
-    font-size: 32px;
-    background-color: #7289da;
-    color: white;
-    padding: 6px 15px;
-    width: 150px;
-    border-radius: 15px;
+.cards-container .card .overlay .img-container div.button {
+	font-size: 32px;
+	background-color: #7289da;
+	color: white;
+	padding: 6px 15px;
+	width: 150px;
+	border-radius: 15px;
 }
-#cards-container .content:hover + .overlay, #cards-container .card .overlay:hover {
+.cards-container .content:hover + .overlay, .cards-container .card .overlay:hover {
 	display: block;
 }
 
 #create-card {
-    font-size: 175px;
-    text-align: center;
-    text-decoration: none;
-    color: #23272a;
-    background-color: pink;
+	font-size: 175px;
+	text-align: center;
+	text-decoration: none;
+	color: #23272a;
+	background-color: pink;
 }
 #create-card:hover {
-    filter: brightness(0.8);
+	filter: brightness(0.8);
 }

@@ -3,12 +3,18 @@
 	<head>
 		<link rel="icon" href="../static/favicon.ico" type="image/x-icon" />
 		<link href="../stylesheets/general.css" rel="stylesheet" />
+		<link href="../stylesheets/cards.css" rel="stylesheet" />
 		<title>[Title of our app]</title>
 	</head>
 
 	<body>
 		<iframe id="header" src="../components/header.html" width="100%"></iframe>
 
-		<script src="../scripts/requests/playMatch.js"></script>
+		<main>
+			<h1>Manage users</h1>
+			<div id="cards-container" class="cards-container"></div>
+		</main>
+
+		<script src="../scripts/createCard.js"></script>
 	</body>
 </html>

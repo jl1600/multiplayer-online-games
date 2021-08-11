@@ -10,7 +10,7 @@ http.createServer((request, response) => {
 			console.log("POST: " + body);
 			response.writeHead(200, {"Content-Type": "application/json"});
 			response.end(`{"userId": 1,
-			"userType": "normal",
+			"userType": "admin",
 				"games": [
 					{
 						"type": "hangman",
@@ -26,7 +26,7 @@ http.createServer((request, response) => {
 		console.log("GET");
 		response.writeHead(200, {"Content-Type": "application/json"});
 		response.end(`{
-		    "username": "MyUserName",
+			"username": "MyUserName",
 			"matches": [
 				{
 					"type": "hangman",
@@ -47,23 +47,37 @@ http.createServer((request, response) => {
 					"title": "A public game",
 					"description": "My very first game!",
 					"id": 2,
-                    "public": false
+					"accessLevel": "PRIVATE"
 				},
 				{
 					"type": "quiz",
 					"title": "Another public game",
 					"description": "A fun quiz",
 					"id": 3,
-                    "public": true
-				}
+					"accessLevel": "PUBLIC"
+				},
+				{
+                    "type": "quiz",
+                    "title": "Another public game",
+                    "description": "A fun quiz",
+                    "id": 4,
+                    "accessLevel": "FRIENDS"
+                },
+                {
+                    "type": "quiz",
+                    "title": "An uncool game",
+                    "description": "made by username",
+                    "id": 4,
+                    "accessLevel": "FRIENDS"
+                }
 			],
 			"templates": [
-                {
-                    "type": "multiple-choice",
-                    "title": "Multiple choice",
-                    "description": "description of a multiple choice",
-                	"id": 1
-                }
+				{
+					"type": "multiple-choice",
+					"title": "Multiple choice",
+					"description": "description of a multiple choice",
+					"id": 1
+				}
 			]
 		}`);
 	}
