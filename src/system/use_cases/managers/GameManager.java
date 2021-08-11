@@ -89,6 +89,19 @@ public class GameManager {
     }
 
     /**
+     * Delete the specified builder.
+     *
+     * @param creatorID The user ID associated with this builder.
+     * @throws NoCreationInProgressException when there is no such builder to be destroyed.
+     * */
+    public void destroyBuilder(String creatorID) throws NoCreationInProgressException {
+        if (!gameBuilders.containsKey(creatorID)) {
+            throw new NoCreationInProgressException();
+        } else {
+            gameBuilders.remove(creatorID);
+        }
+    }
+    /**
      * Conclude the building process. Provide the game with and ID and stores it. Remove the CreatorID
      * from the collection of users that are in building process.
      *
@@ -226,7 +239,10 @@ public class GameManager {
      * Returns the title of a game
      * @param gameID The unique string identifier of the game
      * */
-    public String getGameTitle(String gameID) {
+    public String getGameTitle(String gameID) throws InvalidGameIDException {
+        if(!games.containsKey(gameID)) {
+            throw new InvalidGameIDException();
+        }
         return games.get(gameID).getTitle();
     }
 
@@ -234,7 +250,10 @@ public class GameManager {
      * Returns the template ID of a game
      * @param gameID The unique string identifier of the game
      * */
-    public String getTemplateID(String gameID) {
+    public String getTemplateID(String gameID) throws InvalidGameIDException {
+        if(!games.containsKey(gameID)) {
+            throw new InvalidGameIDException();
+        }
         return games.get(gameID).getTemplateID();
     }
 
@@ -242,20 +261,17 @@ public class GameManager {
      * Returns the owner ID of a game
      * @param gameID The unique string identifier of the game
      * */
-    public String getOwnerID(String gameID) {
+    public String getOwnerID(String gameID) throws InvalidGameIDException {
+        if(!games.containsKey(gameID)) {
+            throw new InvalidGameIDException();
+        }
         return games.get(gameID).getOwnerId();
     }
 
-    public void setPublicStatus(String gameID) throws InvalidGameIDException {
-        setGameAccessLevel(gameID,GameAccessLevel.PUBLIC);
-    }
-    public void setPrivateStatus(String gameID) throws InvalidGameIDException {
-        setGameAccessLevel(gameID,GameAccessLevel.PRIVATE);
-    }
-    public void setFriendOnlyStatus(String gameID) throws InvalidGameIDException {
-        setGameAccessLevel(gameID,GameAccessLevel.FRIEND);
-    }
-    public void setDeletedStatus(String gameID) throws InvalidGameIDException {
-        setGameAccessLevel(gameID,GameAccessLevel.DELETED);
+    public GameAccessLevel getAccessLevel(String gameID) throws InvalidGameIDException {
+        if(!games.containsKey(gameID)) {
+            throw new InvalidGameIDException();
+        }
+        return games.get(gameID).getGameAccessLevel();
     }
 }

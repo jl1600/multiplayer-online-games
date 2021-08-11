@@ -1,15 +1,14 @@
 package system.use_cases.game_matches;
 
+import shared.constants.GameAccessLevel;
 import shared.constants.MatchStatus;
 import shared.exceptions.use_case_exceptions.*;
-import system.entities.game.Game;
 import system.entities.game.hangman.HangmanGame;
 import system.entities.template.HangmanTemplate;
 import system.use_cases.builders.normal_builders.HangmanGameBuilder;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class HangmanMatch extends GameMatch {
@@ -166,7 +165,7 @@ public class HangmanMatch extends GameMatch {
         builder.setGameId("hangmanGameId3432141");
         builder.setTemplateId("templ8-3421");
         builder.setOwnerId("zach01111");
-        builder.setIsPublic(true);
+        builder.setGameAccessLevel(GameAccessLevel.PUBLIC);
         builder.addPuzzle("Star Wars - Episode 1: The Phantom Menace", "The one with JarJar");
         builder.setTitle("Zach's Starwars Hangman Game");
         HangmanGame game = builder.toHangmanGame();

@@ -77,6 +77,23 @@ public class MatchManager {
     }
 
     /**
+     * Remove a player form a match.
+     * @param userID the ID of the player.
+     * @param matchID the ID of the match.
+     * */
+    public void removePlayer(String userID, String matchID) throws InvalidMatchIDException, InvalidUserIDException {
+        if (preparingMatches.containsKey(matchID)) {
+            preparingMatches.get(matchID).removePlayer(userID);
+        } else if (ongoingMatches.containsKey(matchID)) {
+            ongoingMatches.get(matchID).removePlayer(userID);
+        } else if (finishedMatches.containsKey(matchID)) {
+            finishedMatches.get(matchID).removePlayer(userID);
+        } else {
+            throw new InvalidMatchIDException();
+        }
+    }
+
+    /**
      * Returns the status of a match.
      *
      * @param matchID The String identifier of the match.

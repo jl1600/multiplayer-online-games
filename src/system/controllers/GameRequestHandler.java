@@ -3,7 +3,8 @@ package system.controllers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import shared.DTOs.Requests.CreateMatchRequestBody;
+import shared.DTOs.Requests.*;
+import shared.DTOs.Responses.DesignQuestionResponseBody;
 import shared.DTOs.Responses.MatchDataResponseBody;
 import shared.exceptions.use_case_exceptions.*;
 import shared.DTOs.Responses.GameDataResponseBody;
@@ -14,17 +15,12 @@ import system.use_cases.managers.UserManager;
 
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.io.*;
 
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class GameRequestHandler implements HttpHandler {
@@ -34,6 +30,7 @@ public class GameRequestHandler implements HttpHandler {
     private final UserManager userManager;
     private final MatchManager matchManager;
     private final ServerSocket serverSocket;
+    private final Gson gson;
 
     public GameRequestHandler(GameManager gameManager,
                               TemplateManager templateManager,
@@ -48,6 +45,7 @@ public class GameRequestHandler implements HttpHandler {
         } catch (IOException e) {
             throw new RuntimeException("Cannot create server socket, IO problem.");
         }
+        gson = new Gson();
     }
 
     @Override
@@ -93,18 +91,86 @@ public class GameRequestHandler implements HttpHandler {
             case "create-builder":
                 handleCreateBuilder(exchange);
                 break;
+            case "make-design-choice":
+                handleMakeDesignChoice(exchange);
+                break;
+            case "cancel-builder":
+                handleCancelBuilder(exchange);
+                break;
             case "create-match":
                 handleCreateMatch(exchange);
+                break;
+            case "join-match":
+                handleJoinMatch(exchange);
+                break;
+            case "leave-match":
+                handleLeaveMatch(exchange);
                 break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
 
+    private void handleLeaveMatch(HttpExchange exchange) throws IOException {
+        LeaveMatchRequestBody body = gson.fromJson(getRequestBody(exchange), LeaveMatchRequestBody.class);
+        try {
+            matchManager.removePlayer(body.userID, body.matchID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidMatchIDException e) {
+            sendResponse(exchange, 404, "Invalid ID.");
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Match doesn't contain this user.");
+        }
+    }
+
+    private void handleJoinMatch(HttpExchange exchange) throws IOException {
+        JoinMatchRequestBody body = gson.fromJson(getRequestBody(exchange), JoinMatchRequestBody.class);
+        try {
+            matchManager.addPlayer(body.userID, userManager.getUsername(body.userID), body.matchID);
+            acceptPlayerSocket(body.userID, body.matchID);
+        } catch (InvalidMatchIDException e) {
+            sendResponse(exchange, 403, "Match already started or the given ID is invalid.");
+        } catch (DuplicateUserIDException e) {
+            sendResponse(exchange, 400, "The user is already in this match.");
+        } catch (MaxPlayerReachedException e) {
+            sendResponse(exchange, 403, "The max number of players is reached.");
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 404, "The user ID is invalid.");
+        }
+    }
+
+    private void handleCancelBuilder(HttpExchange exchange) throws IOException {
+        CancelBuilderRequestBody body = gson.fromJson(getRequestBody(exchange), CancelBuilderRequestBody.class);
+        try {
+            gameManager.destroyBuilder(body.userID);
+            sendResponse(exchange, 204, null);
+        } catch (NoCreationInProgressException e) {
+            sendResponse(exchange, 400, "User ID is invalid or no builder is in progress.");
+        }
+    }
+
+    private void handleMakeDesignChoice(HttpExchange exchange) throws IOException {
+        DesignChoiceRequestBody body = gson.fromJson(getRequestBody(exchange), DesignChoiceRequestBody.class);
+        try {
+            gameManager.makeDesignChoice(body.userID, body.designChoice);
+            try {
+                gameManager.buildGame(body.userID);
+                sendResponse(exchange, 201, "Success!");
+            } catch (InsufficientInputException e) {
+                DesignQuestionResponseBody res = new DesignQuestionResponseBody();
+                res.designQuestion = gameManager.getDesignQuestion(body.userID);
+                sendResponse(exchange, 200, gson.toJson(res));
+            }
+        } catch (NoCreationInProgressException e) {
+            sendResponse(exchange, 404, "No game builder associated with this user.");
+        } catch (InvalidInputException e) {
+            sendResponse(exchange, 400, "Invalid Input");
+        }
+    }
+
     private void handleCreateMatch(HttpExchange exchange) throws IOException {
 
         String data = getRequestBody(exchange);
-        Gson gson = new Gson();
         CreateMatchRequestBody body  = gson.fromJson(data, CreateMatchRequestBody.class);
 
         try {
@@ -113,19 +179,8 @@ public class GameRequestHandler implements HttpHandler {
                                     gameManager.getGame(body.gameID),
                                     templateManager.getTemplate(templateID));
             System.out.println(matchID);
-            sendResponse(exchange, 204, null);
-
-            Socket newPlayer = serverSocket.accept();
-            // handShake(newPlayer);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(newPlayer.getInputStream()));
-            System.out.println("trying to read the player's ID");
-            String playerID = reader.readLine();
-            System.out.println(playerID);
-            PlayerInputListener inputListener = new PlayerInputListener(newPlayer, matchManager, matchID, playerID);
-            MatchOutputDispatcher outputDispatcher = new MatchOutputDispatcher(matchManager, matchID);
-            outputDispatcher.addPlayerOutput(newPlayer);
-            matchManager.addObserver(outputDispatcher, matchID);
-            inputListener.start();
+            sendResponse(exchange, 204, null); // Telling the client that match is successfully created.
+            acceptPlayerSocket(body.userID, matchID);
 
         } catch (InvalidUserIDException | InvalidIDException e) {
             sendResponse(exchange, 400, "One of the provided IDs is invalid.");
@@ -134,6 +189,27 @@ public class GameRequestHandler implements HttpHandler {
         }
     }
 
+    private void acceptPlayerSocket(String userID, String matchID) throws IOException, InvalidMatchIDException {
+        Socket connection = serverSocket.accept();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        // handShake(newPlayer);
+        String playerID = reader.readLine();
+        // Refusing connection until it's the correct user ID that we are looking for.
+        while (!playerID.equals(userID)) {
+            connection.close();
+            connection = serverSocket.accept();
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            playerID = reader.readLine();
+        }
+        PlayerInputListener inputListener = new PlayerInputListener(connection, matchManager, matchID, playerID);
+        MatchOutputDispatcher outputDispatcher = new MatchOutputDispatcher(matchManager, matchID);
+        outputDispatcher.addPlayerOutput(connection);
+        matchManager.addObserver(outputDispatcher, matchID);
+        inputListener.start();
+    }
+
+    //////////////////////////////////////////////////////
+    // May need to remove this later
     private void handShake(Socket client) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
         reader.readLine();
@@ -161,9 +237,26 @@ public class GameRequestHandler implements HttpHandler {
         }
         return result;
     }
-    // NOT IMPLEMENTED
-    private void handleCreateBuilder(HttpExchange exchange) {
 
+    private void handleCreateBuilder(HttpExchange exchange) throws IOException {
+        CreateGameBuilderRequestBody body = gson.fromJson(getRequestBody(exchange), CreateGameBuilderRequestBody.class);
+        DesignQuestionResponseBody question = new DesignQuestionResponseBody();
+        try {
+            gameManager.initiateGameBuilder(body.userID, templateManager.getTemplate(body.templateID));
+            question.designQuestion = gameManager.getDesignQuestion(body.userID);
+            sendResponse(exchange, 201, gson.toJson(question));
+        } catch (CreationInProgressException e) {
+            try {
+                question.designQuestion = gameManager.getDesignQuestion(body.userID);
+                sendResponse(exchange, 200, gson.toJson(question));
+            } catch (NoCreationInProgressException noCreationInProgressException) {
+                throw new RuntimeException("No creation in progress. This should never happen.");
+            }
+        } catch (InvalidIDException e) {
+            sendResponse(exchange, 404, "The provided ID is invalid.");
+        } catch (NoCreationInProgressException e) {
+            throw new RuntimeException("No creation in progress. This should never happen.");
+        }
     }
 
     private void handleGetPublicGamesByTemplate(HttpExchange exchange) throws IOException {
@@ -186,19 +279,21 @@ public class GameRequestHandler implements HttpHandler {
         Set<String> allPublicGames = gameManager.getAllPublicGamesID();
         Set<GameDataResponseBody> dataSet = new HashSet<>();
         for (String gameID: allPublicGames) {
-            if (gameManager.getTemplateID(gameID).equals(templateID)) {
-                GameDataResponseBody data = new GameDataResponseBody();
-                data.id = gameID;
-                data.ownerId = gameManager.getOwnerID(gameID);
-                data.title = gameManager.getGameTitle(gameID);
-                dataSet.add(data);
+            try {
+                if (gameManager.getTemplateID(gameID).equals(templateID)) {
+                    GameDataResponseBody data = new GameDataResponseBody();
+                    data.id = gameID;
+                    data.ownerName = userManager.getUsername(gameManager.getOwnerID(gameID));
+                    data.title = gameManager.getGameTitle(gameID);
+                    data.accessLevel = gameManager.getAccessLevel(gameID);
+                    dataSet.add(data);
+                }
+            } catch (InvalidGameIDException | InvalidUserIDException e) {
+                throw new RuntimeException("Invalid game ID from the list of public games. This should never happen.");
             }
         }
-        Map<String, Set<GameDataResponseBody>> dataMap = new HashMap<>();
-        dataMap.put("data", dataSet);
 
-        Gson gson = new Gson();
-        return gson.toJson(dataMap);
+        return gson.toJson(dataSet);
     }
 
     private void handleGetAllGameMatches(HttpExchange exchange) throws IOException {
@@ -220,13 +315,12 @@ public class GameRequestHandler implements HttpHandler {
                 dataSet.add(data);
             } catch (InvalidMatchIDException e) {
                 throw new RuntimeException("The match ID returned from match manager doesn't exist anymore");
+            } catch (InvalidGameIDException e) {
+                throw new RuntimeException("The game ID got from match is invalid.");
             }
         }
-        Map<String, Set<MatchDataResponseBody>> dataMap = new HashMap<>();
-        dataMap.put("data", dataSet);
 
-        Gson gson = new Gson();
-        return gson.toJson(dataMap);
+        return gson.toJson(dataSet);
     }
 
 
@@ -281,7 +375,7 @@ public class GameRequestHandler implements HttpHandler {
             try {
                 if (gameManager.checkIsPublic(id)){
                     GameDataResponseBody data = new GameDataResponseBody();
-                    data.ownerId = userID;
+                    data.ownerName = userManager.getUsername(userID);
                     data.id = id;
                     data.title = gameManager.getGameTitle(id);
                     dataSet.add(data);
@@ -290,11 +384,8 @@ public class GameRequestHandler implements HttpHandler {
                 throw new RuntimeException("Fatal Error: The user contains an invalid game ID.");
             }
         }
-        Map<String, Set<GameDataResponseBody>> dataMap = new HashMap<>();
-        dataMap.put("data", dataSet);
 
-        Gson gson = new Gson();
-        return gson.toJson(dataMap);
+        return gson.toJson(dataSet);
     }
 
     private void sendResponse(HttpExchange exchange, int responseCode, String body) throws IOException {
@@ -318,8 +409,6 @@ public class GameRequestHandler implements HttpHandler {
         while ((b = br.read()) != -1) {
             buf.append((char) b);
         }
-        buf.delete(0, 8); // Eliminating the {"data":
-        buf.deleteCharAt(buf.length() - 1); // Eliminating the last }
         br.close();
         isr.close();
         return buf.toString();
@@ -329,16 +418,17 @@ public class GameRequestHandler implements HttpHandler {
             Set<GameDataResponseBody> dataSet = new HashSet<>();
             for (String id: ownedIds) {
                 GameDataResponseBody data = new GameDataResponseBody();
-                data.ownerId = userID;
+                data.ownerName = userManager.getUsername(userID);
                 data.id = id;
-                data.title = gameManager.getGameTitle(id);
+                try {
+                    data.title = gameManager.getGameTitle(id);
+                } catch (InvalidGameIDException e) {
+                    throw new RuntimeException("Game ID from owned list is invalid.");
+                }
                 dataSet.add(data);
             }
-            Map<String, Set<GameDataResponseBody>> dataMap = new HashMap<>();
-            dataMap.put("data", dataSet);
 
-            Gson gson = new Gson();
-            return gson.toJson(dataMap);
+            return gson.toJson(dataSet);
     }
 
     private String getAllPublicGamesData() {
@@ -348,15 +438,17 @@ public class GameRequestHandler implements HttpHandler {
         for (String id: publicGames) {
             GameDataResponseBody game = new GameDataResponseBody();
             game.id = id;
-            game.title = gameManager.getGameTitle(id);
-            game.ownerId = gameManager.getOwnerID(id);
+            try {
+                game.title = gameManager.getGameTitle(id);
+                game.ownerName = userManager.getUsername(gameManager.getOwnerID(id));
+            } catch (InvalidGameIDException | InvalidUserIDException e) {
+                throw new RuntimeException("Game ID or user ID got from public game list is invalid.");
+            }
+
             dataSet.add(game);
         }
-        Map<String, Set<GameDataResponseBody>> dataMap = new HashMap<>();
-        dataMap.put("data", dataSet);
 
-        Gson gson = new Gson();
-        return gson.toJson(dataMap);
+        return gson.toJson(dataSet);
     }
 
 

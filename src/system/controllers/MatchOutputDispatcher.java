@@ -47,6 +47,7 @@ public class MatchOutputDispatcher implements Observer {
                 matchOutput.status = matchManager.getMatchStatus(matchID);
                 matchOutput.textContent = matchManager.getMatchTextContent(matchID);
                 matchOutput.lastTurnMoves = matchManager.getPlayersLastMove(matchID);
+                matchOutput.numPlayers = matchManager.getPlayerCount(matchID);
             } catch (InvalidMatchIDException e) {
                 throw new RuntimeException("Invalid match ID. This should never happen.");
             }

@@ -95,12 +95,17 @@ public class QuizGameMatch extends GameMatch {
         }
 
         playerStats.put(userID, new PlayerStat(username));
+        setChanged();
+        notifyObservers();
     }
 
     @Override
     public void removePlayer(String playerID) throws InvalidUserIDException {
-        if (playerStats.containsKey(playerID))
+        if (playerStats.containsKey(playerID)) {
             this.playerStats.remove(playerID);
+            setChanged();
+            notifyObservers();
+        }
         else throw  new InvalidUserIDException();
     }
 
