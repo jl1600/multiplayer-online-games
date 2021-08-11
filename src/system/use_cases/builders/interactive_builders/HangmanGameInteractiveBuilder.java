@@ -2,7 +2,6 @@ package system.use_cases.builders.interactive_builders;
 
 import shared.exceptions.use_case_exceptions.CreationInProgressException;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
-import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.Game;
 import system.entities.game.hangman.HangmanGame;
 import system.entities.template.HangmanTemplate;
@@ -34,7 +33,7 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
         chosenTemplate = template;
 
         builder = new HangmanGameBuilder();
-        builder.setOwnerId(creatorId);
+        builder.setOwnerId(this.getCreatorID());
         builder.setTemplateId(template.getID());
 
         currentPuzzleIndex = 0;
@@ -42,7 +41,6 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
         currentDesignQuestion = DesignQuestion.TITLE;
         currentDesignQuestionText = DESIGN_QUESTION_TEXT[0];
     }
-
 
     @Override
     public String getDesignQuestion() {
@@ -62,69 +60,85 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
 
     @Override
     public void makeDesignChoice(String designChoice) {
-        currentDesignQuestionText = update(designChoice);
-    }
-
-    private String update(String designChoice) {
         switch (currentDesignQuestion) {
             case TITLE:
-                return handleTitleDesignQuestion(designChoice);
+                handleTitleDesignQuestion(designChoice);
+                break;
             case PUBLIC:
-                return handlePublicDesignQuestion(designChoice);
+                handlePublicDesignQuestion(designChoice);
+                break;
             case PUZZLE_ANSWER:
-                return handleAnswerDesignQuestion(designChoice);
+                handleAnswerDesignQuestion(designChoice);
+                break;
             case PUZZLE_PROMPT:
-                return handlePromptQuestion(designChoice);
+                handlePromptQuestion(designChoice);
+                break;
+            case CONFIRMATION:
+                handleConfirmationQuestion(designChoice);
+                break;
         }
-        return "Design question not recognized. Some error occurred.";
     }
 
-    private String handleTitleDesignQuestion(String designChoice) {
-        if (designChoice == null | designChoice.equals("")) {
-            builder.setTitle("HangmanGame " + currentGame.getID());
+    private void handleTitleDesignQuestion(String designChoice) {
+        if (designChoice.equals("")) {
+            builder.setTitle("HangmanGame");
         } else {
             builder.setTitle(designChoice);
         }
         currentDesignQuestion = DesignQuestion.PUBLIC;
-        return DESIGN_QUESTION_TEXT[1];
+        currentDesignQuestionText = DESIGN_QUESTION_TEXT[1];
     }
 
-    private String handlePublicDesignQuestion(String designChoice) {
+    private void handlePublicDesignQuestion(String designChoice) {
         if (designChoice.equals("yes")) {
             builder.setIsPublic(true);
         } else if (designChoice.equals("no")) {
             builder.setIsPublic(false);
         } else {
-          //throw some error
+            currentDesignQuestionText = "Invalid input. " + DESIGN_QUESTION_TEXT[1];
         }
         currentDesignQuestion = DesignQuestion.PUZZLE_ANSWER;
-        return DESIGN_QUESTION_TEXT[2];
+        currentDesignQuestionText = DESIGN_QUESTION_TEXT[2];
     }
 
-    private String handleAnswerDesignQuestion(String designChoice) {
+    private void handleAnswerDesignQuestion(String designChoice) {
         try {
             builder.addAnswer(currentPuzzleIndex, designChoice);
         } catch (InsufficientInputException e) {
-            e.printStackTrace();
+            currentDesignQuestionText = "Invalid input. " + DESIGN_QUESTION_TEXT[2];
         }
         currentDesignQuestion = DesignQuestion.PUZZLE_PROMPT;
-        return DESIGN_QUESTION_TEXT[3];
+        currentDesignQuestionText = DESIGN_QUESTION_TEXT[3];
     }
 
-    private String handlePromptQuestion(String designChoice) {
+    private void handlePromptQuestion(String designChoice) {
         try {
             builder.addPrompt(currentPuzzleIndex, designChoice);
         } catch (InsufficientInputException e) {
-            e.printStackTrace();
+            currentDesignQuestionText = "Invalid input. " + DESIGN_QUESTION_TEXT[3];
         }
-
         currentPuzzleIndex++;
         if (currentPuzzleIndex < chosenTemplate.getNumPuzzles()) {
             currentDesignQuestion = DesignQuestion.PUZZLE_ANSWER;
-            return DESIGN_QUESTION_TEXT[2];
+            currentDesignQuestionText = DESIGN_QUESTION_TEXT[2];
         } else {
             currentDesignQuestion = DesignQuestion.CONFIRMATION;
-            return DESIGN_QUESTION_TEXT[4];
+            currentDesignQuestionText = DESIGN_QUESTION_TEXT[4];
+        }
+    }
+
+    private void handleConfirmationQuestion(String designChoice) {
+        if (designChoice.equals("yes")) {
+            this.readyToBuild = true;
+        } else if (designChoice.equals("no")) {
+            builder = new HangmanGameBuilder();
+            builder.setOwnerId(this.getCreatorID());
+            builder.setTemplateId(chosenTemplate.getID());
+            currentPuzzleIndex = 0;
+            currentDesignQuestion = DesignQuestion.TITLE;
+            currentDesignQuestionText = DESIGN_QUESTION_TEXT[0];
+        } else {
+            currentDesignQuestionText = "Invalid input. " + DESIGN_QUESTION_TEXT[4];
         }
     }
 }
