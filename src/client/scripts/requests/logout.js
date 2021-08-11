@@ -1,7 +1,7 @@
 window.addEventListener("beforeunload", logout);
 
 function logout() {
-	xhr.open("POST", "http://localhost:8000/logout");
+	xhr.open("POST", "http://localhost:8000/user/logout");
 	xhr.setRequestHeader("Content-Type", "application/json");
 
 	xhr.onreadystatechange = () => {
@@ -15,6 +15,23 @@ function logout() {
 	xhr.send(JSON.stringify`{
 		userId: sessionStorage.getItem("userId")
 	}`);
+}
+
+function delete() {
+    xhr.open("POST", "http://localhost:8000/user/delete");
+    	xhr.setRequestHeader("Content-Type", "application/json");
+
+    	xhr.onreadystatechange = () => {
+    		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+    			sessionStorage.setItem("userId", null);
+    			sessionStorage.setItem("userType", null);
+    			newTrial();
+    		}
+    	};
+
+    	xhr.send(JSON.stringify`{
+    		userId: sessionStorage.getItem("userId")
+    	}`);
 }
 
 function newTrial() {

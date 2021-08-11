@@ -1,7 +1,7 @@
 function login(username, password) {
 	if (!username || !password) return;
 
-	xhr.open("POST", "http://localhost:8000/login");
+	xhr.open("POST", "http://localhost:8000/user/login");
 	xhr.setRequestHeader("Content-Type", "application/json");
 
 	xhr.onreadystatechange = () => {
@@ -10,7 +10,7 @@ function login(username, password) {
 			sessionStorage.setItem("userId", data.userId);
 			sessionStorage.setItem("userType", data.userType);
 
-			window.location = data.userType === "admin" ? "http://localho.st:8080/pages/edit-template" : "http://localho.st:8080/pages/matches";
+			window.location = data.userType === "admin" ? "http://localho.st:8080/pages/templates" : "http://localho.st:8080/pages/matches";
 			document.getElementById("header").contentWindow.updateHeader();
 		}
 	};
