@@ -11,12 +11,20 @@
 	<body>
 		<iframe src="../components/header.html" width="100%"></iframe>
 
-		<form onsubmit="signup(this.username.value, this.password.value); return false">
+		<form onsubmit="signup(this.username.value, this.password.value, this.confirmPassword.value, this.userType.value); return false">
 			<h1>Sign up</h1>
 			<input type="text" name="username" placeholder="Username">
 			<input id="password" type="password" name="password" placeholder="Password">
 			<input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm password" onfocusout="checkPassword()">
 			<div id="errorMessage"></div>
+			<div id="user-type">User type:
+				<label>
+					<input type="radio" name="userType" value="normal" checked />Normal
+				</label>
+				<label>
+					<input type="radio" name="userType" value="admin" />Admin
+				</label>
+			</div>
 			<button type="submit">Sign up</button>
 		</form>
 

@@ -4,6 +4,7 @@
     <link rel="icon" href="../static/favicon.ico" type="image/x-icon" />
     <link href="../stylesheets/general.css" rel="stylesheet" />
     <link href="../stylesheets/form.css" rel="stylesheet" />
+    <script src="../scripts/requests/logout.js"></script>
     <title>Log in to [Title of our app]</title>
 </head>
 
@@ -26,6 +27,8 @@
         <button id="edit-password" onclick="allowEditPassword()" type="button" style="margin-left: 10px">Edit</button>
     </label>
 </form>
+
+<button id="logout" onclick="logout()" type="button">Log out</button>
 
 <script src="../scripts/requests/login.js"></script>
 <script src="../scripts/requests/editUser.js"></script>

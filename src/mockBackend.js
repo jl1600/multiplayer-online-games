@@ -16,7 +16,8 @@ http.createServer((request, response) => {
 						"type": "hangman",
 						"title": "My first game",
 						"description": "My very first game!",
-						"id": 2
+						"id": 2,
+						"public": false
 					}
 				]
 			}`);
@@ -45,13 +46,15 @@ http.createServer((request, response) => {
 					"type": "hangman",
 					"title": "A public game",
 					"description": "My very first game!",
-					"id": 2
+					"id": 2,
+                    "public": false
 				},
 				{
 					"type": "quiz",
 					"title": "Another public game",
 					"description": "A fun quiz",
-					"id": 3
+					"id": 3,
+                    "public": true
 				}
 			],
 			"templates": [

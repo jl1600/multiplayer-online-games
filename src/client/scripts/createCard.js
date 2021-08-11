@@ -3,7 +3,7 @@ function createCard(data, type) {
 	card.setAttribute("data-id", data.id);
 
 	const content = createContent(data);
-	const overlay = createOverlay(type);
+	const overlay = createOverlay(type, data.public);
 
 	card.appendChild(content);
 	card.appendChild(overlay);
@@ -32,9 +32,9 @@ function createContent(data) {
 	content.appendChild(description);
 	return content;
 }
-function createOverlay(type) {
+function createOverlay(type, publicity) {
 	const el = createElement("overlay");
-	const imgs = createOverlayButtons(type);
+	const imgs = createOverlayButtons(type, publicity);
 
 	el.appendChild(imgs);
 	return el;
@@ -44,14 +44,11 @@ function createElement(className) {
     el.classList.add(className);
     return el;
 }
-function createOverlayButtons(type) {
+function createOverlayButtons(type, publicity) {
     const imgs = createElement("img-container");
 
     if (type === "EDIT") {
-	    const [editImg, deleteImg] = createEditButtons();
-
-	    imgs.appendChild(editImg);
-        imgs.appendChild(deleteImg);
+        createEditButtons(publicity).forEach(el => imgs.appendChild(el));
 	} else {
 	    const btn = createElement("button");
 	    btn.innerHTML = type.toUpperCase();
@@ -61,7 +58,7 @@ function createOverlayButtons(type) {
 
 	return imgs;
 }
-function createEditButtons() {
+function createEditButtons(publicity) {
     const editImg = createImg("edit", "png");
     editImg.classList.add("button");
     editImg.classList.add("edit");
@@ -70,5 +67,9 @@ function createEditButtons() {
     deleteImg.classList.add("button");
     deleteImg.classList.add("delete");
 
-    return [editImg, deleteImg];
+    const visibilityImg = createImg(publicity ? "public" : "private", "png");
+    visibilityImg.classList.add("button");
+    visibilityImg.classList.add("publicity");
+
+    return [editImg, deleteImg, visibilityImg];
 }

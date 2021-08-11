@@ -10,7 +10,7 @@ form {
 	border-radius: 12px;
 	padding: 25px;
 }
-form input {
+form input[type="text"], form input[type="password"] {
     background-color: whitesmoke;
 	outline-width: 0px;
 	outline: none;
@@ -21,6 +21,16 @@ form input {
 	padding: 5px;
 	margin-bottom: 30px;
 	transition-duration: 0.1s;
+}
+form #user-type {
+    font-size: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 20px;
+}
+form input[type="radio"] {
+    width: auto;
 }
 form input:focus {
 	border-color: #36393f;

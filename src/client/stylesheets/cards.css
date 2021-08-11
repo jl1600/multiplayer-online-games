@@ -57,6 +57,10 @@
 #cards-container .card .overlay .img-container .button {
     cursor: pointer;
 }
+#cards-container .card .overlay .img-container button.button {
+    width: 48px;
+    height: 48px;
+}
 #cards-container .card .overlay .img-container div.button {
     font-size: 32px;
     background-color: #7289da;

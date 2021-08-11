@@ -1,4 +1,4 @@
-function signup(username, password, confirmPassword) {
+function signup(username, password, confirmPassword, userType) {
 	if (!username || !password) return;
 	if (!checkPassword(password, confirmPassword)) return;
 
@@ -11,7 +11,8 @@ function signup(username, password, confirmPassword) {
 		}
 	};
 
-	xhr.send(JSON.stringify({ username, password }));
+    console.log(JSON.stringify({ username, password, userType }));
+	xhr.send(JSON.stringify({ username, password, userType }));
 }
 
 function checkPassword() {
@@ -19,7 +20,6 @@ function checkPassword() {
 		document.getElementById("errorMessage").innerHTML = "Passwords don't match!";
 		return false;
 	} else {
-
 		document.getElementById("errorMessage").innerHTML = "";
 		return true;
 	}
