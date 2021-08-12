@@ -120,7 +120,7 @@ public class TemplateRequestHandler extends RequestHandler {
     private void handleGetAllAttributes(HttpExchange exchange) throws IOException {
         String templateID;
         try {
-            String query = exchange.getRequestURI().toURL().getQuery();
+            String query = exchange.getRequestURI().getQuery();
             if (query == null) {
                 sendResponse(exchange, 400, "Missing Query.");
                 return;

@@ -31,7 +31,7 @@ public class UserManager {
         idManager = new IdManager(gateway.getUserCount() + 1);
     }
 
-    private String getUserId(String username) throws InvalidUsernameException {
+    public String getUserId(String username) throws InvalidUsernameException {
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
 
