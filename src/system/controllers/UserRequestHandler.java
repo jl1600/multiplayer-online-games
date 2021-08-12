@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.LoginRequestBody;
 import shared.DTOs.Requests.LogoutRequestBody;
 import shared.DTOs.Requests.RegisterRequestBody;
+import shared.DTOs.Responses.LoginResponseBody;
 import shared.exceptions.use_case_exceptions.*;
 import system.use_cases.managers.UserManager;
 
@@ -80,7 +81,10 @@ public class UserRequestHandler extends RequestHandler {
         LoginRequestBody body = gson.fromJson(getRequestBody(exchange), LoginRequestBody.class);
         try {
             String userID = userManager.login(body.username, body.password);
-            sendResponse(exchange, 200, "{\"userID\":\"" + userID+"\"}");
+            LoginResponseBody resBody = new LoginResponseBody();
+            resBody.userID = userID;
+            resBody.role = userManager.getUserRole(userID);
+            sendResponse(exchange, 200, gson.toJson(resBody));
         } catch (InvalidUsernameException | IncorrectPasswordException | ExpiredUserException e) {
             sendResponse(exchange, 400, "User doesn't exist, is expired, or the password is incorrect.");
         } catch (InvalidUserIDException e) {
