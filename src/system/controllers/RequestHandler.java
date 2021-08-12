@@ -35,6 +35,8 @@ public abstract class RequestHandler implements HttpHandler {
     protected abstract void handlePostRequest(HttpExchange exchange) throws IOException;
 
     protected static void sendResponse(HttpExchange exchange, int responseCode, String body) throws IOException {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type");
         if (responseCode != 204) {
             OutputStream outputStream = exchange.getResponseBody();
             exchange.sendResponseHeaders(responseCode, body.length());
