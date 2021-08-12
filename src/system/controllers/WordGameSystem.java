@@ -38,7 +38,7 @@ public class WordGameSystem {
 
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
         server.createContext("/game", gameRH);
-        server.createContext("/template", templateRH);
+        // server.createContext("/template", templateRH);
         server.setExecutor(threadPoolExecutor);
 
     }

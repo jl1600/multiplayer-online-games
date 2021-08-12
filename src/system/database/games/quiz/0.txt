@@ -1,9 +1,9 @@
 @gameId:0
 @templateId:1
-@ownerId:null
+@ownerId:2
 @title:answer is the question
 @maxAttempts:2
-@GameAccessLevel:PRIVATE
+@GameAccessLevel:PUBLIC
 @scoreCategories
 1.0|General|0.0|Quiz Game Finished.
 @scoreCategories

@@ -2,7 +2,6 @@ package system.controllers;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import shared.DTOs.Requests.*;
 import shared.DTOs.Responses.DesignQuestionResponseBody;
 import shared.DTOs.Responses.MatchDataResponseBody;
@@ -377,6 +376,7 @@ public class GameRequestHandler extends RequestHandler {
                     data.ownerName = userManager.getUsername(userID);
                     data.id = id;
                     data.title = gameManager.getGameTitle(id);
+                    data.accessLevel = gameManager.getAccessLevel(id);
                     dataSet.add(data);
                 }
             } catch (InvalidGameIDException e) {
@@ -397,6 +397,7 @@ public class GameRequestHandler extends RequestHandler {
                 data.id = id;
                 try {
                     data.title = gameManager.getGameTitle(id);
+                    data.accessLevel = gameManager.getAccessLevel(id);
                 } catch (InvalidGameIDException e) {
                     throw new RuntimeException("Game ID from owned list is invalid.");
                 }
@@ -409,20 +410,19 @@ public class GameRequestHandler extends RequestHandler {
     private String getAllPublicGamesData() {
         Set<GameDataResponseBody> dataSet = new HashSet<>();
         Set<String> publicGames = gameManager.getAllPublicGamesID();
-
         for (String id: publicGames) {
             GameDataResponseBody game = new GameDataResponseBody();
             game.id = id;
             try {
                 game.title = gameManager.getGameTitle(id);
                 game.ownerName = userManager.getUsername(gameManager.getOwnerID(id));
+                game.accessLevel = gameManager.getAccessLevel(id);
             } catch (InvalidGameIDException | InvalidUserIDException e) {
                 throw new RuntimeException("Game ID or user ID got from public game list is invalid.");
             }
 
             dataSet.add(game);
         }
-
         return gson.toJson(dataSet);
     }
 

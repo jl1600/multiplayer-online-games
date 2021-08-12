@@ -144,9 +144,10 @@ public class TemplateRequestHandler extends RequestHandler {
     private void handleGetAllTemplates(HttpExchange exchange) throws IOException {
         Set<String> allIDs = templateManager.getAllTemplateIDs();
         Set<GeneralTemplateDataResponseBody> dataSet = new HashSet<>();
-        GeneralTemplateDataResponseBody datum = new GeneralTemplateDataResponseBody();
+
         for (String id: allIDs) {
             try {
+                GeneralTemplateDataResponseBody datum = new GeneralTemplateDataResponseBody();
                 if (templateManager.getTemplate(id) instanceof QuizTemplate)
                     datum.gameGenre = GameGenre.QUIZ;
                 else datum.gameGenre = GameGenre.HANGMAN;
