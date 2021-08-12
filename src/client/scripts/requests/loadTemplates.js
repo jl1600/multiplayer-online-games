@@ -20,9 +20,9 @@ function listenForClicks() {
 	document.querySelectorAll("#cards-container .card .overlay .img-container .button").forEach(el => {
 		el.addEventListener("click", () => {
 			window.location = sessionStorage.getItem("userType") === "admin" ?
-			    "http://localho.st:8080/pages/create-game?template=" +
+			    "http://localho.st:8080/pages/edit-template?template=" +
 				el.parentElement.parentElement.parentElement.getAttribute("data-id") :
-				"http://localho.st:8080/pages/edit-template?template=" +
+				"http://localho.st:8080/pages/create-game?template=" +
 				el.parentElement.parentElement.parentElement.getAttribute("data-id");
 		});
 	});

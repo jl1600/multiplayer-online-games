@@ -33,7 +33,7 @@ form input[type="radio"] {
 	width: auto;
 }
 form input:focus {
-	border-color: #36393f;
+	border-color: #7289da;
 	transition-duration: 0.4s;
 }
 form button {

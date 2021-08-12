@@ -3,12 +3,21 @@
 	<head>
 		<link rel="icon" href="../static/favicon.ico" type="image/x-icon" />
 		<link href="../stylesheets/general.css" rel="stylesheet" />
+		<link href="../stylesheets/form.css" rel="stylesheet" />
+		<link href="../stylesheets/questions.css" rel="stylesheet" />
 		<script src="../scripts/requests/newTrial.js"></script>
-		<title>[Title of our app]</title>
+		<title>Multiplayer Games</title>
 	</head>
 
 	<body>
 		<iframe id="header" src="../components/header.html" width="100%"></iframe>
+
+		<form id="form">
+			<div class="buttons">
+				<button type="reset" onclick="resetQuestions()">Reset</button>
+				<button type="button" onclick="makeDesignChoice()">Next</button>
+			</div>
+		</form>
 
 		<script src="../scripts/requests/createGame.js"></script>
 	</body>

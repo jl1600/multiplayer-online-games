@@ -76,7 +76,8 @@ http.createServer((request, response) => {
 					"type": "multiple-choice",
 					"title": "Multiple choice",
 					"description": "description of a multiple choice",
-					"id": 1
+					"id": 1,
+					"genre": "quiz"
 				}
 			]
 		}`);

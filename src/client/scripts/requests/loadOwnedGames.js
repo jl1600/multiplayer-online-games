@@ -34,7 +34,7 @@ function listenForClicks() {
 }
 
 function deleteGame(el) {
-	xhr.open("POST", "http://localhost:8000/game/delete");
+	xhr.open("POST", "http://localhost:8000/game/access-level");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
@@ -53,12 +53,13 @@ function deleteGame(el) {
 
 	xhr.send(JSON.stringify({
 		gameId: el.parentElement.parentElement.parentElement.getAttribute("data-id"),
-		userId: sessionStorage.getItem("userId")
+		userId: sessionStorage.getItem("userId"),
+		accessLevel: "DELETED"
 	}));
 }
 
 function recoverGame(el) {
-	xhr.open("POST", "http://localhost:8000/game/recover");
+	xhr.open("POST", "http://localhost:8000/game/access-level");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
@@ -68,23 +69,32 @@ function recoverGame(el) {
 
 	xhr.send(JSON.stringify({
 		gameId: el.parentElement.parentElement.parentElement.getAttribute("data-id"),
-		userId: sessionStorage.getItem("userId")
+		userId: sessionStorage.getItem("userId"),
+		accessLevel: "PRIVATE"
 	}));
 }
 
 function togglePublicity(el) {
-	xhr.open("POST", "http://localhost:8000/game/toggle-publicity");
+	xhr.open("POST", "http://localhost:8000/game/access-level");
+
+    let newAccessLevel;
+    if (el.getAttribute("src").includes("public")) {
+        newAccessLevel = "PRIVATE";
+    } else if (el.getAttribute("src").includes("private")) {
+        newAccessLevel = "FRIENDS";
+    } else if (el.getAttribute("src").includes("friends")) {
+        newAccessLevel = "PUBLIC";
+    }
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-			el.setAttribute("src",
-			el.getAttribute("src").replace("public", "xxx").replace("private", "public").replace("friends", "private").replace("xxx", "friends")
-			);
+			el.setAttribute("src", el.getAttribute("src").replace(/[a-z]+\.png$/, newAccessLevel.toLowerCase() + ".png"));
 		}
 	};
 
 	xhr.send(JSON.stringify({
 		gameId: el.parentElement.parentElement.parentElement.getAttribute("data-id"),
-		userId: sessionStorage.getItem("userId")
+		userId: sessionStorage.getItem("userId"),
+		accessLevel: newAccessLevel
 	}));
 }

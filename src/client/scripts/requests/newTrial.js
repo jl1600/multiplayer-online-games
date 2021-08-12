@@ -3,7 +3,7 @@ const xhr = new XMLHttpRequest();
 document.addEventListener("DOMContentLoaded", newTrial, false);
 
 function newTrial() {
-	if (sessionStorage.getItem("userType") === "trial") return;
+	if (!!sessionStorage.getItem("userType")) return;
 
 	xhr.open("POST", "http://localhost:8000/trial");
 	xhr.setRequestHeader("Content-Type", "application/json");

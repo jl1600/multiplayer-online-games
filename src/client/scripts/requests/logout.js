@@ -17,7 +17,7 @@ function logout() {
 	}`);
 }
 
-function delete() {
+function deleteUser() {
     xhr.open("POST", "http://localhost:8000/user/delete");
     	xhr.setRequestHeader("Content-Type", "application/json");
 
