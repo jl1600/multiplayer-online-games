@@ -1,6 +1,6 @@
 function createCard(data, type) {
 	const card = createElement("card");
-	card.setAttribute("data-id", data.id);
+	card.setAttribute("data-id", data.templateID || data.gameID);
 
 	const content = createContent(data);
 	const overlay = createOverlay(type, data.accessLevel);
@@ -13,7 +13,7 @@ function createCard(data, type) {
 
 function createImg(type, extension = "jpg") {
 	const img = document.createElement("img");
-	img.setAttribute("src", `../../static/${ type }.${ extension }`);
+	img.setAttribute("src", `../../static/${ type.toLowerCase() }.${ extension }`);
 	return img;
 }
 function createText(text, elementClass) {
@@ -24,9 +24,9 @@ function createText(text, elementClass) {
 function createContent(data) {
 	const content = createElement("content");
 
-	const img = createImg(data.type);
+	const img = createImg(data.gameGenre);
 	const title = createText(data.title, "title");
-	const description = createText(data.description, "description");
+	const description = createText(getDescription(data.gameGenre), "description");
 
 	content.appendChild(img);
 	content.appendChild(title);
@@ -70,4 +70,11 @@ function createEditButtons(publicity) {
 	deleteImg.classList.add("delete");
 
 	return [visibilityImg, deleteImg];
+}
+
+function getDescription(genre) {
+    switch (genre) {
+        case "QUIZ": return "Description for the quiz game";
+        case "HANGMAN": return "Try to guess the word before the man is hung";
+    }
 }

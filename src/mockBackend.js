@@ -1,7 +1,7 @@
 const http = require("http");
 
 http.createServer((request, response) => {
-	response.setHeader("Access-Control-Allow-Origin", "http://localho.st:8080");
+	response.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
 	response.setHeader("Access-Control-Allow-Headers", "Content-Type");
 	if (request.method == "POST") {
 		let body = "";

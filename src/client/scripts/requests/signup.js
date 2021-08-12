@@ -12,16 +12,15 @@ function signup(username, password, confirmPassword, userType) {
 	if (!username || !password) return false;
 	if (!checkPassword(password, confirmPassword)) return false;
 
-	xhr.open("POST", "http://localhost:8000/register");
-	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.open("POST", "http://localhost:8000/user/register");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 204) {
 			window.location = "http://localho.st:8080/pages/login";
 		}
 	};
 
-	xhr.send(JSON.stringify({ username, password, userType }));
+	xhr.send(JSON.stringify({ username, password, role: userType }));
 }
 
 function checkPassword() {

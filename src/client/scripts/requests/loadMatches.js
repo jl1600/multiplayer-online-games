@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", fetchMatches, false);
 
 function fetchMatches() {
-	xhr.open("GET", "http://localhost:8000/game/all-available-matches?userid=" + sessionStorage.getItem("userId"));
+	xhr.open("GET", "http://localhost:8000/game/available-matches?userid=" + sessionStorage.getItem("userId"));
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-			JSON.parse(xhr.response).matches.forEach(match => createCard(match, "JOIN"));
+			JSON.parse(xhr.response).forEach(match => createCard(match, "JOIN"));
 			listenForClicks();
 		}
 	};
