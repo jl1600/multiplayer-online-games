@@ -29,7 +29,6 @@ public class GameRequestHandler extends RequestHandler {
     private final UserManager userManager;
     private final MatchManager matchManager;
     private final ServerSocket serverSocket;
-    private final Gson gson;
 
     public GameRequestHandler(GameManager gameManager,
                               TemplateManager templateManager,
@@ -44,7 +43,6 @@ public class GameRequestHandler extends RequestHandler {
         } catch (IOException e) {
             throw new RuntimeException("Cannot create server socket, IO problem.");
         }
-        gson = new Gson();
     }
 
     protected void handleGetRequest(HttpExchange exchange) throws IOException {

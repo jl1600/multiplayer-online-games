@@ -1,6 +1,10 @@
 package system.controllers;
 
 import com.sun.net.httpserver.HttpExchange;
+import shared.DTOs.Requests.LoginRequestBody;
+import shared.DTOs.Requests.LogoutRequestBody;
+import shared.exceptions.use_case_exceptions.ExpiredUserException;
+import shared.exceptions.use_case_exceptions.IncorrectPasswordException;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import shared.exceptions.use_case_exceptions.InvalidUsernameException;
 import system.use_cases.managers.UserManager;
@@ -40,7 +44,39 @@ public class UserRequestHandler extends RequestHandler {
 
     @Override
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
+        String specification = exchange.getRequestURI().getPath().split("/")[2];
+        switch (specification) {
+            case "login":
+                handleLogin(exchange);
+                break;
+            case "logout":
+                handleLogout(exchange);
+                break;
+            default:
+                sendResponse(exchange, 404, "Unidentified Request.");
+        }
+    }
 
+    private void handleLogin(HttpExchange exchange) throws IOException {
+        LoginRequestBody body = gson.fromJson(getRequestBody(exchange), LoginRequestBody.class);
+        try {
+            String userID = userManager.login(body.username, body.password);
+            sendResponse(exchange, 200, "{\"userID\":\"" + userID+"\"}");
+        } catch (InvalidUsernameException | IncorrectPasswordException | ExpiredUserException e) {
+            sendResponse(exchange, 400, "User doesn't exist, is expired, or the password is incorrect.");
+        } catch (InvalidUserIDException e) {
+            throw new RuntimeException("Invalid user ID. This should never happen.");
+        }
+    }
+
+    private void handleLogout(HttpExchange exchange) throws IOException {
+        LogoutRequestBody body = gson.fromJson(getRequestBody(exchange), LogoutRequestBody.class);
+        try {
+            userManager.logout(body.userID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 404, "Invalid user ID.");
+        }
     }
 
     private void handleGetUserID(HttpExchange exchange) throws IOException {

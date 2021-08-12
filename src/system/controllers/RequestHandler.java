@@ -1,5 +1,6 @@
 package system.controllers;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -9,6 +10,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 public abstract class RequestHandler implements HttpHandler {
+
+    protected Gson gson;
+
+    public RequestHandler() {
+        gson = new Gson();
+    }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         switch (exchange.getRequestMethod()) {

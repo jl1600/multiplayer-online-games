@@ -23,7 +23,6 @@ import java.util.Set;
 public class TemplateRequestHandler extends RequestHandler {
 
     private final TemplateManager templateManager;
-    private final Gson gson;
 
     /**
      * Constructor for TemplateRequestHandler()
@@ -32,7 +31,6 @@ public class TemplateRequestHandler extends RequestHandler {
      */
     public TemplateRequestHandler(TemplateManager templateManager, UserManager userManager) {
         this.templateManager = templateManager;
-        this.gson = new Gson();
     }
 
     @Override
