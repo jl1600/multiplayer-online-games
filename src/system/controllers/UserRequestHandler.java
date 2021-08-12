@@ -5,7 +5,7 @@ import system.use_cases.managers.UserManager;
 
 import java.io.IOException;
 
-public class UserRequestHandler extends RequestHandler{
+public class UserRequestHandler extends RequestHandler {
 
     /**
      * a user manager that can manipulate all user entities
@@ -22,7 +22,12 @@ public class UserRequestHandler extends RequestHandler{
 
     @Override
     protected void handleGetRequest(HttpExchange exchange) throws IOException {
+        String specification = exchange.getRequestURI().getPath().split("/")[2];
+        switch (specification) {
 
+            default:
+                sendResponse(exchange, 404, "Unidentified Request.");
+        }
     }
 
     @Override
