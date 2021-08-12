@@ -3,10 +3,8 @@ package system.controllers;
 import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.LoginRequestBody;
 import shared.DTOs.Requests.LogoutRequestBody;
-import shared.exceptions.use_case_exceptions.ExpiredUserException;
-import shared.exceptions.use_case_exceptions.IncorrectPasswordException;
-import shared.exceptions.use_case_exceptions.InvalidUserIDException;
-import shared.exceptions.use_case_exceptions.InvalidUsernameException;
+import shared.DTOs.Requests.RegisterRequestBody;
+import shared.exceptions.use_case_exceptions.*;
 import system.use_cases.managers.UserManager;
 
 import java.io.IOException;
@@ -55,8 +53,21 @@ public class UserRequestHandler extends RequestHandler {
             case "trial":
                 handleTrial(exchange);
                 break;
+            case "register":
+                handleRegister(exchange);
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
+        }
+    }
+
+    private void handleRegister(HttpExchange exchange) throws IOException {
+        RegisterRequestBody body = gson.fromJson(getRequestBody(exchange), RegisterRequestBody.class);
+        try {
+            userManager.createUser(body.username, body.password, body.role);
+            sendResponse(exchange, 204, null);
+        } catch (DuplicateUsernameException e) {
+            sendResponse(exchange, 403, "Duplicate username.");
         }
     }
 
