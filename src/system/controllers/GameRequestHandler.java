@@ -150,12 +150,15 @@ public class GameRequestHandler extends RequestHandler {
         try {
             gameManager.makeDesignChoice(body.userID, body.designChoice);
             try {
-                gameManager.buildGame(body.userID);
+                String gameID = gameManager.buildGame(body.userID);
+                userManager.addOwnedGameID(body.userID, gameID);
                 sendResponse(exchange, 201, "Success!");
             } catch (InsufficientInputException e) {
                 DesignQuestionResponseBody res = new DesignQuestionResponseBody();
                 res.designQuestion = gameManager.getDesignQuestion(body.userID);
                 sendResponse(exchange, 200, gson.toJson(res));
+            } catch (InvalidUserIDException e) {
+                throw new RuntimeException("user id is invalid. This should never happen.");
             }
         } catch (NoCreationInProgressException e) {
             sendResponse(exchange, 404, "No game builder associated with this user.");
