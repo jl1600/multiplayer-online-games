@@ -52,9 +52,17 @@ public class UserRequestHandler extends RequestHandler {
             case "logout":
                 handleLogout(exchange);
                 break;
+            case "trial":
+                handleTrial(exchange);
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
+    }
+
+    private void handleTrial(HttpExchange exchange) throws IOException {
+        String trialID = userManager.createTrialUser();
+        sendResponse(exchange, 200, "{\"userID\":\"" + trialID+"\"}");
     }
 
     private void handleLogin(HttpExchange exchange) throws IOException {

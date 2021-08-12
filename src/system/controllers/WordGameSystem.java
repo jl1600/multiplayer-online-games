@@ -34,7 +34,7 @@ public class WordGameSystem {
         templateRH = new TemplateRequestHandler(tm, um);
         userRH = new UserRequestHandler(um);
 
-        server = HttpServer.create(new InetSocketAddress("localhost", 4444), 20);
+        server = HttpServer.create(new InetSocketAddress("localhost", 8000), 20);
 
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
         server.createContext("/game", gameRH);
