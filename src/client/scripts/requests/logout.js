@@ -29,9 +29,9 @@ function deleteUser() {
     		}
     	};
 
-    	xhr.send(JSON.stringify`{
+    	xhr.send(JSON.stringify({
     		userId: sessionStorage.getItem("userId")
-    	}`);
+    	}));
 }
 
 function newTrial() {
