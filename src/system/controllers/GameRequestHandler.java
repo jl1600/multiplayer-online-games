@@ -23,7 +23,7 @@ import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GameRequestHandler implements HttpHandler {
+public class GameRequestHandler extends RequestHandler {
 
     private final GameManager gameManager;
     private final TemplateManager templateManager;
@@ -48,21 +48,7 @@ public class GameRequestHandler implements HttpHandler {
         gson = new Gson();
     }
 
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        switch (exchange.getRequestMethod()) {
-            case "GET":
-                handleGetRequest(exchange);
-                break;
-            case "POST":
-                handlePostRequest(exchange);
-                break;
-            default:
-                sendResponse(exchange, 404,"Unidentified Request.");
-        }
-    }
-
-    private void handleGetRequest(HttpExchange exchange) throws IOException {
+    protected void handleGetRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().getPath().split("/")[2];
         switch (specification) {
             case "all-public-games":
@@ -85,7 +71,7 @@ public class GameRequestHandler implements HttpHandler {
         }
     }
 
-    private void handlePostRequest(HttpExchange exchange) throws IOException {
+    protected void handlePostRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().toString().split("/")[2];
         switch (specification) {
             case "create-builder":
@@ -106,8 +92,21 @@ public class GameRequestHandler implements HttpHandler {
             case "leave-match":
                 handleLeaveMatch(exchange);
                 break;
+            case "access-level":
+                handleAccessLevel(exchange);
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
+        }
+    }
+
+    private void handleAccessLevel(HttpExchange exchange) throws IOException {
+        AccessLevelRequestBody body = gson.fromJson(getRequestBody(exchange), AccessLevelRequestBody.class);
+        try {
+            gameManager.setGameAccessLevel(body.gameID, body.accessLevel);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidGameIDException e) {
+            sendResponse(exchange, 404, "The game ID is invalid.");
         }
     }
 
@@ -388,31 +387,7 @@ public class GameRequestHandler implements HttpHandler {
         return gson.toJson(dataSet);
     }
 
-    private void sendResponse(HttpExchange exchange, int responseCode, String body) throws IOException {
-        if (responseCode != 204) {
-            OutputStream outputStream = exchange.getResponseBody();
-            exchange.sendResponseHeaders(responseCode, body.length());
-            outputStream.write(body.getBytes());
-            outputStream.flush();
-            outputStream.close();
-        } else {
-            exchange.sendResponseHeaders(204, -1);
-        }
-    }
 
-    private String getRequestBody(HttpExchange exchange) throws IOException {
-        InputStreamReader isr =  new InputStreamReader(exchange.getRequestBody(),"utf-8");
-        BufferedReader br = new BufferedReader(isr);
-
-        int b;
-        StringBuilder buf = new StringBuilder();
-        while ((b = br.read()) != -1) {
-            buf.append((char) b);
-        }
-        br.close();
-        isr.close();
-        return buf.toString();
-    }
     private String getOwnedGamesData(String userID) throws InvalidUserIDException {
             Set<String> ownedIds = userManager.getOwnedGamesID(userID);
             Set<GameDataResponseBody> dataSet = new HashSet<>();

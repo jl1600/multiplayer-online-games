@@ -66,7 +66,8 @@ public class MatchManager {
      * @throws InvalidMatchIDException When there is no match with the given ID is having PREPARING status.
      * @throws DuplicateUserIDException When the user is already in the match.
      * */
-    public void addPlayer(String userID, String username, String matchID) throws InvalidMatchIDException, DuplicateUserIDException,
+    public void addPlayer(String userID, String username, String matchID) throws
+            InvalidMatchIDException, DuplicateUserIDException,
             MaxPlayerReachedException {
         if (preparingMatches.containsKey(matchID)) {
             preparingMatches.get(matchID).addPlayer(userID, username);

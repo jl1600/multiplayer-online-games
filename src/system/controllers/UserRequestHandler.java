@@ -1,8 +1,11 @@
 package system.controllers;
 
+import com.sun.net.httpserver.HttpExchange;
 import system.use_cases.managers.UserManager;
 
-public class UserRequestHandler {
+import java.io.IOException;
+
+public class UserRequestHandler extends RequestHandler{
 
     /**
      * a user manager that can manipulate all user entities
@@ -17,4 +20,13 @@ public class UserRequestHandler {
         this.userManager = um;
     }
 
+    @Override
+    protected void handleGetRequest(HttpExchange exchange) throws IOException {
+
+    }
+
+    @Override
+    protected void handlePostRequest(HttpExchange exchange) throws IOException {
+
+    }
 }
