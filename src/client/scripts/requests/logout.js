@@ -37,8 +37,7 @@ function deleteUser() {
 function newTrial() {
 	if (sessionStorage.getItem("userType") === "trial") return;
 
-	xhr.open("POST", "http://localhost:8000/trial");
-	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.open("POST", "http://localhost:8000/user/trial");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {

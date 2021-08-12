@@ -1,4 +1,4 @@
-form {
+form, #form {
 	background-color: whitesmoke;
 	display: flex;
 	flex-direction: column;
@@ -10,7 +10,7 @@ form {
 	border-radius: 12px;
 	padding: 25px;
 }
-form input[type="text"], form input[type="password"] {
+form input[type="text"], form input[type="password"], #form input[type="text"] {
 	background-color: whitesmoke;
 	outline-width: 0px;
 	outline: none;
@@ -32,11 +32,11 @@ form #user-type {
 form input[type="radio"] {
 	width: auto;
 }
-form input:focus {
+form input:focus, #form input:focus {
 	border-color: #7289da;
 	transition-duration: 0.4s;
 }
-form button {
+form button, #form button {
 	background-color: #ffcccc;
 	font-size: 28px;
 	border: none;
@@ -57,10 +57,10 @@ button:hover {
 	color: red;
 }
 
-form label {
+form label, #form label {
 	font-size: 20px;
 }
-form label input {
+form label input, #form label input {
 	font-size: 26px;
 	width: 200px;
 	margin-left: 10px;

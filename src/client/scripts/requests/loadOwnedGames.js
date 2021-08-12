@@ -5,7 +5,7 @@ function fetchOwnedGames() {
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-			JSON.parse(xhr.response).games.forEach(match => createCard(match, "EDIT"));
+			JSON.parse(xhr.response).forEach(match => createCard(match, "EDIT"));
 			listenForClicks();
 		}
 	};

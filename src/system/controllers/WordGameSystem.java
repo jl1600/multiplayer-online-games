@@ -46,7 +46,7 @@ public class WordGameSystem {
 
     public void run() {
         server.start();
-        System.out.println(" Server started on port 4444");
+        System.out.println(" Server started on port 8000");
     }
 
     public static void main(String[] args) {

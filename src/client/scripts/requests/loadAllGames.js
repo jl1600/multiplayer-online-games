@@ -4,8 +4,8 @@ function fetchAllGames() {
 	xhr.open("GET", "http://localhost:8000/game/all-public-games");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-			JSON.parse(xhr.response).games.forEach(match => createCard(match, "CREATE"));
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+			JSON.parse(xhr.response).forEach(match => createCard(match, "CREATE"));
 			listenForClicks();
 		}
 	};
@@ -19,8 +19,8 @@ function listenForClicks() {
 		    xhr.open("GET", "http://localhost:8000/game/create-match");
 
             xhr.onreadystatechange = () => {
-                if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-                    window.location = "http://localho.st:8080/pages/play-match";
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    window.location = "http://localhost:8080/pages/play-match";
                 }
             };
 
