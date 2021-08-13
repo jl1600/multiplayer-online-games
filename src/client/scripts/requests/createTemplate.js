@@ -50,17 +50,17 @@ function makeDesignChoice() {
 }
 
 function resetQuestions() {
-//	xhr.open("POST", "http://localhost:8000/template/cancel-builder");
-//
-//	xhr.onreadystatechange = () => {
-//		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
-//			window.location.reload();
-//		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
-//		    alert("You haven't started building anything");
-//		}
-//	}
-//
-//	xhr.send(JSON.stringify({
-//		userID: sessionStorage.getItem("userId")
-//	}));
+	xhr.open("POST", "http://localhost:8000/template/cancel-builder");
+
+	xhr.onreadystatechange = () => {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
+			window.location.reload();
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+		    alert("You haven't started building anything");
+		}
+	}
+
+	xhr.send(JSON.stringify({
+		userID: sessionStorage.getItem("userId")
+	}));
 }

@@ -16,3 +16,10 @@
     font-size: 20px;
     border-radius: 5px;
 }
+#form label input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+#form label input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+}
