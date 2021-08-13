@@ -30,6 +30,8 @@ function deleteUser() {
     			sessionStorage.setItem("userId", null);
     			sessionStorage.setItem("userType", null);
     			newTrial();
+    		} else if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 200) {
+    		    alert("User does not exist");
     		}
     	}
 
