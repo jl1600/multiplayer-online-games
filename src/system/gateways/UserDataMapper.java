@@ -1,7 +1,10 @@
 package system.gateways;
+
+import com.google.gson.Gson;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.entities.User;
+import system.entities.game.quiz.QuizGame;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -15,6 +18,7 @@ public class UserDataMapper implements UserDataGateway {
      * Adds a user to the database and increases the total number of users created by 1
      * Users are added to the data file in the following format:
      * <id>,<username>,<password>,<role>,{<game-ids-separated-by-|>}
+     *
      * @param user user to add to the database
      * @throws IOException if the database is not found
      */
@@ -24,6 +28,7 @@ public class UserDataMapper implements UserDataGateway {
 
     /**
      * Deletes the user with the specified userId from the database
+     *
      * @param userId id of the user to delete
      * @throws IOException if the database is not found
      */
@@ -36,8 +41,9 @@ public class UserDataMapper implements UserDataGateway {
 
     /**
      * Updates the user in the database
+     *
      * @param user user to update
-     * @throws IOException if the database is not found
+     * @throws IOException            if the database is not found
      * @throws InvalidUserIDException if the user does not exist
      */
     public void updateUser(User user) throws InvalidUserIDException, IOException {
@@ -75,7 +81,12 @@ public class UserDataMapper implements UserDataGateway {
         return new Integer(rd.readLine());
     }
 
-    private User stringToUser(String userString){
+    private User stringToUser(String userString) {
+        Gson gson = new Gson();
+        User user = gson.fromJson(userString, User.class);
+        return user;
+
+        /*
         String[] userDetails = userString.split(",");
         String userId = userDetails[0].trim();
         String username = userDetails[1].trim();
@@ -100,9 +111,17 @@ public class UserDataMapper implements UserDataGateway {
         }
 
         return user;
+       // */
     }
 
     private String userToString(User user) {
+        Gson gson = new Gson();
+
+        String jsonData = gson.toJson(user);
+        return jsonData;
+
+        /*
+
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
 
         return user.getUserId() + "," +
@@ -112,12 +131,15 @@ public class UserDataMapper implements UserDataGateway {
                 sdf.format(user.getRegisterDate()) +",{" +
                 String.join("|", user.getGameCreationSet()) + "}" +
                 System.getProperty("line.separator").replace("{|", "{");
+
+
+         */
     }
 
     private UserRole resolveUserRole(String role) {
-        if (role.equals(UserRole.MEMBER.name())){
+        if (role.equals(UserRole.MEMBER.name())) {
             return UserRole.MEMBER;
-        } else if (role.equals(UserRole.ADMIN.name())){
+        } else if (role.equals(UserRole.ADMIN.name())) {
             return UserRole.ADMIN;
         } else {
             return UserRole.TRIAL;

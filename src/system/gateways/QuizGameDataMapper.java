@@ -1,8 +1,8 @@
 package system.gateways;
 
 
+import com.google.gson.*;
 import shared.constants.GameAccessLevel;
-import shared.constants.UserRole;
 import shared.exceptions.entities_exception.IDAlreadySetException;
 import shared.exceptions.entities_exception.UnknownGameTypeException;
 import shared.exceptions.use_case_exceptions.*;
@@ -110,6 +110,12 @@ public class QuizGameDataMapper {
     }
 
     private String quizGameToString(QuizGame g) {
+        Gson gson = new Gson();
+
+        String jsonData = gson.toJson(g);
+        return jsonData;
+
+        /*
         StringBuilder result = new StringBuilder();
 
         result.append("@gameId:");
@@ -153,6 +159,8 @@ public class QuizGameDataMapper {
         result.append(this.quizQuestionsToString(questionData, categoriesInOrder));
         result.append("@questions\n\n");
         return result.toString();
+        */
+
     }
 
     private String quizQuestionsToString(ArrayList<QuizQuestion> questionData, ArrayList<String> categoriesInOrder) {
@@ -196,7 +204,15 @@ public class QuizGameDataMapper {
     }
 
     public QuizGame quizGameFromString(String gameString) throws IDAlreadySetException, InsufficientInputException, CreationInProgressException {
+        Gson gson = new Gson();
+        QuizGame game = gson.fromJson(gameString, QuizGame.class);
+        return game;
+
+
+        /*
+
         String[] textData = gameString.split("@gameId:");
+
         textData = textData[1].split("\n", 2);
         String gameId = textData[0];
 
@@ -257,7 +273,7 @@ public class QuizGameDataMapper {
             quizGameBuilder.addQuestion(questionResult);
         }
         return quizGameBuilder.toQuizGame();
-
+        */
     }
 
     private GameAccessLevel resolveGameAccessLevel(String gameAccessLevelString) {

@@ -1,4 +1,6 @@
 package system.gateways;
+import com.google.gson.Gson;
+import system.entities.game.quiz.QuizGame;
 import system.entities.template.HangmanTemplate;
 import system.entities.template.QuizTemplate;
 import system.entities.template.Template;
@@ -77,6 +79,12 @@ public class TemplateDataMapper implements TemplateDataGateway{
     }
 
     private String quizTemplateToString(QuizTemplate template) {
+        Gson gson = new Gson();
+
+        String jsonData = gson.toJson(template);
+        return jsonData;
+
+        /*
         return template.getID() + "," +
                 template.getTitle().replace(",", "-") + "," +
                 template.hasMultipleScoreCategories() + "," +
@@ -84,6 +92,8 @@ public class TemplateDataMapper implements TemplateDataGateway{
                 template.hasCustomEndingMessage() + "," +
                 template.isChooseAllThatApply() + "," +
                 template.isMultipleChoice();
+
+         */
     }
 
     private String hangmanTemplateToString(HangmanTemplate template) {
@@ -91,6 +101,11 @@ public class TemplateDataMapper implements TemplateDataGateway{
     }
 
     private Template stringToTemplate(String templateString) {
+        Gson gson = new Gson();
+        Template template = gson.fromJson(templateString, QuizTemplate.class);
+        return template;
+
+        /*
         String[] info = templateString.split(",");
         QuizTemplate template = new QuizTemplate();
         String id = info[0];
@@ -102,6 +117,7 @@ public class TemplateDataMapper implements TemplateDataGateway{
         template.setChooseAllThatApply(Boolean.parseBoolean(info[5]));
         template.setMultipleChoice(Boolean.parseBoolean(info[6]));
         return template;
+        */
     }
 
     private void incrementTemplateCount() throws IOException {
