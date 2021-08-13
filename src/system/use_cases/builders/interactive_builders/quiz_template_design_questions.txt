@@ -1,8 +1,0 @@
-NAME = "Enter the name of your template";
-MULTIPLE_CHOICE = "Is your quiz multiple choice? (yes/no)";
-CHOOSE_ALL_THAT_APPLY = "Is your quiz choose all that apply? (yes/no)";
-MULTIPLE_SCORE_CATEGORIES = "Does your quiz have multiple categories for score? (yes/no)";
-SCORE_WEIGHT = "Do your score categories have different weights? (yes/no)" ;
-HAS_ENDING_MESSAGE = "Does your quiz have custom ending messages? (yes/no)";
-CONFIRMATION = "Ready to create new template. Are you sure that you want proceed? (yes/no)";
-NULL = "";
