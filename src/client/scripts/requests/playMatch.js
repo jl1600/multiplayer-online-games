@@ -31,10 +31,13 @@ function joinMatch(matchID) {
 
 function createSocket() {
     serverSocket = new WebSocket("ws://localhost:8888");
-    serverSocket.send(sessionStorage.getItem("userId"));
-    document.getElementById("matchContent").textContent="Successful handshake";
+
+    serverSocket.onopen = function(event) {
+        serverSocket.send(sessionStorage.getItem("userId"));
+    };
+
     serverSocket.onmessage = function(event) {
-        document.getElementById("matchContent").textContent=event.data;
+        document.getElementById("matchContent").textContent=JSON.parse(event.data).textContent;
     };
 }
 
@@ -67,7 +70,7 @@ function leaveMatch() {
     };
 
     xhr.send(JSON.stringify({
-        userID: sessionStorage.getItem("user"),
+        userID: sessionStorage.getItem("userId"),
         matchID
     }));
 }

@@ -7,17 +7,13 @@ import shared.exceptions.use_case_exceptions.InvalidInputException;
 import shared.exceptions.use_case_exceptions.InvalidMatchIDException;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.use_cases.managers.MatchManager;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 public class PlayerInputListener extends Thread {
 
-    BufferedReader reader;
-    PrintWriter writer;
+    InputStream inStream;
+    OutputStream outStream;
     MatchManager manager;
     String matchID;
     String playerID;
@@ -25,8 +21,8 @@ public class PlayerInputListener extends Thread {
 
     public PlayerInputListener(Socket socket, MatchManager manager, String matchID, String playerID) {
         try {
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            writer = new PrintWriter(socket.getOutputStream());
+            inStream = socket.getInputStream();
+            outStream = socket.getOutputStream();
         } catch (IOException e) {
             throw new RuntimeException("I/O problem when trying to get input stream from socket.");
         }
@@ -40,26 +36,28 @@ public class PlayerInputListener extends Thread {
         while (true) {
             try {
                 if (manager.getMatchStatus(matchID) != MatchStatus.FINISHED) {
-                    String userInput;
-                    if((userInput = reader.readLine()) != null) {
-                        MatchInput inData = gson.fromJson(userInput, MatchInput.class);
-                        switch (inData.sysCommand) {
-                            case "start":
-                                if (manager.getHostId(matchID).equals(playerID))
-                                    manager.startMatch(matchID);
-                                break;
-                        }
-                        if (!inData.gameMove.equals("")) {
-                            System.out.println("trying to play move");
-                            manager.playGameMove(playerID, matchID, inData.gameMove);
-                        }
+                    String userInput = ClientSocketSeeker.readWSMessage(inStream);
+                    System.out.println(userInput);
+                    MatchInput inData = gson.fromJson(userInput, MatchInput.class);
+                    switch (inData.sysCommand) {
+                        case "start":
+                            if (manager.getHostId(matchID).equals(playerID))
+                                manager.startMatch(matchID);
+                            break;
+                    }
+                    if (!inData.gameMove.equals("")) {
+                        System.out.println("trying to play move");
+                        manager.playGameMove(playerID, matchID, inData.gameMove);
                     }
                 }
             } catch (InvalidMatchIDException e) {
                 throw new RuntimeException("Match ID is invalid. This should never happen.");
             } catch (InvalidInputException e) {
-                writer.println("Error: Invalid input.");
-                writer.flush();
+                try {
+                    ClientSocketSeeker.sendWSMessage(outStream, "Invalid input.");
+                } catch (IOException ioException) {
+                   return; // Terminate this thread.
+                }
             } catch (InvalidUserIDException e) {
                 throw new RuntimeException("Invalid player ID. This should never happen.");
             } catch (IOException e) {
@@ -67,4 +65,5 @@ public class PlayerInputListener extends Thread {
             }
         }
     }
+
 }
