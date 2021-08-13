@@ -19,7 +19,7 @@ function editTemplate() {
 	xhr.open("POST", "http://localhost:8000/template/edit");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
             window.location = "http://localhost:8080/pages/templates.html";
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
             alert("There's an invalid attribute or value");
