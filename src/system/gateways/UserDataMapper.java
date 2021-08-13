@@ -69,7 +69,7 @@ public class UserDataMapper implements UserDataGateway {
         HashSet<User> users = new HashSet<>();
 
         for (File file : Objects.requireNonNull(folder.listFiles())) {
-            String userString = String.join(",", Files.readAllLines(file.toPath()));
+            String userString = String.join("\n", Files.readAllLines(file.toPath()));
             User user = stringToUser(userString);
             users.add(user);
         }
