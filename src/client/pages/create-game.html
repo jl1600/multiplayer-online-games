@@ -12,12 +12,16 @@
 	<body>
 		<iframe id="header" src="../components/header.html" width="100%"></iframe>
 
-		<div id="form">
-			<div class="buttons">
-				<button type="reset" onclick="resetQuestions()">Reset</button>
-				<button type="button" onclick="makeDesignChoice()">Next</button>
+		<main>
+			<h1>Create a game</h1>
+
+			<div id="form">
+				<div class="buttons">
+					<button type="reset" onclick="resetQuestions()">Reset</button>
+					<button type="button" onclick="makeDesignChoice()">Next</button>
+				</div>
 			</div>
-		</div>
+		</main>
 
 		<script src="../scripts/promptQuestion.js"></script>
 		<script src="../scripts/requests/createGame.js"></script>

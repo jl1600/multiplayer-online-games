@@ -26,11 +26,11 @@ function deleteUser() {
     xhr.open("POST", "http://localhost:8000/user/delete");
 
     	xhr.onreadystatechange = () => {
-    		if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 200) {
+    		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
     			sessionStorage.setItem("userId", null);
     			sessionStorage.setItem("userType", null);
     			newTrial();
-    		} else if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 200) {
+    		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
     		    alert("User does not exist");
     		}
     	}

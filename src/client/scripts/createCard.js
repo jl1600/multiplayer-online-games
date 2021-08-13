@@ -24,7 +24,7 @@ function createText(text, elementClass) {
 function createContent(data) {
 	const content = createElement("content");
 
-	const img = createImg(data.gameGenre || "");
+	const img = createImg(data.gameGenre || data.genre);
 	const title = createText(data.title || data.gameTitle, "title");
 	const description = createText(data.maxPlayers ? `Room size: ${ data.numPlayers }/${ data.maxPlayers }`: "", "description");
 

@@ -11,7 +11,7 @@ function fetchTemplates() {
 			    sessionStorage.getItem("userType") === "ADMIN" ? "EDIT" : "USE THIS"));
 			listenForClicks();
 		}
-	};
+	}
 
 	xhr.send();
 }

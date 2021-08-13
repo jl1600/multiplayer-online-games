@@ -10,7 +10,7 @@ function fetchMatches() {
 			JSON.parse(xhr.response).forEach(match => createCard(match, "JOIN"));
 			listenForClicks();
 		}
-	};
+	}
 
 	xhr.send();
 }

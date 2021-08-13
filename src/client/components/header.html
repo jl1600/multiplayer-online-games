@@ -1,57 +1,7 @@
 <html lang="en">
 	<head>
 		<base href="http://localhost:8080/" />
-		<style>
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
-body {
-	margin: 0;
-}
-a {
-	text-decoration: none;
-	color: white;
-}
-header {
-	background-color: #7289da;
-	padding: 16px 60px;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	font-family: "Open Sans", sans-serif;
-	font-weight: 700;
-}
-header .logo {
-	font-weight: 700;
-	font-size: 36px;
-	color: white;
-}
-header .menu a {
-	margin: 0 25px;
-	transition-duration: 0.2s;
-}
-header .menu a:hover {
-	filter: brightness(0.85);
-}
-header .user a {
-	background-color: white;
-	padding: 12px 20px;
-	margin: 0 10px;
-	border-radius: 30px;
-	color: #23272a;
-	transition-duration: 0.2s;
-}
-header .user a:hover {
-	filter: brightness(0.85);
-}
-header .user a#signup {
-	background-color: #36393f;
-	color: white;
-}
-#my-account {
-	color: white;
-	width: 146px;
-	text-align: right;
-}
-		</style>
+		<link href="../stylesheets/header.css" rel="stylesheet" />
 	</head>
 
 	<body>
@@ -59,13 +9,14 @@ header .user a#signup {
 			<div class="logo">
 				<a href="/" target="_parent">Multiplayer Games</a>
 			</div>
-			<div class="menu normal">
-				<a href="pages/matches.html" target="_parent">Play a match</a>
-				<a href="pages/my-games.html" target="_parent">My games</a>
+			<div class="menu">
+				<a href="pages/matches.html" target="_parent" class="trial">Play a match</a>
+				<a href="pages/my-games.html" target="_parent" class="trial">My games</a>
+				<a href="pages/friends.html" target="_parent"  class="member">Friends</a>
 			</div>
-			<div class="menu admin">
-				<a href="pages/templates.html" target="_parent">Edit a template</a>
-				<a href="pages/users.html" target="_parent">Manage users</a>
+			<div class="menu">
+				<a href="pages/templates.html" target="_parent" class="admin">Edit a template</a>
+				<a href="pages/users.html" target="_parent" class="admin">Manage users</a>
 			</div>
 			<span class="user">
 				<a id="signup" href="../pages/signup.html" target="_parent">Sign up</a>
@@ -74,31 +25,6 @@ header .user a#signup {
 			<a id="my-account" href="../pages/profile.html" target="_parent">My account</a>
 		</header>
 
-		<script>
-			updateHeader();
-
-			function updateHeader() {
-				switch (sessionStorage.getItem("userType")) {
-					case "TRIAL":
-						document.getElementsByClassName("normal")[0].hidden = false;
-						document.getElementsByClassName("admin")[0].hidden = true;
-						document.getElementsByClassName("user")[0].hidden = false;
-						document.getElementById("my-account").hidden = true;
-					break;
-					case "ADMIN":
-						document.getElementsByClassName("normal")[0].hidden = true;
-						document.getElementsByClassName("admin")[0].hidden = false;
-						document.getElementsByClassName("user")[0].hidden = true;
-						document.getElementById("my-account").hidden = false;
-					break;
-					case "MEMBER":
-						document.getElementsByClassName("normal")[0].hidden = false;
-						document.getElementsByClassName("admin")[0].hidden = true;
-						document.getElementsByClassName("user")[0].hidden = true;
-						document.getElementById("my-account").hidden = false;
-					break;
-				}
-			}
-		</script>
+		<script src="../scripts/updateHeader.js"></script>
 	</body>
 </html>

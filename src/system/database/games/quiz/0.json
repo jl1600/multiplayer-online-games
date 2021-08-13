@@ -1,0 +1,41 @@
+{
+  "maxAttempts": 2,
+  "questions": [
+    {
+      "question": "d",
+      "answerChoices": [
+        {
+          "text": "d",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "question": "m",
+      "answerChoices": [
+        {
+          "text": "m",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    }
+  ],
+  "scoreCategories": {
+    "General": {
+      "name": "General",
+      "weight": 1.0,
+      "minAcceptable": 0.0,
+      "endingMessage": "Quiz Game Finished."
+    }
+  },
+  "gameId": "0",
+  "ownerId": "2",
+  "templateId": "1",
+  "gameAccessLevel": "PUBLIC",
+  "previousGameAccessLevel": "PRIVATE",
+  "title": "answer is the question"
+}

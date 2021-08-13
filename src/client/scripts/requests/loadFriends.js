@@ -3,11 +3,11 @@ if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 document.addEventListener("DOMContentLoaded", fetchAllGames, false);
 
 function fetchAllGames() {
-	xhr.open("GET", "http://localhost:8000/game/all-public-games");
+	xhr.open("GET", "http://localhost:8000/user/all-users");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-			JSON.parse(xhr.response).forEach(game => createCard(game, "CREATE"));
+			JSON.parse(xhr.response).forEach(user => createRow(user));
 			listenForClicks();
 		}
 	}
