@@ -138,4 +138,11 @@ public class TemplateManager {
         gateway.deleteTemplate(templateID);
     }
 
+    public void destroyBuilder(String userID) throws NoCreationInProgressException {
+        if (templateBuilders.containsKey(userID)) {
+            templateBuilders.remove(userID);
+        } else {
+            throw new NoCreationInProgressException();
+        }
+    }
 }

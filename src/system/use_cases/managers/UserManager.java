@@ -246,32 +246,17 @@ public class UserManager {
     /**
      * Delete the user with the specified id from this class and the database
      * @param userId id of the user to delete
-     * @param password password of the user to delete to confirm the action
      * @throws InvalidUserIDException if no user has the specified userId
-     * @throws IncorrectPasswordException if the specified password does not match the user's password
-     * @throws IOException if the database is not found
      */
-    public void deleteUser(String userId, String password)
-            throws IncorrectPasswordException, IOException, InvalidUserIDException {
-
-        //not trial check password, trial just delete
-        if (users.get(userId).getRole().equals(UserRole.TRIAL)){
+    public void deleteUser(String userId) throws InvalidUserIDException {
             String username = users.get(userId).getUsername();
             users.remove(userId);
             userIds.remove(username);
-
-        } else {
-            if (isPasswordIncorrect(userId, password)) {
-                throw new IncorrectPasswordException();
-            }
-
-            String username = users.get(userId).getUsername();
-            users.remove(userId);
-            userIds.remove(username);
+        try {
             gateway.deleteUser(userId);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot connect to the database");
         }
-
-
     }
 
     /**

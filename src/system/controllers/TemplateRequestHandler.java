@@ -2,6 +2,7 @@ package system.controllers;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import shared.DTOs.Requests.CancelBuilderRequestBody;
 import shared.DTOs.Requests.CreateTemplateBuilderRequestBody;
 import shared.DTOs.Requests.DesignChoiceRequestBody;
 import shared.DTOs.Requests.EditTemplateRequestBody;
@@ -60,8 +61,21 @@ public class TemplateRequestHandler extends RequestHandler {
             case "edit":
                 handleEdit(exchange);
                 break;
+            case "cancel-builder":
+                handleCancelBuilder(exchange);
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
+        }
+    }
+
+    private void handleCancelBuilder(HttpExchange exchange) throws IOException {
+        CancelBuilderRequestBody body = gson.fromJson(getRequestBody(exchange), CancelBuilderRequestBody.class);
+        try {
+            templateManager.destroyBuilder(body.userID);
+            sendResponse(exchange, 204, null);
+        } catch (NoCreationInProgressException e) {
+            sendResponse(exchange, 400, "User ID is invalid or no builder is in progress.");
         }
     }
 

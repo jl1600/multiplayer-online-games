@@ -1,6 +1,7 @@
 package system.controllers;
 
 import com.sun.net.httpserver.HttpExchange;
+import shared.DTOs.Requests.DeleteUserRequestBody;
 import shared.DTOs.Requests.LoginRequestBody;
 import shared.DTOs.Requests.LogoutRequestBody;
 import shared.DTOs.Requests.RegisterRequestBody;
@@ -57,8 +58,21 @@ public class UserRequestHandler extends RequestHandler {
             case "register":
                 handleRegister(exchange);
                 break;
+            case "delete":
+                handleDeleteUser(exchange);
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
+        }
+    }
+
+    private void handleDeleteUser(HttpExchange exchange) throws IOException {
+        DeleteUserRequestBody body = gson.fromJson(getRequestBody(exchange), DeleteUserRequestBody.class);
+        try {
+            userManager.deleteUser(body.userID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
 
