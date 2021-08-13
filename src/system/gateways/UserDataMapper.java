@@ -1,6 +1,7 @@
 package system.gateways;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.entities.User;
@@ -14,6 +15,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class UserDataMapper implements UserDataGateway {
+
+    //Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    Gson gson = new Gson();
+
     /**
      * Adds a user to the database and increases the total number of users created by 1
      * Users are added to the data file in the following format:
@@ -33,7 +39,7 @@ public class UserDataMapper implements UserDataGateway {
      * @throws IOException if the database is not found
      */
     public void deleteUser(String userId) throws IOException {
-        File file = new File(userFolderPath + userId + ".txt");
+        File file = new File(userFolderPath + userId + ".json");
         if (!file.delete()) {
             throw new IOException();
         }
@@ -82,69 +88,13 @@ public class UserDataMapper implements UserDataGateway {
     }
 
     private User stringToUser(String userString) {
-        Gson gson = new Gson();
-        User user = gson.fromJson(userString, User.class);
-        return user;
-
-        /*
-        String[] userDetails = userString.split(",");
-        String userId = userDetails[0].trim();
-        String username = userDetails[1].trim();
-        String password = userDetails[2].trim();
-        String roleString = userDetails[3].trim();
-
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
-        Date registerDate = null;
-        try{
-            registerDate = sdf.parse(userDetails[4].trim());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-
-        User user = new User(userId, username, password, resolveUserRole(roleString),registerDate);
-
-        String gameCreationString = userDetails[5].trim();
-        gameCreationString = gameCreationString.substring(1, gameCreationString.length() - 1);
-        for (String gameId : gameCreationString.split("\\|")) {
-            user.addGameID(gameId);
-        }
-
-        return user;
-       // */
+        return gson.fromJson(userString, User.class);
     }
 
     private String userToString(User user) {
-        Gson gson = new Gson();
-
-        String jsonData = gson.toJson(user);
-        return jsonData;
-
-        /*
-
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
-
-        return user.getUserId() + "," +
-                user.getUsername() + "," +
-                user.getPassword() + "," +
-                user.getRole() + "," +
-                sdf.format(user.getRegisterDate()) +",{" +
-                String.join("|", user.getGameCreationSet()) + "}" +
-                System.getProperty("line.separator").replace("{|", "{");
-
-
-         */
+        return gson.toJson(user);
     }
 
-    private UserRole resolveUserRole(String role) {
-        if (role.equals(UserRole.MEMBER.name())) {
-            return UserRole.MEMBER;
-        } else if (role.equals(UserRole.ADMIN.name())) {
-            return UserRole.ADMIN;
-        } else {
-            return UserRole.TRIAL;
-        }
-    }
 
     private void incrementUserCount() throws IOException {
         BufferedReader rd = new BufferedReader(new FileReader(userCountFile));
@@ -157,7 +107,7 @@ public class UserDataMapper implements UserDataGateway {
     }
 
     private void addUser(User user, boolean increment) throws IOException {
-        File userFile = new File(userFolderPath + user.getUserId() + ".txt");
+        File userFile = new File(userFolderPath + user.getUserId() + ".json");
         Writer wr = new FileWriter(userFile);
         wr.write(userToString(user));
         wr.close();

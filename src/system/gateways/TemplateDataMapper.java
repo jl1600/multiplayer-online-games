@@ -1,5 +1,6 @@
 package system.gateways;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import system.entities.game.quiz.QuizGame;
 import system.entities.template.HangmanTemplate;
 import system.entities.template.QuizTemplate;
@@ -11,6 +12,9 @@ import java.util.HashSet;
 import java.util.Objects;
 
 public class TemplateDataMapper implements TemplateDataGateway{
+    //Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    Gson gson = new Gson();
+
     /**
      * Adds a template to the database and increases the total number of templates created by 1
      * @param template template to add to the database
@@ -36,7 +40,7 @@ public class TemplateDataMapper implements TemplateDataGateway{
      * @throws IOException if the database is not found
      */
     public void deleteTemplate(String templateID) throws IOException {
-        File file = new File(templateFolderPath + templateID + ".txt");
+        File file = new File(templateFolderPath + templateID + ".json");
         if (!file.delete()) {
             throw new IOException();
         }
@@ -79,21 +83,7 @@ public class TemplateDataMapper implements TemplateDataGateway{
     }
 
     private String quizTemplateToString(QuizTemplate template) {
-        Gson gson = new Gson();
-
-        String jsonData = gson.toJson(template);
-        return jsonData;
-
-        /*
-        return template.getID() + "," +
-                template.getTitle().replace(",", "-") + "," +
-                template.hasMultipleScoreCategories() + "," +
-                template.hasScoreWeight() + "," +
-                template.hasCustomEndingMessage() + "," +
-                template.isChooseAllThatApply() + "," +
-                template.isMultipleChoice();
-
-         */
+        return gson.toJson(template);
     }
 
     private String hangmanTemplateToString(HangmanTemplate template) {
@@ -101,23 +91,7 @@ public class TemplateDataMapper implements TemplateDataGateway{
     }
 
     private Template stringToTemplate(String templateString) {
-        Gson gson = new Gson();
-        Template template = gson.fromJson(templateString, QuizTemplate.class);
-        return template;
-
-        /*
-        String[] info = templateString.split(",");
-        QuizTemplate template = new QuizTemplate();
-        String id = info[0];
-        template.setID(id);
-        template.setTitle(info[1]);
-        template.setHasMultipleScoreCategories(Boolean.parseBoolean(info[2]));
-        template.setHasScoreWeight(Boolean.parseBoolean(info[3]));
-        template.setHasCustomEndingMessage(Boolean.parseBoolean(info[4]));
-        template.setChooseAllThatApply(Boolean.parseBoolean(info[5]));
-        template.setMultipleChoice(Boolean.parseBoolean(info[6]));
-        return template;
-        */
+        return gson.fromJson(templateString, QuizTemplate.class);
     }
 
     private void incrementTemplateCount() throws IOException {
@@ -131,7 +105,7 @@ public class TemplateDataMapper implements TemplateDataGateway{
     }
 
     private void addTemplate(Template template, boolean increment) throws IOException {
-        File templateFile = new File(templateFolderPath + template.getID() + ".txt");
+        File templateFile = new File(templateFolderPath + template.getID() + ".json");
         Writer wr = new FileWriter(templateFile);
         wr.write(templateToString(template));
         wr.close();
