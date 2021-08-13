@@ -20,6 +20,7 @@ function editTemplate() {
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
+		    alert("Successfully edited template");
             window.location = "http://localhost:8080/pages/templates.html";
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
             alert("There's an invalid attribute or value");

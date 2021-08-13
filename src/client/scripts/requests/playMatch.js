@@ -14,11 +14,11 @@ function joinMatch(matchID) {
     xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
             createSocket();
-        } else if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 400) {
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
             alert("You're already in a match");
-        } else if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 403) {
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
             alert("The match is ongoing or is already finished");
-        } else if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 404) {
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {
             alert("Invalid userID or matchID");
         }
     };
@@ -57,11 +57,11 @@ function leaveMatch() {
     xhr.open("POST", "http://localhost:8000/game/leave-match");
 
     xhr.onreadystatechange = () => {
-        if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 204) {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
             alert("You're already in a match");
-        } else if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 400) {
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
             alert("You're not in this match");
-        } else if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 404) {
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {
             alert("Invalid userId or matchId");
         }
     };

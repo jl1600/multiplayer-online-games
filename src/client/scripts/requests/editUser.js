@@ -24,7 +24,7 @@ function updateUsername(username) {
 	xhr.open("POST", "http://localhost:8000/edit");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 200) {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
             document.getElementById("edit-username").hidden = false;
             document.getElementById("save-username").hidden = true;
             document.getElementById("username").readOnly = true;

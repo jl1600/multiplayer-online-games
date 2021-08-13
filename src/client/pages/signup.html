@@ -13,6 +13,7 @@
 
 		<form onsubmit="signup(this.username.value, this.password.value, this.confirmPassword.value, this.userType.value); return false">
 			<h1>Sign up</h1>
+
 			<input type="text" name="username" placeholder="Username" required>
 			<input id="password" type="password" name="password" placeholder="Password" required>
 			<input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm password" required onfocusout="checkPassword()">
