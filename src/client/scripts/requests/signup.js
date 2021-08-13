@@ -16,7 +16,7 @@ function signup(username, password, confirmPassword, userType) {
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 204) {
-			window.location = "http://localho.st:8080/pages/login";
+			window.location = "http://localhost:8080/pages/login";
 		}
 	};
 

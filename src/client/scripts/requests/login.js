@@ -9,7 +9,7 @@ function login(username, password) {
 			sessionStorage.setItem("userId", data.userid);
 			sessionStorage.setItem("userType", data.role);
 
-			window.location = data.userType === "admin" ? "http://localho.st:8080/pages/templates" : "http://localho.st:8080/pages/matches";
+			window.location = data.userType === "admin" ? "http://localhost:8080/pages/templates" : "http://localhost:8080/pages/matches";
 			document.getElementById("header").contentWindow.updateHeader();
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
 		    alert("Wrong username or password");

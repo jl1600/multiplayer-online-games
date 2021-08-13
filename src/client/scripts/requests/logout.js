@@ -45,7 +45,7 @@ function newTrial() {
 			sessionStorage.setItem("userId", data.userId);
 			sessionStorage.setItem("userType", "trial");
 			document.getElementById("header").contentWindow.updateHeader();
-            window.location = "http://localho.st:8080/pages/matches";
+            window.location = "http://localhost:8080/pages/matches";
 		}
 	};
 

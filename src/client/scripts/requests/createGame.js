@@ -43,7 +43,7 @@ function makeDesignChoice() {
             promptQuestion(JSON.parse(xhr.response).designQuestion);
 		} else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 201) {
 		    alert("Successfully created game");
-		    window.location = "http://localho.st:8080/pages/my-games";
+		    window.location = "http://localhost:8080/pages/my-games";
 		} else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 400) {
 		    alert("The input is invalid. Please re-enter");
 		}
