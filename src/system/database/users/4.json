@@ -1,1 +1,11 @@
-{"userId":"4","username":"c","password":"c","role":"ADMIN","onlineStatus":"OFFLINE","gameCreations":[""],"registerDate":"Jul 31, 2021 10:31:58 AM"}
+{
+  "userId": "4",
+  "username": "c",
+  "password": "c",
+  "role": "ADMIN",
+  "onlineStatus": "OFFLINE",
+  "gameCreations": [
+    ""
+  ],
+  "registerDate": "Jul 31, 2021 10:31:58 AM"
+}

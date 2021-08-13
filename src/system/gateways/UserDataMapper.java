@@ -16,8 +16,8 @@ import java.util.*;
 
 public class UserDataMapper implements UserDataGateway {
 
-    //Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    Gson gson = new Gson();
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    //Gson gson = new Gson();
 
     /**
      * Adds a user to the database and increases the total number of users created by 1

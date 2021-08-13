@@ -1,1 +1,9 @@
-{"multipleChoice":true,"chooseAllThatApply":true,"hasMultipleScoreCategories":false,"hasScoreWeight":false,"hasCustomEndingMessage":true,"id":"4","title":"Choose All that apply quiz"}
+{
+  "multipleChoice": true,
+  "chooseAllThatApply": true,
+  "hasMultipleScoreCategories": false,
+  "hasScoreWeight": false,
+  "hasCustomEndingMessage": true,
+  "id": "4",
+  "title": "Choose All that apply quiz"
+}
