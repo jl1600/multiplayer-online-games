@@ -1,10 +1,12 @@
+if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
+
 document.addEventListener("DOMContentLoaded", fetchMatches, false);
 
 function fetchMatches() {
 	xhr.open("GET", "http://localhost:8000/game/available-matches?userid=" + sessionStorage.getItem("userId"));
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 			JSON.parse(xhr.response).forEach(match => createCard(match, "JOIN"));
 			listenForClicks();
 		}

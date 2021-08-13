@@ -3,19 +3,15 @@ const xhr = new XMLHttpRequest();
 document.addEventListener("DOMContentLoaded", fillUsername, false);
 
 function fillUsername() {
-    xhr.open("GET", "http://localhost:8000/user/username?userId=" + sessionStorage.getItem("userId"));
+    xhr.open("GET", "http://localhost:8000/user/username?userid=" + sessionStorage.getItem("userId"));
 
     	xhr.onreadystatechange = () => {
-    		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-    		    const data = JSON.parse(xhr.response);
-    		    document.getElementById("username").value = data.username;
+    		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+    		    document.getElementById("username").value = JSON.parse(xhr.response).username;
     		}
     	};
 
-    	xhr.send(JSON.stringify({
-    	    userId: sessionStorage.getItem("userId"),
-    	    username
-    	}));
+    	xhr.send();
 }
 
 function allowEditUsername() {
@@ -26,10 +22,9 @@ function allowEditUsername() {
 }
 function updateUsername(username) {
 	xhr.open("POST", "http://localhost:8000/edit");
-	xhr.setRequestHeader("Content-Type", "application/json");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+		if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 200) {
             document.getElementById("edit-username").hidden = false;
             document.getElementById("save-username").hidden = true;
             document.getElementById("username").readOnly = true;
@@ -37,7 +32,7 @@ function updateUsername(username) {
 	};
 
 	xhr.send(JSON.stringify({
-	    userId: sessionStorage.getItem("userId"),
+	    userID: sessionStorage.getItem("userId"),
 	    username
 	}));
 }
@@ -56,7 +51,7 @@ function updatePassword(oldPassword, newPassword) {
 	xhr.setRequestHeader("Content-Type", "application/json");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
             document.getElementById("edit-password").hidden = false;
             document.getElementById("save-password").hidden = true;
             document.getElementById("new-password").hidden = true;
@@ -68,7 +63,7 @@ function updatePassword(oldPassword, newPassword) {
 	};
 
 	xhr.send(JSON.stringify({
-	    userId: sessionStorage.getItem("userId"),
+	    userID: sessionStorage.getItem("userId"),
 	    oldPassword,
 	    newPassword
 	}));

@@ -1,11 +1,19 @@
+if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
+
 document.addEventListener("DOMContentLoaded", createGameBuilder, false);
+window.addEventListener("beforeunload", resetQuestions);
 
 function createGameBuilder() {
 	xhr.open("POST", "http://localhost:8000/game/create-builder");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE && (xhr.status === 200 || xhr.status === 201)) {
-            promptQuestion(JSON.parse(xhr.response).designQuestion);
+	console.log(xhr.status)
+	    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+	        resetQuestions();
+	    } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
+			promptQuestion(JSON.parse(xhr.response).designQuestion);
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {
+			alert("templateID or userID is invalid");
 		}
 	}
 
@@ -16,36 +24,38 @@ function createGameBuilder() {
 }
 
 function promptQuestion(questionText) {
-    const question = document.createElement("label");
-    const input = document.createElement("input");
-    input.required = true;
-    input.onkeypress = event => {
-        if (event.keyCode === 13) makeDesignChoice();
-    }
-    input.setAttribute("data-id", document.getElementsByTagName("tag").length);
-    question.innerHTML = questionText;
-    question.appendChild(input);
+	const question = document.createElement("label");
+	const input = document.createElement("input");
+	input.required = true;
+	input.onkeypress = event => {
+		if (event.keyCode === 13) makeDesignChoice();
+	}
+	input.setAttribute("data-id", document.getElementsByTagName("tag").length);
+	question.innerHTML = questionText;
+	question.appendChild(input);
 
-    document.getElementById("form").insertBefore(question, document.getElementsByClassName("buttons")[0]);
-    question.focus();
+	document.getElementById("form").insertBefore(question, document.getElementsByClassName("buttons")[0]);
+	question.focus();
 }
 
 function makeDesignChoice() {
-    const inputs = document.getElementsByTagName("input");
-    const choice = inputs[inputs.length - 1].value;
-    if (choice == "") return alert("The input is invalid. Please re-enter");
+	const inputs = document.getElementsByTagName("input");
+	const choice = inputs[inputs.length - 1].value;
+	if (choice == "") return alert("The input is invalid. Please re-enter");
 
-    xhr.open("POST", "http://localhost:8000/game/make-design-choice");
+	xhr.open("POST", "http://localhost:8000/game/make-design-choice");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-		    inputs[inputs.length - 1].readOnly = true;
-            promptQuestion(JSON.parse(xhr.response).designQuestion);
+			inputs[inputs.length - 1].readOnly = true;
+			promptQuestion(JSON.parse(xhr.response).designQuestion);
 		} else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 201) {
-		    alert("Successfully created game");
-		    window.location = "http://localhost:8080/pages/my-games";
+			alert("Successfully created game");
+			window.location = "http://localhost:8080/pages/my-games";
 		} else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 400) {
-		    alert("The input is invalid. Please re-enter");
+			alert("The input is invalid. Please re-enter");
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {
+		    alert("You haven't started creating a game");
 		}
 	}
 
@@ -56,15 +66,17 @@ function makeDesignChoice() {
 }
 
 function resetQuestions() {
-    xhr.open("POST", "http://localhost:8000/game/cancel-builder");
+	xhr.open("POST", "http://localhost:8000/game/cancel-builder");
 
-    xhr.onreadystatechange = () => {
-        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-            window.location.reload();
-        }
-    }
+	xhr.onreadystatechange = () => {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
+			window.location.reload();
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+		    alert("You haven't started building anything");
+		}
+	}
 
-    xhr.send(JSON.stringify({
-        userID: sessionStorage.getItem("userId")
-    }));
+	xhr.send(JSON.stringify({
+		userID: sessionStorage.getItem("userId")
+	}));
 }

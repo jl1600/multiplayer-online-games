@@ -79,19 +79,19 @@ header .user a#signup {
 
 			function updateHeader() {
 				switch (sessionStorage.getItem("userType")) {
-					case "trial":
+					case "TRIAL":
 						document.getElementsByClassName("normal")[0].hidden = false;
 						document.getElementsByClassName("admin")[0].hidden = true;
 						document.getElementsByClassName("user")[0].hidden = false;
 						document.getElementById("my-account").hidden = true;
 					break;
-					case "admin":
+					case "ADMIN":
 						document.getElementsByClassName("normal")[0].hidden = true;
 						document.getElementsByClassName("admin")[0].hidden = false;
 						document.getElementsByClassName("user")[0].hidden = true;
 						document.getElementById("my-account").hidden = false;
 					break;
-					case "normal":
+					case "MEMBER":
 						document.getElementsByClassName("normal")[0].hidden = false;
 						document.getElementsByClassName("admin")[0].hidden = true;
 						document.getElementsByClassName("user")[0].hidden = true;

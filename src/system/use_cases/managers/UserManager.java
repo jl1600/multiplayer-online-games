@@ -83,7 +83,7 @@ public class UserManager {
             throws DuplicateUsernameException, IOException, UnaccountedUserRoleException {
         if (role.equals(UserRole.TRIAL))
             throw new UnaccountedUserRoleException();
-        if (users.containsKey(username))
+        if (userIds.containsKey(username))
             throw new DuplicateUsernameException();
 
         String userId = idManager.getNextId();

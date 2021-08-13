@@ -1,6 +1,6 @@
 function createCard(data, type) {
 	const card = createElement("card");
-	card.setAttribute("data-id", data.templateID || data.gameID);
+	card.setAttribute("data-id", data.templateID || data.gameID || data.id);
 
 	const content = createContent(data);
 	const overlay = createOverlay(type, data.accessLevel);
@@ -24,7 +24,7 @@ function createText(text, elementClass) {
 function createContent(data) {
 	const content = createElement("content");
 
-	const img = createImg(data.gameGenre);
+	const img = createImg(data.gameGenre || "QUIZ");
 	const title = createText(data.title, "title");
 	const description = createText(getDescription(data.gameGenre), "description");
 
@@ -48,7 +48,7 @@ function createElement(className) {
 function createOverlayButtons(type, publicity) {
 	const imgs = createElement("img-container");
 
-	if (type === "EDIT" && sessionStorage.getItem("userType") !== "admin") {
+	if (type === "EDIT" && sessionStorage.getItem("userType") !== "ADMIN") {
 		createEditButtons(publicity).forEach(el => imgs.appendChild(el));
 	} else {
 		const btn = createElement("button");

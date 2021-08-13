@@ -8,7 +8,7 @@ function fetchTemplates() {
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 			JSON.parse(xhr.response).forEach(template => createCard(template,
-			    sessionStorage.getItem("userType") === "admin" ? "EDIT" : "USE THIS"));
+			    sessionStorage.getItem("userType") === "ADMIN" ? "EDIT" : "USE THIS"));
 			listenForClicks();
 		}
 	};
@@ -19,7 +19,7 @@ function fetchTemplates() {
 function listenForClicks() {
 	document.querySelectorAll("#cards-container .card .overlay .img-container .button").forEach(el => {
 		el.addEventListener("click", () => {
-			window.location = sessionStorage.getItem("userType") === "admin" ?
+			window.location = sessionStorage.getItem("userType") === "ADMIN" ?
 			    "http://localhost:8080/pages/edit-template?templateId=" +
 				el.parentElement.parentElement.parentElement.getAttribute("data-id") :
 				"http://localhost:8080/pages/create-game?templateId=" +

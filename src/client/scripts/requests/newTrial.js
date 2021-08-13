@@ -11,7 +11,9 @@ function newTrial() {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 			const data = JSON.parse(xhr.response);
 			sessionStorage.setItem("userId", data.userID);
-			sessionStorage.setItem("userType", "trial");
+			sessionStorage.setItem("userType", "TRIAL");
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 500) {
+		    alert("Server error");
 		}
 	};
 
