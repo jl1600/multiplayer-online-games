@@ -1,3 +1,5 @@
+var serverSocket;
+
 if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -28,6 +30,27 @@ function joinMatch(matchID) {
 }
 
 function createSocket() {
+    serverSocket = new WebSocket("ws://localhost:8888");
+    serverSocket.send(sessionStorage.getItem("userId"));
+    document.getElementById("matchContent").textContent="Successful handshake";
+    serverSocket.onmessage = function(event) {
+        document.getElementById("matchContent").textContent=event.data;
+    };
+}
+
+
+function sendInput(input) {
+    serverSocket.send(JSON.stringify({
+                              sysCommand: "",
+                              gameMove: input
+                          }));
+}
+
+function startMatch() {
+    serverSocket.send(JSON.stringify({
+                                  sysCommand: "start",
+                                  gameMove: ""
+                              }));
 }
 
 function leaveMatch() {

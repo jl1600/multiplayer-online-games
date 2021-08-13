@@ -1,6 +1,5 @@
 package system.controllers;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.*;
 import shared.DTOs.Responses.DesignQuestionResponseBody;
@@ -123,7 +122,8 @@ public class GameRequestHandler extends RequestHandler {
         JoinMatchRequestBody body = gson.fromJson(getRequestBody(exchange), JoinMatchRequestBody.class);
         try {
             matchManager.addPlayer(body.userID, userManager.getUsername(body.userID), body.matchID);
-            acceptPlayerSocket(body.userID, body.matchID);
+            ClientSocketSeeker clientSeeker = new ClientSocketSeeker(matchManager, serverSocket, body.userID, body.matchID);
+            clientSeeker.start();
         } catch (InvalidMatchIDException e) {
             sendResponse(exchange, 403, "Match already started or the given ID is invalid.");
         } catch (DuplicateUserIDException e) {
@@ -179,62 +179,13 @@ public class GameRequestHandler extends RequestHandler {
                                     templateManager.getTemplate(templateID));
             System.out.println(matchID);
             sendResponse(exchange, 204, null); // Telling the client that match is successfully created.
-            acceptPlayerSocket(body.userID, matchID);
-
+            ClientSocketSeeker clientSeeker = new ClientSocketSeeker(matchManager, serverSocket, body.userID, matchID);
+            clientSeeker.start();
         } catch (InvalidUserIDException | InvalidIDException e) {
             sendResponse(exchange, 400, "One of the provided IDs is invalid.");
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void acceptPlayerSocket(String userID, String matchID) throws IOException, InvalidMatchIDException {
-        Socket connection = serverSocket.accept();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        // handShake(newPlayer);
-        String playerID = reader.readLine();
-        // Refusing connection until it's the correct user ID that we are looking for.
-        while (!playerID.equals(userID)) {
-            connection.close();
-            connection = serverSocket.accept();
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            playerID = reader.readLine();
-        }
-        PlayerInputListener inputListener = new PlayerInputListener(connection, matchManager, matchID, playerID);
-        MatchOutputDispatcher outputDispatcher = new MatchOutputDispatcher(matchManager, matchID);
-        outputDispatcher.addPlayerOutput(connection);
-        matchManager.addObserver(outputDispatcher, matchID);
-        inputListener.start();
-    }
-
-    //////////////////////////////////////////////////////
-    // May need to remove this later
-    private void handShake(Socket client) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-        reader.readLine();
-        reader.readLine();
-        String key = reader.readLine().split(" ")[1];
-        PrintWriter printWriter = new PrintWriter(client.getOutputStream());
-        printWriter.println("HTTP/1.1 101 Switching Protocols");
-        printWriter.println("Upgrade: websocket");
-        printWriter.println("Connection: Upgrade");
-        printWriter.println("Sec-WebSocket-Accept: " + encode(key));
-        printWriter.println();
-        printWriter.flush();
-    }
-    private String encode(String key) throws Exception {
-        key += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-        byte[] bytes = MessageDigest.getInstance("SHA-1").digest(key.getBytes());
-        return DatatypeConverter.printBase64Binary(bytes);
-    }
-
-    private static String byteArrayToHexString(byte[] b) {
-        String result = "";
-        for (int i=0; i < b.length; i++) {
-            result +=
-                    Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
-        }
-        return result;
     }
 
     private void handleCreateBuilder(HttpExchange exchange) throws IOException {
