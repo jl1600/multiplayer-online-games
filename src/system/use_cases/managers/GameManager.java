@@ -1,10 +1,12 @@
 package system.use_cases.managers;
 
 import shared.constants.GameAccessLevel;
+import shared.constants.GameGenre;
 import shared.exceptions.entities_exception.DuplicateGameIDException;
 import shared.exceptions.entities_exception.IDNotYetSetException;
 import shared.exceptions.use_case_exceptions.*;
 
+import system.entities.game.quiz.QuizGame;
 import system.entities.template.Template;
 import system.entities.game.Game;
 import system.gateways.GameDataGateway;
@@ -148,7 +150,7 @@ public class GameManager {
      * Removes the game from the system and database.
      *
      * @param gameId The String identifier of the Game.
-     * @throws InvalidIDException There is no such a game in the system.
+     * @throws InvalidGameIDException There is no such a game in the system.
      * */
     public void removeGame(String gameId) throws InvalidGameIDException {
         if (games.containsKey(gameId)) {
@@ -233,6 +235,18 @@ public class GameManager {
             throw new InvalidGameIDException();
         }
         return games.get(gameID).isPublic();
+    }
+
+    /**
+     * Returns the genre of the game.
+     * */
+    public GameGenre getGenre(String gameID) throws InvalidGameIDException {
+        if(!games.containsKey(gameID)) {
+            throw new InvalidGameIDException();
+        }
+        if (games.get(gameID) instanceof QuizGame) {
+            return GameGenre.QUIZ;
+        } else return GameGenre.HANGMAN;
     }
 
     /**

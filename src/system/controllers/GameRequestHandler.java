@@ -285,6 +285,7 @@ public class GameRequestHandler extends RequestHandler {
                     data.ownerName = userManager.getUsername(gameManager.getOwnerID(gameID));
                     data.title = gameManager.getGameTitle(gameID);
                     data.accessLevel = gameManager.getAccessLevel(gameID);
+                    data.genre = gameManager.getGenre(gameID);
                     dataSet.add(data);
                 }
             } catch (InvalidGameIDException | InvalidUserIDException e) {
@@ -311,6 +312,7 @@ public class GameRequestHandler extends RequestHandler {
                 data.hostName = matchManager.getHostName(id);
                 data.numPlayers = matchManager.getPlayerCount(id);
                 data.maxPlayers = matchManager.getPlayerCountLimit(id);
+                data.genre = gameManager.getGenre(gameId);
                 dataSet.add(data);
             } catch (InvalidMatchIDException e) {
                 throw new RuntimeException("The match ID returned from match manager doesn't exist anymore");
@@ -378,6 +380,7 @@ public class GameRequestHandler extends RequestHandler {
                     data.id = id;
                     data.title = gameManager.getGameTitle(id);
                     data.accessLevel = gameManager.getAccessLevel(id);
+                    data.genre = gameManager.getGenre(id);
                     dataSet.add(data);
                 }
             } catch (InvalidGameIDException e) {
@@ -399,6 +402,7 @@ public class GameRequestHandler extends RequestHandler {
                 try {
                     data.title = gameManager.getGameTitle(id);
                     data.accessLevel = gameManager.getAccessLevel(id);
+                    data.genre = gameManager.getGenre(id);
                 } catch (InvalidGameIDException e) {
                     throw new RuntimeException("Game ID from owned list is invalid.");
                 }
@@ -418,6 +422,7 @@ public class GameRequestHandler extends RequestHandler {
                 game.title = gameManager.getGameTitle(id);
                 game.ownerName = userManager.getUsername(gameManager.getOwnerID(id));
                 game.accessLevel = gameManager.getAccessLevel(id);
+                game.genre = gameManager.getGenre(id);
             } catch (InvalidGameIDException | InvalidUserIDException e) {
                 throw new RuntimeException("Game ID or user ID got from public game list is invalid.");
             }
