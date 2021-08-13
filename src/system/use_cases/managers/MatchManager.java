@@ -180,6 +180,23 @@ public class MatchManager {
     }
 
     /**
+     * Returns the userName of the player who created this match
+     *
+     * @param matchID The ID of the match.
+     * */
+    public String getHostName(String matchID) throws InvalidMatchIDException {
+        if (preparingMatches.containsKey(matchID)) {
+            return preparingMatches.get(matchID).getHostName();
+        } else if (ongoingMatches.containsKey(matchID)) {
+            return ongoingMatches.get(matchID).getHostName();
+        } else if (finishedMatches.containsKey(matchID)) {
+            return finishedMatches.get(matchID).getHostName();
+        } else {
+            throw new InvalidMatchIDException();
+        }
+    }
+
+    /**
      * Returns a set of all ongoing match ids.
      * */
     public Set<String> getAllOngoingMatchIds() {

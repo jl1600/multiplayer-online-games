@@ -308,14 +308,14 @@ public class GameRequestHandler extends RequestHandler {
                 String gameId = matchManager.getGameIdFromMatch(id);
                 data.gameTitle = gameManager.getGameTitle(gameId);
                 data.matchId = id;
-                data.hostName = matchManager.getHostId(id);
+                data.hostName = matchManager.getHostName(id);
                 data.numPlayers = matchManager.getPlayerCount(id);
                 data.maxPlayers = matchManager.getPlayerCountLimit(id);
                 dataSet.add(data);
             } catch (InvalidMatchIDException e) {
                 throw new RuntimeException("The match ID returned from match manager doesn't exist anymore");
             } catch (InvalidGameIDException e) {
-                throw new RuntimeException("The game ID got from match is invalid.");
+                throw new RuntimeException("The game ID or host ID got from match is invalid.");
             }
         }
 
