@@ -87,10 +87,16 @@ public class MatchManager {
     public void removePlayer(String userID, String matchID) throws InvalidMatchIDException, InvalidUserIDException {
         if (preparingMatches.containsKey(matchID)) {
             preparingMatches.get(matchID).removePlayer(userID);
+            if (preparingMatches.get(matchID).getPlayerCount() == 0)
+                preparingMatches.remove(matchID);
         } else if (ongoingMatches.containsKey(matchID)) {
             ongoingMatches.get(matchID).removePlayer(userID);
+            if (ongoingMatches.get(matchID).getPlayerCount() == 0)
+                ongoingMatches.remove(matchID);
         } else if (finishedMatches.containsKey(matchID)) {
             finishedMatches.get(matchID).removePlayer(userID);
+            if (finishedMatches.get(matchID).getPlayerCount() == 0)
+                finishedMatches.remove(matchID);
         } else {
             throw new InvalidMatchIDException();
         }
@@ -199,13 +205,6 @@ public class MatchManager {
     }
 
     /**
-     * Returns a set of all ongoing match ids.
-     * */
-    public Set<String> getAllOngoingMatchIds() {
-        return new HashSet<>(ongoingMatches.keySet());
-    }
-
-    /**
      * Returns the maximum number of players allowed for a particular match.
      *
      * @param matchID The ID of the match.
@@ -243,6 +242,9 @@ public class MatchManager {
             throws InvalidMatchIDException, InvalidInputException, InvalidUserIDException {
         if (ongoingMatches.containsKey(matchID)) {
             ongoingMatches.get(matchID).playMove(playerID, move);
+            if (ongoingMatches.get(matchID).getStatus() == MatchStatus.FINISHED) {
+                finishedMatches.put(matchID, ongoingMatches.remove(matchID));
+            }
         }
         else {
             throw new InvalidMatchIDException();
