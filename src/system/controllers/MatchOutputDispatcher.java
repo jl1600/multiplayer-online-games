@@ -6,6 +6,7 @@ import shared.exceptions.use_case_exceptions.InvalidMatchIDException;
 import system.use_cases.managers.MatchManager;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.*;
@@ -13,14 +14,14 @@ import java.util.*;
 public class MatchOutputDispatcher implements Observer {
 
     public final MatchManager matchManager;
-    public final List<PrintWriter> outputWriters;
+    public final List<OutputStream> outStreams;
     public final String matchID;
     public final Gson gson;
 
     public MatchOutputDispatcher(MatchManager manager, String matchID) {
         this.matchManager = manager;
         this.matchID = matchID;
-        this.outputWriters = new ArrayList<>();
+        this.outStreams = new ArrayList<>();
         gson = new Gson();
     }
 
@@ -28,7 +29,7 @@ public class MatchOutputDispatcher implements Observer {
      * Add a new output stream that is associated with a new player.
      * */
     public void addPlayerOutput(Socket socket) throws IOException {
-        this.outputWriters.add(new PrintWriter(socket.getOutputStream()));
+        this.outStreams.add(socket.getOutputStream());
     }
 
 
@@ -41,7 +42,7 @@ public class MatchOutputDispatcher implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         System.out.println("Trying to update");
-        for (PrintWriter out: outputWriters) {
+        for (OutputStream out: outStreams) {
             MatchOutput matchOutput = new MatchOutput();
             try {
                 matchOutput.status = matchManager.getMatchStatus(matchID);
@@ -51,10 +52,11 @@ public class MatchOutputDispatcher implements Observer {
             } catch (InvalidMatchIDException e) {
                 throw new RuntimeException("Invalid match ID. This should never happen.");
             }
-            Gson gson = new Gson();
-            System.out.println("Trying to output:" + gson.toJson(matchOutput));
-            out.println(gson.toJson(matchOutput));
-            out.flush();
+            try {
+                ClientSocketSeeker.sendWSMessage(out, gson.toJson(matchOutput));
+            } catch (IOException e) {
+                System.out.println("Can't connect to this player. They may have left the match.");
+            }
         }
     }
 }

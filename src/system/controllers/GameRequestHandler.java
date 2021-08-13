@@ -11,13 +11,11 @@ import system.use_cases.managers.MatchManager;
 import system.use_cases.managers.TemplateManager;
 import system.use_cases.managers.UserManager;
 
-import javax.xml.bind.DatatypeConverter;
-import java.security.MessageDigest;
+
 import java.io.*;
 
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -177,7 +175,6 @@ public class GameRequestHandler extends RequestHandler {
             String matchID = matchManager.newMatch(body.userID, userManager.getUsername(body.userID),
                                     gameManager.getGame(body.gameID),
                                     templateManager.getTemplate(templateID));
-            System.out.println(matchID);
             sendResponse(exchange, 204, null); // Telling the client that match is successfully created.
             ClientSocketSeeker clientSeeker = new ClientSocketSeeker(matchManager, serverSocket, body.userID, matchID);
             clientSeeker.start();

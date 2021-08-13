@@ -84,6 +84,11 @@ public class QuizGameMatch extends GameMatch {
         this.game = game;
         this.template = template;
         this.playerStats = new HashMap<>();
+        try {
+            addPlayer(userID, username);
+        } catch (DuplicateUserIDException | MaxPlayerReachedException e) {
+            throw new RuntimeException("Failed to add host as a new player. This should never happen");
+        }
     }
 
     @Override
@@ -93,7 +98,7 @@ public class QuizGameMatch extends GameMatch {
         } else if (getPlayerCount() >= getPlayerLimit()) {
             throw new MaxPlayerReachedException();
         }
-
+        System.out.println("Trying to add player");
         playerStats.put(userID, new PlayerStat(username));
         setChanged();
         notifyObservers();
@@ -116,11 +121,13 @@ public class QuizGameMatch extends GameMatch {
     @Override
     public String getTextContent()  {
 
+        if (getStatus() == MatchStatus.PREPARING) {
+            return "";
+        }
 
         if (getStatus() == MatchStatus.FINISHED) {
             return getEndingContent();
         }
-
         String currQuestion = game.getQuestion(currQuestionIndex).toString();
 
         if (template.isMultipleChoice() && template.isChooseAllThatApply()) {
@@ -129,9 +136,14 @@ public class QuizGameMatch extends GameMatch {
         } else if (template.isMultipleChoice() && template.hasMultipleScoreCategories()) {
             return currQuestion + "\nEnter the number corresponding to your choice:";
         } else { // One correct answer multiple choice or Exact answer
-            int correctAnswerIndex = game.getQuestion(currQuestionIndex).getCorrectAnswerIndex();
-            return "Correct answer is: " + game.getQuestion(currQuestionIndex).getAnswer(correctAnswerIndex)
-                    + Integer.toString(currQuestionIndex + 1) + ". " + currQuestion;
+            String lastRes = "";
+            if (currQuestionIndex > 0) {
+                int correctAnswerIndex = game.getQuestion(currQuestionIndex - 1).getCorrectAnswerIndex();
+                if (correctAnswerIndex != -1)
+                    lastRes = "Correct answer: " +
+                            game.getQuestion(currQuestionIndex - 1).getAnswer(correctAnswerIndex);
+            }
+            return lastRes + "\n" + ". " + currQuestion;
         }
     }
 
@@ -152,8 +164,12 @@ public class QuizGameMatch extends GameMatch {
             }
             return  result.toString();
         } else { // Simple Multiple choice or simple exact answer.
-            int correctAnswerIndex = game.getQuestion(currQuestionIndex).getCorrectAnswerIndex();
-            result.append("Correct answer: ").append(game.getQuestion(currQuestionIndex).getAnswer(correctAnswerIndex));
+            int correctAnswerIndex = game.getQuestion(currQuestionIndex - 1).getCorrectAnswerIndex();
+            if (correctAnswerIndex != -1) {
+                result.append("Correct answer: ").
+                        append(game.getQuestion(currQuestionIndex - 1).getAnswer(correctAnswerIndex)).
+                        append("\n");
+            }
             result.append("Quiz ended. Player scores are:");
             for (PlayerStat player : playerStats.values()) {
                 result.append("\n").append(player.username).
@@ -189,11 +205,6 @@ public class QuizGameMatch extends GameMatch {
         if (getStatus() == MatchStatus.PREPARING) {
             setStatus(MatchStatus.ONGOING);
             this.currQuestionIndex = 0;
-            try {
-                addPlayer(getHostID(), getHostName());
-            } catch (DuplicateUserIDException | MaxPlayerReachedException e) {
-                throw new RuntimeException("Error: Cannot add the first player to the match");
-            }
             setChanged();
             notifyObservers();
         }
@@ -201,9 +212,6 @@ public class QuizGameMatch extends GameMatch {
 
 
     private void nextTurn() {
-        for(PlayerStat player: playerStats.values()) {
-            player.clearLastTurn();
-        }
         numMovedPlayers = 0;
         if (currQuestionIndex < game.getNumQuestions() - 1) {
             currQuestionIndex += 1;
@@ -212,6 +220,9 @@ public class QuizGameMatch extends GameMatch {
         }
         setChanged();
         notifyObservers();
+        for(PlayerStat player: playerStats.values()) {
+            player.clearLastTurn();
+        }
     }
 
 
@@ -236,8 +247,6 @@ public class QuizGameMatch extends GameMatch {
         if (player.numAttempted == 1){
             numMovedPlayers ++;
         }
-        setChanged();
-        notifyObservers();
 
         if (numMovedPlayers == getPlayerCount())
             nextTurn();

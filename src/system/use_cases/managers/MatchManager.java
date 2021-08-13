@@ -54,7 +54,6 @@ public class MatchManager {
         if (preparingMatches.containsKey(matchID)) {
             ongoingMatches.put(matchID, preparingMatches.remove(matchID));
             ongoingMatches.get(matchID).startMatch();
-            System.out.println("Match started");
         } else {
             System.out.println("Throwing this");
             throw new InvalidMatchIDException();
