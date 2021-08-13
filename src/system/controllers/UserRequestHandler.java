@@ -281,6 +281,8 @@ public class UserRequestHandler implements RequestHandler {
         }
         catch (InvalidUserIDException e) {
             return new ErrorMessageResponse(sessionID, "Error: Invalid Id");
+        } catch (IOException e) {
+            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
         }
     }
 }

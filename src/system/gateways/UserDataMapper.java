@@ -142,4 +142,11 @@ public class UserDataMapper implements UserDataGateway {
 
         if (increment) incrementUserCount();
     }
+    public void banUser(User user, Date bannedUntil) throws IOException {
+        File userFile = new File(userFolderPath + user.getUserId() + ".txt");
+        Writer wr = new FileWriter(userFile);
+        wr.write(userToString(user));
+        wr.write(String.valueOf(bannedUntil));
+        wr.close();
+    }
 }

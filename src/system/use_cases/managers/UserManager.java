@@ -327,7 +327,7 @@ public class UserManager {
         return (ArrayList<User>) users.values();
     }
 
-    public void banUser(String adminID, String userID, int duration) throws InvalidUserIDException{
+    public void banUser(String adminID, String userID, int duration) throws InvalidUserIDException, IOException{
         if (!users.containsKey(userID) || !users.containsKey(adminID))
             throw new InvalidUserIDException();
 
@@ -337,5 +337,6 @@ public class UserManager {
         Calendar date = Calendar.getInstance();
         date.add(Calendar.DAY_OF_YEAR, duration);
         bannedUsers.put(userID, date.getTime());
+        gateway.banUser(users.get(userID), date.getTime());
     }
 }
