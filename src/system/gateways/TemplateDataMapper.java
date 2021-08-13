@@ -1,7 +1,6 @@
 package system.gateways;
+
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import system.entities.game.quiz.QuizGame;
 import system.entities.template.HangmanTemplate;
 import system.entities.template.QuizTemplate;
 import system.entities.template.Template;
@@ -11,12 +10,17 @@ import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Objects;
 
-public class TemplateDataMapper implements TemplateDataGateway{
-    //Gson gson = new GsonBuilder().setPrettyPrinting().create();
+public class TemplateDataMapper implements TemplateDataGateway {
+
     Gson gson = new Gson();
+    //Gson gson = new GsonBuilder().setPrettyPrinting().setLenient().create();
+
+    private final String[] SUB_FOLDERS = {"quiz/", "hangman/"};
+    private final String SUFFIX = ".json";
 
     /**
      * Adds a template to the database and increases the total number of templates created by 1
+     *
      * @param template template to add to the database
      * @throws IOException if the database is not found
      */
@@ -26,6 +30,7 @@ public class TemplateDataMapper implements TemplateDataGateway{
 
     /**
      * Updates the user in the database
+     *
      * @param template template do update
      * @throws IOException if the database is not found
      */
@@ -36,12 +41,19 @@ public class TemplateDataMapper implements TemplateDataGateway{
 
     /**
      * Deletes the template with the specified id from the database
+     *
      * @param templateID id of the template to delete
      * @throws IOException if the database is not found
      */
     public void deleteTemplate(String templateID) throws IOException {
-        File file = new File(templateFolderPath + templateID + ".json");
-        if (!file.delete()) {
+        boolean deleted = false;
+        for (String subfolder : SUB_FOLDERS) {
+            File file = new File(templateFolderPath + subfolder + templateID + SUFFIX);
+            if (file.delete()) {
+                deleted = true;
+            }
+        }
+        if (!deleted) {
             throw new IOException();
         }
     }
@@ -51,15 +63,16 @@ public class TemplateDataMapper implements TemplateDataGateway{
      * @throws IOException if the database is not found
      */
     public HashSet<Template> getAllTemplates() throws IOException {
-        File folder = new File(templateFolderPath);
         HashSet<Template> templates = new HashSet<>();
 
-        for (File file : Objects.requireNonNull(folder.listFiles())) {
-            String templateString = String.join(",", Files.readAllLines(file.toPath()));
-            Template template = stringToTemplate(templateString);
-            templates.add(template);
+        for (String subfolder : SUB_FOLDERS) {
+            File folder = new File(templateFolderPath + subfolder);
+            for (File file : Objects.requireNonNull(folder.listFiles())) {
+                String templateString = String.join(",", Files.readAllLines(file.toPath()));
+                Template template = jsonToTemplate(templateString, subfolder);
+                templates.add(template);
+            }
         }
-
         return templates;
     }
 
@@ -72,26 +85,18 @@ public class TemplateDataMapper implements TemplateDataGateway{
         return new Integer(rd.readLine());
     }
 
-    private String templateToString(Template template) {
-        if (template instanceof QuizTemplate) {
-            return quizTemplateToString((QuizTemplate) template);
-        } else if (template instanceof HangmanTemplate) {
-            return hangmanTemplateToString((HangmanTemplate) template);
-        } else {
-            return "";
-        }
-    }
-
-    private String quizTemplateToString(QuizTemplate template) {
+    private String templateToJson(Template template) {
         return gson.toJson(template);
     }
 
-    private String hangmanTemplateToString(HangmanTemplate template) {
-        return "";
-    }
-
-    private Template stringToTemplate(String templateString) {
-        return gson.fromJson(templateString, QuizTemplate.class);
+    private Template jsonToTemplate(String templateString, String subfolder) {
+        if (subfolder.equals(SUB_FOLDERS[0])) {
+            return gson.fromJson(templateString, QuizTemplate.class);
+        } else if (subfolder.equals(SUB_FOLDERS[1])) {
+            return gson.fromJson(templateString, HangmanTemplate.class);
+        } else {
+            throw new RuntimeException();
+        }
     }
 
     private void incrementTemplateCount() throws IOException {
@@ -105,12 +110,22 @@ public class TemplateDataMapper implements TemplateDataGateway{
     }
 
     private void addTemplate(Template template, boolean increment) throws IOException {
-        File templateFile = new File(templateFolderPath + template.getID() + ".json");
+        String subfolder;
+        if (template instanceof QuizTemplate) {
+            subfolder = SUB_FOLDERS[0];
+        } else if (template instanceof HangmanTemplate) {
+            subfolder = SUB_FOLDERS[1];
+        } else {
+            throw new RuntimeException();
+        }
+
+        File templateFile = new File(templateFolderPath + subfolder + template.getID() + SUFFIX);
         Writer wr = new FileWriter(templateFile);
-        wr.write(templateToString(template));
+        wr.write(templateToJson(template));
         wr.close();
 
-        if (increment) incrementTemplateCount();
+        if (increment) {
+            incrementTemplateCount();
+        }
     }
 }
-

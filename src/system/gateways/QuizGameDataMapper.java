@@ -14,7 +14,12 @@ import java.lang.String;
 
 public class QuizGameDataMapper {
     String folderPath = GameDataGateway.gameFolderPath + "quiz/";
+    String folderPath2 = GameDataGateway.gameFolderPath + "hangman/";
+
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    private final String[] SUBFOLDERS = {"quiz/", "hangman/"};
+    private final String SUFFIX = ".json";
 
     /**
      * Adds the input QuizGame to the database and increases the total number of games created by 1

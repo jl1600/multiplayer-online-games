@@ -17,7 +17,6 @@ import java.util.*;
 public class UserDataMapper implements UserDataGateway {
 
     //Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
     Gson gson = new Gson();
 
     /**
