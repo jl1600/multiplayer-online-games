@@ -1,6 +1,5 @@
 const xhr = new XMLHttpRequest();
-
-document.addEventListener("DOMContentLoaded", newTrial, false);
+newTrial();
 
 function newTrial() {
 	if (!!sessionStorage.getItem("userType")) return;
@@ -15,7 +14,7 @@ function newTrial() {
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 500) {
 		    alert("Server error");
 		}
-	};
+	}
 
 	xhr.send();
 }

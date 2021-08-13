@@ -17,7 +17,7 @@ function joinMatch(matchID) {
         } else if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 403) {
             alert("The match is ongoing or is already finished");
         } else if (xhr.readyState === XMLHttpRequest.Done && xhr.status === 404) {
-            alert("Invalid userId or matchId");
+            alert("Invalid userID or matchID");
         }
     };
 

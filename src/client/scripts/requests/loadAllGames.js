@@ -22,7 +22,7 @@ function listenForClicks() {
 
             xhr.onreadystatechange = () => {
                 if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
-                    window.location = "http://localhost:8080/pages/play-match";
+                    window.location = "http://localhost:8080/pages/play-match.html";
                 } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
                     alert("You're already in a match. Please finish it before starting another one");
                 } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {

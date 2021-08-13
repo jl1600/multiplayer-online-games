@@ -29,7 +29,7 @@ function updateUsername(username) {
             document.getElementById("save-username").hidden = true;
             document.getElementById("username").readOnly = true;
 		}
-	};
+	}
 
 	xhr.send(JSON.stringify({
 	    userID: sessionStorage.getItem("userId"),

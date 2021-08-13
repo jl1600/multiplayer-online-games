@@ -1,6 +1,6 @@
 function createCard(data, type) {
 	const card = createElement("card");
-	card.setAttribute("data-id", data.templateID || data.gameID || data.id);
+	card.setAttribute("data-id", data.templateID || data.gameID || data.matchId || data.id);
 
 	const content = createContent(data);
 	const overlay = createOverlay(type, data.accessLevel);
@@ -24,9 +24,9 @@ function createText(text, elementClass) {
 function createContent(data) {
 	const content = createElement("content");
 
-	const img = createImg(data.gameGenre || "QUIZ");
-	const title = createText(data.title, "title");
-	const description = createText(getDescription(data.gameGenre), "description");
+	const img = createImg(data.gameGenre || "");
+	const title = createText(data.title || data.gameTitle, "title");
+	const description = createText(data.maxPlayers ? `Room size: ${ data.numPlayers }/${ data.maxPlayers }`: "", "description");
 
 	content.appendChild(img);
 	content.appendChild(title);

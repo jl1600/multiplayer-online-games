@@ -7,7 +7,6 @@ function createGameBuilder() {
 	xhr.open("POST", "http://localhost:8000/game/create-builder");
 
 	xhr.onreadystatechange = () => {
-	console.log(xhr.status)
 	    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 	        resetQuestions();
 	    } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
@@ -23,21 +22,6 @@ function createGameBuilder() {
 	}));
 }
 
-function promptQuestion(questionText) {
-	const question = document.createElement("label");
-	const input = document.createElement("input");
-	input.required = true;
-	input.onkeypress = event => {
-		if (event.keyCode === 13) makeDesignChoice();
-	}
-	input.setAttribute("data-id", document.getElementsByTagName("tag").length);
-	question.innerHTML = questionText;
-	question.appendChild(input);
-
-	document.getElementById("form").insertBefore(question, document.getElementsByClassName("buttons")[0]);
-	question.focus();
-}
-
 function makeDesignChoice() {
 	const inputs = document.getElementsByTagName("input");
 	const choice = inputs[inputs.length - 1].value;
@@ -51,7 +35,7 @@ function makeDesignChoice() {
 			promptQuestion(JSON.parse(xhr.response).designQuestion);
 		} else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 201) {
 			alert("Successfully created game");
-			window.location = "http://localhost:8080/pages/my-games";
+			window.location = "http://localhost:8080/pages/my-games.html";
 		} else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 400) {
 			alert("The input is invalid. Please re-enter");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {

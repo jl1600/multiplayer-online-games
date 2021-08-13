@@ -22,14 +22,14 @@ form input[type="text"], form input[type="password"], #form input[type="text"] {
 	margin-bottom: 30px;
 	transition-duration: 0.1s;
 }
-form #user-type {
+form #user-type, #form #template-genre {
 	font-size: 20px;
 	width: 100%;
 	display: flex;
 	justify-content: space-evenly;
 	margin-bottom: 20px;
 }
-form input[type="radio"] {
+form input[type="radio"], #form input[type="radio"] {
 	width: auto;
 }
 form input:focus, #form input:focus {

@@ -21,6 +21,8 @@ function logout() {
 }
 
 function deleteUser() {
+    if (!confirm("Are you sure?")) return false;
+
     xhr.open("POST", "http://localhost:8000/user/delete");
 
     	xhr.onreadystatechange = () => {
@@ -29,7 +31,7 @@ function deleteUser() {
     			sessionStorage.setItem("userType", null);
     			newTrial();
     		}
-    	};
+    	}
 
     	xhr.send(JSON.stringify({
     		userID: sessionStorage.getItem("userId")
@@ -47,9 +49,9 @@ function newTrial() {
 			sessionStorage.setItem("userId", data.userID);
 			sessionStorage.setItem("userType", "TRIAL");
 			document.getElementById("header").contentWindow.updateHeader();
-            window.location = "http://localhost:8080/pages/matches";
+            window.location = "http://localhost:8080/pages/matches.html";
 		}
-	};
+	}
 
 	xhr.send();
 }
