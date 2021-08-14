@@ -14,7 +14,7 @@ import java.util.Objects;
 public class TemplateDataMapper implements TemplateDataGateway {
 
     //Gson gson = new Gson();
-    Gson gson = new GsonBuilder().setPrettyPrinting().setLenient().create();
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private final String[] SUB_FOLDERS = {"quiz/" , "hangman/"};
     private final String SUFFIX = ".json";
@@ -69,7 +69,9 @@ public class TemplateDataMapper implements TemplateDataGateway {
         for (String subfolder : SUB_FOLDERS) {
             File folder = new File(templateFolderPath + subfolder);
             for (File file : Objects.requireNonNull(folder.listFiles())) {
-
+                if (file.getName().equals(".gitignore")) {
+                    continue;
+                }
                 String templateString = String.join("\n", Files.readAllLines(file.toPath()));
                 Template template = jsonToTemplate(templateString, subfolder);
                 templates.add(template);
