@@ -190,7 +190,6 @@ public class UserManager {
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
         getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
-        System.out.println("Logged out!");
     }
 
     public String getUsername(String userId) throws InvalidUserIDException {
