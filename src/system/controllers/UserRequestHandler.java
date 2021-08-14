@@ -2,18 +2,14 @@ package system.controllers;
 
 import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.*;
-import shared.DTOs.Responses.FriendResponseBody;
-import shared.DTOs.Responses.GeneralTemplateDataResponseBody;
+import shared.DTOs.Responses.GeneralUserInfoResponseBody;
 import shared.DTOs.Responses.LoginResponseBody;
-import shared.constants.GameGenre;
 import shared.exceptions.use_case_exceptions.*;
-import system.entities.template.QuizTemplate;
 import system.use_cases.managers.UserManager;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class UserRequestHandler extends RequestHandler {
@@ -56,55 +52,6 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
-    private void handleGetAllMembers(HttpExchange exchange) throws IOException {
-        if (exchange.getRequestURI().getQuery() == null)
-            sendResponse(exchange, 200, gson.toJson(getAllMembers()));
-        else {
-            String userID = getQueryArgFromGET(exchange);
-            if (userID == null)
-                return;
-            try {
-                sendResponse(exchange, 200, gson.toJson(getAllMembersExcludeFriendsOf(userID)));
-            } catch (InvalidUserIDException e) {
-                sendResponse(exchange, 400, "Invalid user ID.");
-            }
-        }
-    }
-
-    private Set<FriendResponseBody> getAllMembers() {
-        Set<String> IDs = userManager.getAllUserIDs();
-        Set<FriendResponseBody> allMem = new HashSet<>();
-        for (String uid: IDs) {
-            FriendResponseBody user = new FriendResponseBody();
-            user.userID = uid;
-            try {
-                user.userName = userManager.getUsername(uid);
-            } catch (InvalidUserIDException e) {
-                throw new RuntimeException("The user id got from the set of all user ids is invalid.");
-            }
-            allMem.add(user);
-        }
-        return allMem;
-    }
-
-    private Set<FriendResponseBody> getAllMembersExcludeFriendsOf(String targetUser) throws InvalidUserIDException {
-        Set<String> AllIDs = userManager.getAllUserIDs();
-        Set<String> friendIDs = userManager.getFriendList(targetUser);
-        Set<FriendResponseBody> allMem = new HashSet<>();
-        for (String uid: AllIDs) {
-            if (friendIDs.contains(uid))
-                continue;
-            FriendResponseBody user = new FriendResponseBody();
-            user.userID = uid;
-            try {
-                user.userName = userManager.getUsername(uid);
-            } catch (InvalidUserIDException e) {
-                throw new RuntimeException("The user id got from the set of all user ids is invalid.");
-            }
-            allMem.add(user);
-        }
-        return allMem;
-    }
 
     @Override
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
@@ -126,24 +73,120 @@ public class UserRequestHandler extends RequestHandler {
                 handleDeleteUser(exchange);
                 break;
             case "send-friend-request":
-                handleSendPendingFriend(exchange);
+                handleSendFriendRequest(exchange);
+                break;
+            case "cancel-friend-request":
+                handleCancelFriendRequest(exchange);
                 break;
             case "decline-pending-friend":
-                //handleDeclineFriend(exchange);
+                handleDeclinePendingFriend(exchange);
                 break;
             case "accept-pending-friend":
+                handleAcceptPendingFriend(exchange);
                 break;
             case "remove-friend":
+                handleRemoveFriend(exchange);
                 break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
 
-    private void handleSendPendingFriend(HttpExchange exchange) throws IOException {
-        SendPendingFriendBody body = gson.fromJson(getRequestBody(exchange), SendPendingFriendBody.class);
+    private void handleRemoveFriend(HttpExchange exchange) throws IOException {
+        FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
         try {
-            userManager.getUser(body.ownerID).addPendingFriend(body.senderID);
+            userManager.removeFriend(body.senderID, body.receiverID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
+    private void handleCancelFriendRequest(HttpExchange exchange) throws IOException {
+        FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
+        try {
+            userManager.removePendingFriend(body.receiverID, body.senderID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
+    private void handleAcceptPendingFriend(HttpExchange exchange) throws IOException {
+        FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
+        try {
+            userManager.removePendingFriend(body.senderID, body.receiverID);
+            userManager.addFriend(body.senderID, body.receiverID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
+    private void handleDeclinePendingFriend(HttpExchange exchange) throws IOException {
+        FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
+        try {
+            userManager.removePendingFriend(body.senderID, body.receiverID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
+    private void handleGetAllMembers(HttpExchange exchange) throws IOException {
+        if (exchange.getRequestURI().getQuery() == null)
+            sendResponse(exchange, 200, gson.toJson(getAllMembers()));
+        else {
+            String userID = getQueryArgFromGET(exchange);
+            if (userID == null)
+                return;
+            try {
+                sendResponse(exchange, 200, gson.toJson(getAllMembersExcludeFriendsOf(userID)));
+            } catch (InvalidUserIDException e) {
+                sendResponse(exchange, 400, "Invalid user ID.");
+            }
+        }
+    }
+
+    private Set<GeneralUserInfoResponseBody> getAllMembers() {
+        Set<String> IDs = userManager.getAllUserIDs();
+        Set<GeneralUserInfoResponseBody> allMem = new HashSet<>();
+        for (String uid: IDs) {
+            GeneralUserInfoResponseBody user = new GeneralUserInfoResponseBody();
+            user.userID = uid;
+            try {
+                user.userName = userManager.getUsername(uid);
+            } catch (InvalidUserIDException e) {
+                throw new RuntimeException("The user id got from the set of all user ids is invalid.");
+            }
+            allMem.add(user);
+        }
+        return allMem;
+    }
+
+    private Set<GeneralUserInfoResponseBody> getAllMembersExcludeFriendsOf(String targetUser) throws InvalidUserIDException {
+        Set<String> AllIDs = userManager.getAllUserIDs();
+        Set<String> friendIDs = userManager.getFriendList(targetUser);
+        Set<GeneralUserInfoResponseBody> allMem = new HashSet<>();
+        for (String uid: AllIDs) {
+            if (friendIDs.contains(uid))
+                continue;
+            GeneralUserInfoResponseBody user = new GeneralUserInfoResponseBody();
+            user.userID = uid;
+            try {
+                user.userName = userManager.getUsername(uid);
+            } catch (InvalidUserIDException e) {
+                throw new RuntimeException("The user id got from the set of all user ids is invalid.");
+            }
+            allMem.add(user);
+        }
+        return allMem;
+    }
+
+    private void handleSendFriendRequest(HttpExchange exchange) throws IOException {
+        FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
+        try {
+            userManager.addPendingFriend(body.receiverID, body.senderID);
             sendResponse(exchange, 204, null);
         } catch (InvalidUserIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
@@ -205,12 +248,12 @@ public class UserRequestHandler extends RequestHandler {
         if (ownerID == null)
             return;
         //handle load friend list as response body
-        Set<FriendResponseBody> dataSet = new HashSet<>();
+        Set<GeneralUserInfoResponseBody> dataSet = new HashSet<>();
 
         try{
             Set<String> allFriends = userManager.getFriendList(ownerID);
             for (String id : allFriends){
-                FriendResponseBody frb = new FriendResponseBody();
+                GeneralUserInfoResponseBody frb = new GeneralUserInfoResponseBody();
                 frb.userID = id;
                 frb.userName = userManager.getUsername(id);
                 dataSet.add(frb);
@@ -229,12 +272,12 @@ public class UserRequestHandler extends RequestHandler {
         if (ownerID == null)
             return;
         //handle load friend list as response body
-        Set<FriendResponseBody> dataSet = new HashSet<>();
+        Set<GeneralUserInfoResponseBody> dataSet = new HashSet<>();
 
         try{
             Set<String> allFriends = userManager.getPendingFriendList(ownerID);
             for (String id : allFriends){
-                FriendResponseBody frb = new FriendResponseBody();
+                GeneralUserInfoResponseBody frb = new GeneralUserInfoResponseBody();
                 frb.userID = id;
                 frb.userName = userManager.getUsername(id);
                 dataSet.add(frb);

@@ -1,6 +1,6 @@
 package shared.DTOs.Responses;
 
-public class FriendResponseBody {
+public class GeneralUserInfoResponseBody {
     public String userName;
     public String userID;
 }
