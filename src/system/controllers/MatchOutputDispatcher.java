@@ -3,35 +3,28 @@ package system.controllers;
 import com.google.gson.Gson;
 import shared.DTOs.sockets.MatchOutput;
 import shared.exceptions.use_case_exceptions.InvalidMatchIDException;
+import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.use_cases.managers.MatchManager;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class MatchOutputDispatcher implements Observer {
 
     public final MatchManager matchManager;
-    public final List<OutputStream> outStreams;
+    public final OutputStream outStream;
     public final String matchID;
+    public final String userID;
     public final Gson gson;
 
-    public MatchOutputDispatcher(MatchManager manager, String matchID) {
+    public MatchOutputDispatcher(OutputStream out, MatchManager manager, String matchID, String userID) {
         this.matchManager = manager;
         this.matchID = matchID;
-        this.outStreams = new ArrayList<>();
+        outStream = out;
+        this.userID = userID;
         gson = new Gson();
-    }
-
-    /**
-     * Add a new output stream that is associated with a new player.
-     * */
-    public void addPlayerOutput(Socket socket) throws IOException {
-        this.outStreams.add(socket.getOutputStream());
     }
 
 
@@ -43,22 +36,26 @@ public class MatchOutputDispatcher implements Observer {
      * */
     @Override
     public void update(Observable o, Object arg) {
-        for (OutputStream out: outStreams) {
-            MatchOutput matchOutput = new MatchOutput();
+        MatchOutput matchOutput = new MatchOutput();
+        try {
+            matchOutput.status = matchManager.getMatchStatus(matchID);
+            matchOutput.textContent = matchManager.getMatchTextContent(matchID);
+            matchOutput.lastTurnMoves = matchManager.getPlayersLastMove(matchID);
+            matchOutput.numPlayers = matchManager.getPlayerCount(matchID);
+        } catch (InvalidMatchIDException e) {
+            System.out.println("Match no longer exists");
+        }
+        try {
+            sendWSMessage(outStream, gson.toJson(matchOutput));
+        } catch (IOException e) {
             try {
-                matchOutput.status = matchManager.getMatchStatus(matchID);
-                matchOutput.textContent = matchManager.getMatchTextContent(matchID);
-                matchOutput.lastTurnMoves = matchManager.getPlayersLastMove(matchID);
-                matchOutput.numPlayers = matchManager.getPlayerCount(matchID);
-            } catch (InvalidMatchIDException e) {
-                throw new RuntimeException("Invalid match ID. This should never happen.");
+                matchManager.deleteObserver(this, matchID);
+                matchManager.removePlayer(userID, matchID);
+            } catch (InvalidMatchIDException | InvalidUserIDException e2) {
+                System.out.println("Player already left or match doesn't exist anymore.");
             }
-            try {
-                sendWSMessage(out, gson.toJson(matchOutput));
-            } catch (IOException e) {
-                outStreams.remove(out);
-                System.out.println("Can't connect to this player. They may have left the match.");
-            }
+
+            System.out.println("Can't connect to this player. They may have left the match.");
         }
     }
     // Read a websocket text message

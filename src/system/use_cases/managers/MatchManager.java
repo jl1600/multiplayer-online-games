@@ -1,13 +1,11 @@
 package system.use_cases.managers;
 
-import shared.constants.GameGenre;
 import shared.constants.MatchStatus;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.game.Game;
 import system.use_cases.game_matches.GameMatch;
 import system.entities.template.Template;
 import system.use_cases.factories.GameMatchFactory;
-import system.use_cases.game_matches.QuizGameMatch;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -130,6 +128,25 @@ public class MatchManager {
             } else {
                 throw new InvalidMatchIDException();
             }
+    }
+
+    /**
+     * Remove an observer from a match.
+     *
+     * @param o the observer
+     * @param matchID The ID of the match.
+     * @throws InvalidMatchIDException When there is no preparing match with the given ID.
+     * */
+    public void deleteObserver(Observer o, String matchID) throws InvalidMatchIDException {
+        if (preparingMatches.containsKey(matchID)) {
+            preparingMatches.get(matchID).deleteObserver(o);
+        } else if (ongoingMatches.containsKey(matchID)) {
+            ongoingMatches.get(matchID).deleteObserver(o);
+        } else if (finishedMatches.containsKey(matchID)) {
+            finishedMatches.get(matchID).deleteObserver(o);
+        } else {
+            throw new InvalidMatchIDException();
+        }
     }
 
     /**

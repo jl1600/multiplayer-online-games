@@ -32,6 +32,7 @@ public class QuizGameMatch extends GameMatch {
             for (String cat: game.getScoreCategories()) {
                 scoresByCategory.put(cat, 0.0);
             }
+            lastInput = null;
         }
 
         public void clearLastTurn() {
@@ -143,6 +144,8 @@ public class QuizGameMatch extends GameMatch {
                     lastRes = "Correct answer: " +
                             game.getQuestion(currQuestionIndex - 1).getAnswer(correctAnswerIndex);
             }
+            if (!template.isMultipleChoice())
+                return lastRes + "\n" + game.getQuestion(currQuestionIndex).getQuestionData() + "\nEnter exact answer";
             return lastRes + "\n" + currQuestion;
         }
     }
@@ -185,7 +188,11 @@ public class QuizGameMatch extends GameMatch {
     public Map<String, String> getPlayersLastMove(){
         Map<String, String> playersMove = new HashMap<>();
         for (PlayerStat player: playerStats.values()) {
-            playersMove.put(player.username, player.lastInput);
+            if (numMovedPlayers == getPlayerCount())
+                playersMove.put(player.username, player.lastInput);
+            else {
+                playersMove.put(player.username, player.lastInput != null?"Answer hidden":"Waiting for player input...");
+            }
         }
         return playersMove;
     }
@@ -212,7 +219,6 @@ public class QuizGameMatch extends GameMatch {
 
 
     private void nextTurn() {
-        numMovedPlayers = 0;
         if (currQuestionIndex < game.getNumQuestions() - 1) {
             currQuestionIndex += 1;
         } else {
@@ -220,6 +226,7 @@ public class QuizGameMatch extends GameMatch {
         }
         setChanged();
         notifyObservers();
+        numMovedPlayers = 0;
         for(PlayerStat player: playerStats.values()) {
             player.clearLastTurn();
         }
@@ -247,7 +254,8 @@ public class QuizGameMatch extends GameMatch {
         if (player.numAttempted == 1){
             numMovedPlayers ++;
         }
-
+        setChanged();
+        notifyObservers();
         if (numMovedPlayers == getPlayerCount())
             nextTurn();
     }
