@@ -55,7 +55,6 @@ public class MatchManager {
             ongoingMatches.put(matchID, preparingMatches.remove(matchID));
             ongoingMatches.get(matchID).startMatch();
         } else {
-            System.out.println("Throwing this");
             throw new InvalidMatchIDException();
         }
     }
@@ -257,10 +256,15 @@ public class MatchManager {
      * */
     public String getMatchTextContent(String matchID) throws
             InvalidMatchIDException {
-        if (ongoingMatches.containsKey(matchID)) {
+        if (preparingMatches.containsKey(matchID)) {
+            return preparingMatches.get(matchID).getTextContent();
+        } else if (ongoingMatches.containsKey(matchID)) {
             return ongoingMatches.get(matchID).getTextContent();
+        } else if (finishedMatches.containsKey(matchID)) {
+            return finishedMatches.get(matchID).getTextContent();
+        } else {
+            throw new InvalidMatchIDException();
         }
-        else throw new InvalidMatchIDException();
     }
 
     /**

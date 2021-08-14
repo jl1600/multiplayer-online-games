@@ -43,7 +43,6 @@ public class MatchOutputDispatcher implements Observer {
      * */
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println("Trying to update");
         for (OutputStream out: outStreams) {
             MatchOutput matchOutput = new MatchOutput();
             try {

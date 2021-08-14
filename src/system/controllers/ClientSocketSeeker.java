@@ -27,6 +27,7 @@ public class ClientSocketSeeker extends Thread {
         this.matchID = matchID;
         this.matchManager = matchManager;
         this.serverSocket = serverSocket;
+        System.out.println("TRying to contruct client seeker for player " + userID);
     }
 
     public void run() {
@@ -41,6 +42,7 @@ public class ClientSocketSeeker extends Thread {
         Socket connection = serverSocket.accept();
         handShake(connection);
         String playerID = readWSMessage(connection.getInputStream());
+
         // Refusing connection until it's the correct user ID that we are looking for.
         while (!playerID.equals(userID)) {
             connection.close();
@@ -48,7 +50,6 @@ public class ClientSocketSeeker extends Thread {
             handShake(connection);
             playerID = readWSMessage(connection.getInputStream());
         }
-        System.out.println("The player id is: " + playerID);
         PlayerInputListener inputListener = new PlayerInputListener(connection, matchManager, matchID, playerID);
         MatchOutputDispatcher outputDispatcher = new MatchOutputDispatcher(matchManager, matchID);
         outputDispatcher.addPlayerOutput(connection);
