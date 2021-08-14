@@ -42,6 +42,10 @@ public class UserRequestHandler extends RequestHandler {
                 break;
             case "friends":
                 handleGetFriends(exchange);
+                break;
+            case "pending-friends":
+                handleGetPendingFriends(exchange);
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
@@ -66,7 +70,7 @@ public class UserRequestHandler extends RequestHandler {
             case "delete":
                 handleDeleteUser(exchange);
                 break;
-            case "send-pending-friend":
+            case "send-friend-request":
                 handleSendPendingFriend(exchange);
                 break;
             case "decline-pending-friend":
@@ -142,25 +146,15 @@ public class UserRequestHandler extends RequestHandler {
     }
 
     private void handleGetFriends(HttpExchange exchange) throws IOException {
-        //handle get ownerID
-        String ownerID;
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return;
-            }
-            ownerID = query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
+        String ownerID = getQueryArgFromGET(exchange);
+        if (ownerID == null)
             return;
-        }
         //handle load friend list as response body
         Set<FriendResponseBody> dataSet = new HashSet<>();
 
         try{
-            Set<String> allfriends = userManager.getFriendList(ownerID);
-            for (String id : allfriends){
+            Set<String> allFriends = userManager.getFriendList(ownerID);
+            for (String id : allFriends){
                 FriendResponseBody frb = new FriendResponseBody();
                 frb.userID = id;
                 frb.userName = userManager.getUsername(id);
@@ -168,7 +162,7 @@ public class UserRequestHandler extends RequestHandler {
             }
 
         } catch (InvalidUserIDException e) {
-            sendResponse(exchange, 404, "Invalid user ID.");
+            throw new RuntimeException("A friend ID in the friend list is invalid. This should never happen.");
         }
         //send response
         sendResponse(exchange, 200, gson.toJson(dataSet));
@@ -176,32 +170,22 @@ public class UserRequestHandler extends RequestHandler {
 
     private void handleGetPendingFriends(HttpExchange exchange) throws IOException {
         //handle get ownerID
-        String ownerID;
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return;
-            }
-            ownerID = query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
+        String ownerID = getQueryArgFromGET(exchange);
+        if (ownerID == null)
             return;
-        }
         //handle load friend list as response body
         Set<FriendResponseBody> dataSet = new HashSet<>();
 
         try{
-            Set<String> allfriends = userManager.getPendingFriendList(ownerID);
-            for (String id : allfriends){
+            Set<String> allFriends = userManager.getPendingFriendList(ownerID);
+            for (String id : allFriends){
                 FriendResponseBody frb = new FriendResponseBody();
                 frb.userID = id;
                 frb.userName = userManager.getUsername(id);
                 dataSet.add(frb);
             }
-
         } catch (InvalidUserIDException e) {
-            sendResponse(exchange, 404, "Invalid user ID.");
+            throw new RuntimeException("A user in this pending list has an invalid ID. This means illegal datum.");
         }
         //send response
         sendResponse(exchange, 200, gson.toJson(dataSet));
@@ -248,5 +232,17 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
-
+    private String getQueryArgFromGET(HttpExchange exchange) throws IOException {
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return null;
+            }
+            return query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return null;
+        }
+    }
 }
