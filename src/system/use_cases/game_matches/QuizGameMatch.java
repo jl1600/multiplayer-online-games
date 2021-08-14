@@ -185,7 +185,7 @@ public class QuizGameMatch extends GameMatch {
     }
 
     @Override
-    public Map<String, String> getPlayersLastMove(){
+    public Map<String, String> getAllPlayerStats(){
         Map<String, String> playersMove = new HashMap<>();
         for (PlayerStat player: playerStats.values()) {
             if (numMovedPlayers == getPlayerCount())

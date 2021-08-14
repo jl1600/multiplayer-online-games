@@ -8,6 +8,6 @@ public class MatchOutput {
     public MatchStatus status;
     public String textContent;
     public int numPlayers;
-    // A mapping of player ID to player moves
-    public Map<String, String> lastTurnMoves;
+    // A mapping of username to game-specific stats
+    public Map<String, String> playerStats;
 }

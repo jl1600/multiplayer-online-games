@@ -3,7 +3,6 @@ package system.use_cases.builders.normal_builders;
 import shared.constants.GameAccessLevel;
 import shared.exceptions.use_case_exceptions.CreationInProgressException;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
-import system.entities.game.Game;
 import system.entities.game.hangman.HangmanGame;
 
 public class HangmanGameBuilder {

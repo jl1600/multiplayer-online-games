@@ -287,9 +287,9 @@ public class MatchManager {
     /**
      * Returns a mapping of player's name to their last moves.
      * */
-    public Map<String, String> getPlayersLastMove(String matchID) throws InvalidMatchIDException {
+    public Map<String, String> getAllPlayerStats(String matchID) throws InvalidMatchIDException {
         if (ongoingMatches.containsKey(matchID)) {
-            return ongoingMatches.get(matchID).getPlayersLastMove();
+            return ongoingMatches.get(matchID).getAllPlayerStats();
         } else if (preparingMatches.containsKey(matchID)) {
             return new HashMap<>();
         }
