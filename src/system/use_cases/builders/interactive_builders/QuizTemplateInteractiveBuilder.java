@@ -5,13 +5,16 @@ import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.template.QuizTemplate;
 import system.entities.template.Template;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class QuizTemplateInteractiveBuilder extends TemplateInteractiveBuilder {
 
     QuizTemplate currentTemplate;
     String currentDesignQuestion;
 
     static class TemplateDesignQuestions {
-
         static final String NAME = "Enter the name of your template";
         static final String MULTIPLE_CHOICE = "Is your quiz multiple choice? (yes/no)";
         static final String CHOOSE_ALL_THAT_APPLY = "Is your quiz choose all that apply? (yes/no)";
@@ -117,6 +120,39 @@ public class QuizTemplateInteractiveBuilder extends TemplateInteractiveBuilder {
             // abort the current template, make a new one
             currentTemplate = new QuizTemplate();
             currentDesignQuestion = TemplateDesignQuestions.NAME;
+        }
+    }
+
+    public static void main(String[] args) {
+        String[] designQuestions = readDesignQuestions();
+        for (int i=0; i<readDesignQuestions().length; i+=1){
+            System.out.println(designQuestions[i]);
+        }
+        //Here we have the method read from another file and return a array of strings of the design questions, where
+        // NAME = designQuestions[0], MULTIPLE_CHOICE = designQuestions[1], ..., etc
+    }
+
+    private static String[] readDesignQuestions(){
+        String path = System.getProperty("user.dir");
+        String designQuestionsPath = path + "/phase2/src/system/use_cases/builders/interactive_builders/TemplateDesignQuestions.txt";
+        String[] word = new String[8]; // There will always be 8 template design questions
+
+        try{
+            Scanner s = new Scanner(new File(designQuestionsPath));
+            for(int i = 0; i<8; i+=1){
+                word[i] = s.nextLine();
+            }
+            return word;
+        }catch (FileNotFoundException e){
+            System.out.println("Template Design Questions missing, one would be provided");
+            return new String[]{"Enter the name of your template",
+                    "Is your quiz multiple choice? (yes/no)",
+                    "Is your quiz choose all that apply? (yes/no)",
+                    "Does your quiz have multiple categories for score? (yes/no)",
+                    "Do your score categories have different weights? (yes/no)",
+                    "Does your quiz have custom ending messages? (yes/no)",
+                    "Ready to create new template. Are you sure that you want proceed? (yes/no)",
+                    ""};
         }
     }
 
