@@ -2,8 +2,6 @@ package system.gateways;
 
 
 import com.google.gson.*;
-import shared.exceptions.entities_exception.UnknownGameTypeException;
-import shared.exceptions.use_case_exceptions.*;
 import system.entities.game.Game;
 import system.entities.game.hangman.HangmanGame;
 import system.entities.game.quiz.QuizGame;
@@ -19,24 +17,17 @@ public class GameDataMapper implements GameDataGateway {
     private final File GAME_COUNT_FILE = new File(PATH + "/src/system/database/countFiles/game.txt");
     private final String[] SUBFOLDERS = {"quiz/", "hangman/"};
     private final String SUFFIX = ".json";
-    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     /**
-     * Adds the input QuizGame to the database and increases the total number of games created by 1
-     *
-     * @param game the Game object to add.
-     * @throws IOException              if there is a problem writing ot the file.
-     * @throws UnknownGameTypeException if the input Game is not a QuizGame.
+     * {@inheritDoc}
      */
     public void addGame(Game game) throws IOException {
         addGame(game, true);
     }
 
     /**
-     * Updates the input QuizGame in the database
-     *
-     * @param game the QuizGame object to be updated.
-     * @throws IOException If there is a problem writing to the file.
+     * {@inheritDoc}
      */
     public void updateGame(Game game) throws IOException {
         deleteGame(game.getID());
@@ -44,10 +35,7 @@ public class GameDataMapper implements GameDataGateway {
     }
 
     /**
-     * Deletes the input QuizGame from the database.
-     *
-     * @param gameID The gameID of the game to be deleted.
-     * @throws IOException If no corresponding file exists in the database.
+     * {@inheritDoc}
      */
     public void deleteGame(String gameID) throws IOException {
         boolean deleted = false;
@@ -63,10 +51,7 @@ public class GameDataMapper implements GameDataGateway {
     }
 
     /**
-     * Returns a set of all QuizGames in the database.
-     *
-     * @return a set of all QuizGames in the database.
-     * @throws FileNotFoundException If there is an error reading any file.
+     * {@inheritDoc}
      */
     public Set<Game> getAllGames() throws IOException {
         HashSet<Game> games = new HashSet<>();
@@ -84,22 +69,11 @@ public class GameDataMapper implements GameDataGateway {
     }
 
     /**
-     * @return number of games ever created. This number does not decrease when a user is deleted
-     * @throws IOException if the database is not found
+     * {@inheritDoc}
      */
     public int getGameCount() throws IOException {
         BufferedReader rd = new BufferedReader(new FileReader(GAME_COUNT_FILE));
         return new Integer(rd.readLine());
-    }
-
-    private void incrementGameCount() throws IOException {
-        BufferedReader rd = new BufferedReader(new FileReader(GAME_COUNT_FILE));
-        int count = Integer.parseInt(rd.readLine()) + 1;
-        rd.close();
-
-        Writer wr = new FileWriter(GAME_COUNT_FILE, false);
-        wr.write(count + System.getProperty("line.separator"));
-        wr.close();
     }
 
     private void addGame(Game game, boolean increment) throws IOException {
@@ -120,6 +94,16 @@ public class GameDataMapper implements GameDataGateway {
         if (increment) {
             incrementGameCount();
         }
+    }
+
+    private void incrementGameCount() throws IOException {
+        BufferedReader rd = new BufferedReader(new FileReader(GAME_COUNT_FILE));
+        int count = Integer.parseInt(rd.readLine()) + 1;
+        rd.close();
+
+        Writer wr = new FileWriter(GAME_COUNT_FILE, false);
+        wr.write(count + System.getProperty("line.separator"));
+        wr.close();
     }
 
     private String gameToJson(Game game) {
