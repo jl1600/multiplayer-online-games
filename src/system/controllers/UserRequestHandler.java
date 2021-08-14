@@ -238,9 +238,12 @@ public class UserRequestHandler extends RequestHandler {
         RegisterRequestBody body = gson.fromJson(getRequestBody(exchange), RegisterRequestBody.class);
         try {
             userManager.createUser(body.username, body.password, body.role);
+            userManager.deleteUser(body.trialID);
             sendResponse(exchange, 204, null);
         } catch (DuplicateUsernameException e) {
             sendResponse(exchange, 403, "Duplicate username.");
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
 

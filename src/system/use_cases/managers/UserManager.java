@@ -103,7 +103,7 @@ public class UserManager {
         User user = new User(userId, username, password, role, currentTime);
         userIds.put(username, userId);
         users.put(userId, user);
-        gateway.addUser(user);
+        //gateway.addUser(user);
     }
 
     /**
@@ -188,10 +188,16 @@ public class UserManager {
      * @param userId id of the user to log out
      * @throws InvalidUserIDException if no user has the specified userId
      */
-    public void logout(String userId) throws InvalidUserIDException {
+    public void logout(String userId) throws InvalidUserIDException, IOException {
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
         getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
+        if (getUserRole(userId).equals(UserRole.TRIAL)){
+            deleteUser(userId);
+        } else {
+            gateway.updateUser(getUser(userId));
+        }
+
     }
 
     public String getUsername(String userId) throws InvalidUserIDException {
