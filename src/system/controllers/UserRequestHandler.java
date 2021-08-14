@@ -13,6 +13,7 @@ import system.use_cases.managers.UserManager;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class UserRequestHandler extends RequestHandler {
@@ -46,9 +47,63 @@ public class UserRequestHandler extends RequestHandler {
             case "pending-friends":
                 handleGetPendingFriends(exchange);
                 break;
+            case "all-members":
+                handleGetAllMembers(exchange);
+                break;
+
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
+    }
+
+    private void handleGetAllMembers(HttpExchange exchange) throws IOException {
+        if (exchange.getRequestURI().getQuery() == null)
+            sendResponse(exchange, 200, gson.toJson(getAllMembers()));
+        else {
+            String userID = getQueryArgFromGET(exchange);
+            if (userID == null)
+                return;
+            try {
+                sendResponse(exchange, 200, gson.toJson(getAllMembersExcludeFriendsOf(userID)));
+            } catch (InvalidUserIDException e) {
+                sendResponse(exchange, 400, "Invalid user ID.");
+            }
+        }
+    }
+
+    private Set<FriendResponseBody> getAllMembers() {
+        Set<String> IDs = userManager.getAllUserIDs();
+        Set<FriendResponseBody> allMem = new HashSet<>();
+        for (String uid: IDs) {
+            FriendResponseBody user = new FriendResponseBody();
+            user.userID = uid;
+            try {
+                user.userName = userManager.getUsername(uid);
+            } catch (InvalidUserIDException e) {
+                throw new RuntimeException("The user id got from the set of all user ids is invalid.");
+            }
+            allMem.add(user);
+        }
+        return allMem;
+    }
+
+    private Set<FriendResponseBody> getAllMembersExcludeFriendsOf(String targetUser) throws InvalidUserIDException {
+        Set<String> AllIDs = userManager.getAllUserIDs();
+        Set<String> friendIDs = userManager.getFriendList(targetUser);
+        Set<FriendResponseBody> allMem = new HashSet<>();
+        for (String uid: AllIDs) {
+            if (friendIDs.contains(uid))
+                continue;
+            FriendResponseBody user = new FriendResponseBody();
+            user.userID = uid;
+            try {
+                user.userName = userManager.getUsername(uid);
+            } catch (InvalidUserIDException e) {
+                throw new RuntimeException("The user id got from the set of all user ids is invalid.");
+            }
+            allMem.add(user);
+        }
+        return allMem;
     }
 
     @Override

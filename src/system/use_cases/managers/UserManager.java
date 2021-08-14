@@ -334,6 +334,10 @@ public class UserManager {
 
     }
 
+    public Set<String> getAllUserIDs() {
+        return new HashSet<>(users.keySet());
+    }
+
     public void removePendingFriend(String ownerID, String senderID) throws InvalidUserIDException{
         if (!users.containsKey(senderID))
             throw new InvalidUserIDException();
