@@ -103,7 +103,7 @@ public class UserManager {
         User user = new User(userId, username, password, role, currentTime);
         userIds.put(username, userId);
         users.put(userId, user);
-        //gateway.addUser(user);
+        gateway.addUser(user);
     }
 
     /**
@@ -402,13 +402,6 @@ public class UserManager {
         users.get(ownerID).removeFriend(subjectID);
         gateway.updateUser(users.get(ownerID));
 
-    }
-
-    public void addGameCreation(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
-        if (!users.containsKey(ownerID))
-            throw new InvalidUserIDException();
-        users.get(ownerID).addGameCreation(subjectID);
-        gateway.updateUser(users.get(ownerID));
     }
 
 

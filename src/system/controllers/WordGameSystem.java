@@ -19,7 +19,7 @@ public class WordGameSystem {
 
     private final HttpServer server;
 
-    public WordGameSystem() throws IOException {
+    public WordGameSystem() throws IOException, InvalidUserIDException{
 
         GameDataGateway gameGateway = new GameDataMapper();
         GameManager gm = new GameManager(gameGateway);
@@ -29,16 +29,12 @@ public class WordGameSystem {
 
         UserDataGateway userGateway = new UserDataMapper();
 
-        try{
-            UserManager um = new UserManager(userGateway);
+        UserManager um = new UserManager(userGateway);
 
-            MatchManager mm = new MatchManager();
-            gameRH = new GameRequestHandler(gm, tm, um, mm);
-            templateRH = new TemplateRequestHandler(tm, um);
-            userRH = new UserRequestHandler(um);
-        } catch (InvalidUserIDException e) {
-            throw new RuntimeException("User ID not found in database");
-        }
+        MatchManager mm = new MatchManager();
+        gameRH = new GameRequestHandler(gm, tm, um, mm);
+        templateRH = new TemplateRequestHandler(tm, um);
+        userRH = new UserRequestHandler(um);
 
         server = HttpServer.create(new InetSocketAddress("localhost", 8000), 20);
 
@@ -61,6 +57,8 @@ public class WordGameSystem {
             server.run();
         } catch (IOException e) {
             throw new RuntimeException("Problem connecting to the database.");
+        }  catch (InvalidUserIDException e) {
+            throw new RuntimeException("User ID not found in database");
         }
     }
 }

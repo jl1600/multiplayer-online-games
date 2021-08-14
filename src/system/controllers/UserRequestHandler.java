@@ -127,6 +127,7 @@ public class UserRequestHandler extends RequestHandler {
         FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
         try {
             userManager.removeFriend(body.senderID, body.receiverID);
+            userManager.removeFriend(body.receiverID, body.senderID);
             sendResponse(exchange, 204, null);
         } catch (InvalidUserIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
@@ -148,6 +149,7 @@ public class UserRequestHandler extends RequestHandler {
         try {
             userManager.removePendingFriend(body.senderID, body.receiverID);
             userManager.addFriend(body.senderID, body.receiverID);
+            userManager.addFriend(body.receiverID, body.senderID);
             sendResponse(exchange, 204, null);
         } catch (InvalidUserIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
@@ -238,12 +240,9 @@ public class UserRequestHandler extends RequestHandler {
         RegisterRequestBody body = gson.fromJson(getRequestBody(exchange), RegisterRequestBody.class);
         try {
             userManager.createUser(body.username, body.password, body.role);
-            userManager.deleteUser(body.trialID);
             sendResponse(exchange, 204, null);
         } catch (DuplicateUsernameException e) {
             sendResponse(exchange, 403, "Duplicate username.");
-        } catch (InvalidUserIDException e) {
-            sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
 
