@@ -1,7 +1,5 @@
 if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 
-window.addEventListener("beforeunload", logout);
-
 function logout() {
 	xhr.open("POST", "http://localhost:8000/user/logout");
 
