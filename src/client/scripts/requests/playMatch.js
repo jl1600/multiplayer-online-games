@@ -38,9 +38,23 @@ function createSocket() {
 
     serverSocket.onmessage = function(event) {
         document.getElementById("matchContent").textContent=JSON.parse(event.data).textContent;
+        document.getElementById("playerStats").textContent="Player count: ";
+        document.getElementById("playerStats").textContent+=JSON.parse(event.data).numPlayers
+        document.getElementById("playerStats").textContent+="\n"
+        document.getElementById("playerStats").textContent+="\n"
+        document.getElementById("playerStats").textContent+="Last turn moves:\n"
+        displayStats(JSON.parse(event.data).lastTurnMoves);
     };
 }
 
+function displayStats(map) {
+    for (const [key, value] of Object.entries(map)) {
+            document.getElementById("playerStats").textContent+=key;
+            document.getElementById("playerStats").textContent+=": ";
+            document.getElementById("playerStats").textContent+=value;
+            document.getElementById("playerStats").textContent+="\n";
+        }
+}
 
 function sendInput(input) {
     serverSocket.send(JSON.stringify({

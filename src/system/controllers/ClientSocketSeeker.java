@@ -18,7 +18,7 @@ import java.io.OutputStream;
 
 
 public class ClientSocketSeeker extends Thread {
-    private String userID;
+    private final String userID;
     private final String matchID;
     private final MatchManager matchManager;
     private final ServerSocket serverSocket;
@@ -87,8 +87,8 @@ public class ClientSocketSeeker extends Thread {
     }
 
     // Read a websocket text message
-    public static String readWSMessage(InputStream input) throws IOException {
-        input.read(); // Skip the first byte, FIN, which should always be 1.
+    private String readWSMessage(InputStream input) throws IOException {
+        input.read(); // Skip the first bit, FIN, which should always be 1.
         int byteValue = input.read();
         int messageLen;
         if (byteValue - 128 <= 125) {
@@ -114,7 +114,7 @@ public class ClientSocketSeeker extends Thread {
 
     // Sending a websocket text message
     // Formatting the byte array so that it follows the standard for websocket communication
-    public static void sendWSMessage(OutputStream output, String message) throws IOException {
+    private void sendWSMessage(OutputStream output, String message) throws IOException {
         byte[] firstTwo = new byte[2];
         firstTwo[0] |= (1 << 7);  // FIN, telling the client that this is a whole message
         firstTwo[0] |= 1; // Op code, 0x1, telling that this is a text

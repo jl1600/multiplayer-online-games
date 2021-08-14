@@ -1,0 +1,42 @@
+{
+  "creatorName": "2",
+  "maxAttempts": 1,
+  "questions": [
+    {
+      "question": "1 + 1 - 2 + 6 - 13 \u003d ?",
+      "answerChoices": [
+        {
+          "text": "-7",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "question": "1 + 2 + 3 + 5 -112 + 246",
+      "answerChoices": [
+        {
+          "text": "145",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    }
+  ],
+  "scoreCategories": {
+    "General": {
+      "name": "General",
+      "weight": 1.0,
+      "minAcceptable": 0.0,
+      "endingMessage": "Quiz Game Finished."
+    }
+  },
+  "gameId": "7",
+  "ownerId": "2",
+  "templateId": "1",
+  "gameAccessLevel": "PUBLIC",
+  "previousGameAccessLevel": "PRIVATE",
+  "title": "Simple math ver3"
+}

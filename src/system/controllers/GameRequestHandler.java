@@ -117,6 +117,7 @@ public class GameRequestHandler extends RequestHandler {
     }
 
     private void handleJoinMatch(HttpExchange exchange) throws IOException {
+        System.out.println("Join match is called");
         JoinMatchRequestBody body = gson.fromJson(getRequestBody(exchange), JoinMatchRequestBody.class);
         try {
             matchManager.addPlayer(body.userID, userManager.getUsername(body.userID), body.matchID);
@@ -166,7 +167,7 @@ public class GameRequestHandler extends RequestHandler {
     }
 
     private void handleCreateMatch(HttpExchange exchange) throws IOException {
-
+        System.out.println("Create match is called");
         String data = getRequestBody(exchange);
         CreateMatchRequestBody body  = gson.fromJson(data, CreateMatchRequestBody.class);
 

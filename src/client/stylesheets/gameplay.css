@@ -6,9 +6,7 @@
 }
 
 #player-stats {
-padding: 1em;
-width:30%;
+width:16%;
 border: 8px solid darkred;
-background:#3d594b;
 float: right;
 }

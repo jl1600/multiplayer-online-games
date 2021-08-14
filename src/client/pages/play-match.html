@@ -15,9 +15,11 @@
 			<textarea id="matchInput" name="matchInput" rows="1" cols="70"></textarea>
 			<input name="answerButton" onclick="sendInput(document.getElementsByName('matchInput')[0].value)" type="button" value="Answer" />
 		</div>
-
+		<div id="player-stats">
+			<textarea id="playerStats" rows="20" cols="20" readonly></textarea>
+		</div>
 		<div align="center">
-		<input id="startButton" name="startMatch" onclick="startMatch()" type="button" value="Start"/>
+			<input id="startButton" name="startMatch" onclick="startMatch()" type="button" value="Start"/>
 		</div>
 	</body>
 </html>
