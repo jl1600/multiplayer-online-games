@@ -1,0 +1,36 @@
+main {
+    display: flex;
+    justify-content: space-evenly;
+}
+.column {
+    width: 400px;
+}
+
+.column .row {
+	background-color: whitesmoke;
+	border-radius: 10px;
+	padding: 10px;
+	font-size: 18px;
+	margin-bottom: 10px;
+}
+.column .row:hover {
+	filter: brightness(0.95);
+}
+
+.column .row .button {
+	background-color: #7289da;
+	padding: 6px 15px;
+	color: whitesmoke;
+	border-radius: 10px;
+	box-shadow: 1px 0 3px #424549;
+	border: none;
+	float: right;
+	cursor: pointer;
+}
+.column .row .button:hover {
+	transform: translateY(1px);
+}
+
+#friends.column .row .button {
+	background-color: #ff6454;
+}

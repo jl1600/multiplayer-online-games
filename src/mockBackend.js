@@ -25,61 +25,23 @@ http.createServer((request, response) => {
 	} else {
 		console.log("GET");
 		response.writeHead(200, {"Content-Type": "application/json"});
-		response.end(`{
-			"username": "MyUserName",
-			"matches": [
-				{
-					"type": "hangman",
-					"title": "A cool match",
-					"description": "Try to guess the word before the man is hung",
-					"id": 1
-				},
-				{
-					"type": "hangman",
-					"title": "A really cool match",
-					"description": "Try to guess the word before the man is hung",
-					"id": 2
-				}
-			],
-			"games": [
-				{
-					"type": "hangman",
-					"title": "A public game",
-					"description": "My very first game!",
-					"id": 2,
-					"accessLevel": "PRIVATE"
-				},
-				{
-					"type": "quiz",
-					"title": "Another public game",
-					"description": "A fun quiz",
-					"id": 3,
-					"accessLevel": "PUBLIC"
-				},
-				{
-                    "type": "quiz",
-                    "title": "Another public game",
-                    "description": "A fun quiz",
-                    "id": 4,
-                    "accessLevel": "FRIENDS"
-                },
-                {
-                    "type": "quiz",
-                    "title": "An uncool game",
-                    "description": "made by username",
-                    "id": 4,
-                    "accessLevel": "FRIENDS"
-                }
-			],
-			"templates": [
-				{
-					"type": "multiple-choice",
-					"title": "Multiple choice",
-					"description": "description of a multiple choice",
-					"id": 1,
-					"genre": "quiz"
-				}
-			]
-		}`);
+		response.end(`[
+		    {
+		        "username": "charlie",
+		        "id": 1
+		    },
+		    {
+                "username": "sm",
+                "id": 2
+            },
+            {
+                "username": "ad",
+                "id": 3
+            },
+            {
+                "username": "ching",
+                "id": 4
+            }
+		]`);
 	}
 }).listen(8000);
