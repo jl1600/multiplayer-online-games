@@ -44,7 +44,7 @@ function createSocket() {
 }
 
 function displayStats(data) {
-	document.getElementById("player-stats").textContent = `Player count: ${ data.numPlayers }\nPrevious moves:\n`;
+	document.getElementById("player-stats").textContent = `Player count: ${ data.numPlayers }\n\nPlayer stats:\n\n`;
 
 	for (const [key, value] of Object.entries(data.playerStats)) {
 		document.getElementById("player-stats").textContent += `${ key }: ${ value }\n`;
