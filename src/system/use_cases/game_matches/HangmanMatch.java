@@ -57,7 +57,7 @@ public class HangmanMatch extends GameMatch {
     }
 
     @Override
-    public Map<String, String> getPlayersLastMove() {
+    public Map<String, String> getAllPlayerStats() {
         return null;
     }
 

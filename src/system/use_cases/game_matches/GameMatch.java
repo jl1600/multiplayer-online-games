@@ -55,7 +55,7 @@ public abstract class GameMatch extends Observable {
      *
      * @throws InvalidUserIDException When the match doesn't contain such a player.
      * */
-    public abstract Map<String, String> getPlayersLastMove();
+    public abstract Map<String, String> getAllPlayerStats();
 
     /**
      * Returns te current number of players in this match.

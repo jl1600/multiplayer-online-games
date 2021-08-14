@@ -40,7 +40,7 @@ public class MatchOutputDispatcher implements Observer {
         try {
             matchOutput.status = matchManager.getMatchStatus(matchID);
             matchOutput.textContent = matchManager.getMatchTextContent(matchID);
-            matchOutput.lastTurnMoves = matchManager.getPlayersLastMove(matchID);
+            matchOutput.playerStats = matchManager.getAllPlayerStats(matchID);
             matchOutput.numPlayers = matchManager.getPlayerCount(matchID);
         } catch (InvalidMatchIDException e) {
             System.out.println("Match no longer exists");
