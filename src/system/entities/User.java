@@ -21,6 +21,7 @@ public class User {
     private final Date registerDate;
     private final Set<String> friendList;
     private final Set<String> pendingFriendList;
+    private Date lastBanDate; // a word play on the last ban date and the last given ban date
 
     /**
      *
@@ -39,6 +40,7 @@ public class User {
         this.registerDate = registerDate;
         this.friendList = new HashSet<>();
         this.pendingFriendList = new HashSet<>();
+        this.lastBanDate = registerDate;
     }
 
     /**
@@ -154,5 +156,12 @@ public class User {
     }
     public void removePendingFriend(String friendID) {
         this.pendingFriendList.remove(friendID);
+    }
+
+    public Date getLastBanDate() {
+        return lastBanDate;
+    }
+    public void setLastBanDate(Date lastBanDate) {
+        this.lastBanDate = lastBanDate;
     }
 }

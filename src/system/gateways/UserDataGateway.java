@@ -18,8 +18,6 @@ public interface UserDataGateway {
      */
     void addUser(User user) throws IOException;
 
-    void banUser(User user, Date duration) throws IOException;
-
     /**
      * Updates the input user in the database.
      *

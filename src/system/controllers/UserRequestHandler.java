@@ -301,17 +301,13 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
-    private Response handleBanUserRequest(BanUserRequest request) {
-        String sessionID = request.getSessionID();
-
+    private void handleBanUser(HttpExchange exchange) throws IOException {
+        BanUserRequestBody body = gson.fromJson(getRequestBody(exchange), BanUserRequestBody.class);
         try {
-            userManager.banUser(request.getAdminId(), request.getUserId(), request.getBanLength());
-            return new SimpleTextResponse(sessionID, "Successfully banned user");
-        }
-        catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Invalid Id");
-        } catch (IOException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
+            userManager.banUser(body.adminID, body.userID, body.banLength);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 404, "Invalid user ID.");
         }
     }
 }

@@ -17,19 +17,27 @@ public class UserManager {
     private final IdManager idManager;
     private final HashMap<String, String> userIds; // username to userId
     private final UserDataGateway gateway;
-    private final HashMap<String, Date> bannedUsers;
 
     public UserManager(UserDataGateway gateway) throws IOException {
         users = new HashMap<>();
-        bannedUsers = new HashMap<>();
         userIds = new HashMap<>();
         this.gateway = gateway;
 
+        Date currentTime = Calendar.getInstance().getTime();
+
          for (User user: this.gateway.getAllUsers()) {
             String userId = user.getUserId();
+            //unban the user who have gone over their last ban date
+            if (user.getOnlineStatus().equals(OnlineStatus.BANNED)){
+                if (user.getLastBanDate().before(currentTime)){//current time has gone over last ban date
+                    user.setOnlineStatus(OnlineStatus.OFFLINE);
+                }
+            }
+
             users.put(userId, user);
             userIds.put(user.getUsername(), userId);
          }
+
         idManager = new IdManager(gateway.getUserCount() + 1);
     }
 
@@ -126,21 +134,13 @@ public class UserManager {
      */
     public String login(String username, String password)
             throws InvalidUsernameException, IncorrectPasswordException, InvalidUserIDException, ExpiredUserException {
-        Date currentTime = Calendar.getInstance().getTime();
+
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
 
-        if (bannedUsers.containsKey(username)) {
-            if (bannedUsers.get(username).before(currentTime)) {
-                throw new BannedUserException();
-            }
-            else {
-                bannedUsers.remove(username);
-            }
-        }
-
         String userId = getUserId(username);
         if (isPasswordIncorrect(userId, password)) throw new IncorrectPasswordException();
+        if (isBanned(userId)) throw new BannedUserException();
         if (getUserRole(userId) == UserRole.TEMP){
             if (isExpiredUser(userId)){
                 throw new ExpiredUserException();
@@ -150,6 +150,21 @@ public class UserManager {
 
         getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
         return userId;
+    }
+
+    private boolean isBanned(String userId) throws InvalidUserIDException {
+        Date currentTime = Calendar.getInstance().getTime();
+
+        if (getUser(userId).getOnlineStatus().equals(OnlineStatus.BANNED)){//if banned go in bracket
+            if (getUser(userId).getLastBanDate().after(currentTime)) { //if the last ban date hasn't arrived yet
+                return true;
+            } else {
+                //online status will be set in login()
+                return false;
+            }
+
+        }
+        return false;
     }
 
     private boolean isExpiredUser(String userId) throws InvalidUserIDException {
@@ -389,7 +404,6 @@ public class UserManager {
 
         Calendar date = Calendar.getInstance();
         date.add(Calendar.DAY_OF_YEAR, duration);
-        bannedUsers.put(userID, date.getTime());
-        gateway.banUser(users.get(userID), date.getTime());
+        getUser(userID).setLastBanDate(date.getTime());
     }
 }

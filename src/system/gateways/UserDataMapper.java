@@ -97,11 +97,5 @@ public class UserDataMapper implements UserDataGateway {
     private String userToJson(User user) {
         return gson.toJson(user);
     }
-    public void banUser(User user, Date bannedUntil) throws IOException {
-        File userFile = new File(userFolderPath + user.getUserId() + ".txt");
-        Writer wr = new FileWriter(userFile);
-        wr.write(userToString(user));
-        wr.write(String.valueOf(bannedUntil));
-        wr.close();
-    }
+
 }
