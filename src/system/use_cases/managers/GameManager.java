@@ -288,4 +288,12 @@ public class GameManager {
         }
         return games.get(gameID).getGameAccessLevel();
     }
+
+    public GameAccessLevel getPreviousAccessLevel(String gameID) throws InvalidGameIDException {
+        if(!games.containsKey(gameID)) {
+            throw new InvalidGameIDException();
+        }
+        return games.get(gameID).getPreviousGameAccessLevel();
+    }
+
 }

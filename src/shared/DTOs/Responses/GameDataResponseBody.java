@@ -8,5 +8,6 @@ public class GameDataResponseBody {
     public String ownerName;
     public String title;
     public GameAccessLevel accessLevel;
+    public GameAccessLevel previousAccessLevel;
     public GameGenre genre;
 }

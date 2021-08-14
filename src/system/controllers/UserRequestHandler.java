@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.*;
 import shared.DTOs.Responses.GeneralUserInfoResponseBody;
 import shared.DTOs.Responses.LoginResponseBody;
+import shared.exceptions.entities_exception.IDAlreadySetException;
 import shared.exceptions.use_case_exceptions.*;
 import system.use_cases.managers.UserManager;
 
@@ -87,8 +88,38 @@ public class UserRequestHandler extends RequestHandler {
             case "remove-friend":
                 handleRemoveFriend(exchange);
                 break;
+            case "edit-username":
+                handleEditUsername(exchange);
+                break;
+            case "edit-password":
+                handleEditPassword(exchange);
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
+        }
+    }
+
+    private void handleEditPassword(HttpExchange exchange) throws IOException {
+        EditPasswordRequestBody body = gson.fromJson(getRequestBody(exchange), EditPasswordRequestBody.class);
+        try {
+            userManager.editPassword(body.userID,body.oldPassword,body.newPassword);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }catch (IncorrectPasswordException e) {
+            sendResponse(exchange, 403, "Incorrect password.");
+        }
+    }
+
+    private void handleEditUsername(HttpExchange exchange) throws IOException {
+        EditUsernameRequestBody body = gson.fromJson(getRequestBody(exchange), EditUsernameRequestBody.class);
+        try {
+            userManager.editUsername(body.userID,body.newUsername);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        } catch (DuplicateUsernameException e){
+            sendResponse(exchange, 403, "Duplicate username.");
         }
     }
 

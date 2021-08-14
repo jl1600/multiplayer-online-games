@@ -89,9 +89,23 @@ public class GameRequestHandler extends RequestHandler {
             case "access-level":
                 handleAccessLevel(exchange);
                 break;
+            case "undo-access-level":
+                handleUndoAccessLevel(exchange);
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
+    }
+
+    private void handleUndoAccessLevel(HttpExchange exchange) throws IOException {
+        AccessLevelRequestBody body = gson.fromJson(getRequestBody(exchange), AccessLevelRequestBody.class);
+        try {
+            gameManager.undoSetGameAccessLevel(body.gameID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidGameIDException e) {
+            sendResponse(exchange, 404, "The game ID is invalid.");
+        }
+
     }
 
     private void handleAccessLevel(HttpExchange exchange) throws IOException {
@@ -232,6 +246,7 @@ public class GameRequestHandler extends RequestHandler {
                     data.ownerName = userManager.getUsername(gameManager.getOwnerID(gameID));
                     data.title = gameManager.getGameTitle(gameID);
                     data.accessLevel = gameManager.getAccessLevel(gameID);
+                    data.previousAccessLevel = gameManager.getPreviousAccessLevel(gameID);
                     data.genre = gameManager.getGenre(gameID);
                     dataSet.add(data);
                 }
@@ -327,6 +342,7 @@ public class GameRequestHandler extends RequestHandler {
                     data.id = id;
                     data.title = gameManager.getGameTitle(id);
                     data.accessLevel = gameManager.getAccessLevel(id);
+                    data.previousAccessLevel = gameManager.getPreviousAccessLevel(id);
                     data.genre = gameManager.getGenre(id);
                     dataSet.add(data);
                 }
@@ -349,6 +365,7 @@ public class GameRequestHandler extends RequestHandler {
                 try {
                     data.title = gameManager.getGameTitle(id);
                     data.accessLevel = gameManager.getAccessLevel(id);
+                    data.previousAccessLevel = gameManager.getPreviousAccessLevel(id);
                     data.genre = gameManager.getGenre(id);
                 } catch (InvalidGameIDException e) {
                     throw new RuntimeException("Game ID from owned list is invalid.");
@@ -369,6 +386,7 @@ public class GameRequestHandler extends RequestHandler {
                 game.title = gameManager.getGameTitle(id);
                 game.ownerName = userManager.getUsername(gameManager.getOwnerID(id));
                 game.accessLevel = gameManager.getAccessLevel(id);
+                game.previousAccessLevel = gameManager.getPreviousAccessLevel(id);
                 game.genre = gameManager.getGenre(id);
             } catch (InvalidGameIDException | InvalidUserIDException e) {
                 throw new RuntimeException("Game ID or user ID got from public game list is invalid.");

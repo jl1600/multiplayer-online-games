@@ -229,11 +229,11 @@ public class UserManager {
      * @throws IOException if the database is not found
      */
     public void editUsername(String userId, String newUsername) throws
-            IDAlreadySetException, IOException, InvalidUserIDException {
+             IOException, InvalidUserIDException, DuplicateUsernameException {
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
-        if (users.containsKey(newUsername))
-            throw new IDAlreadySetException();
+        if (userIds.containsKey(newUsername) && !newUsername.equals(getUser(userId).getUsername()))
+            throw new DuplicateUsernameException();
 
         User user = getUser(userId);
         userIds.remove(user.getUsername());
