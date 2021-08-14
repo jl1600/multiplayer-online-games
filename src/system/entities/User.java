@@ -100,6 +100,9 @@ public class User {
         return new HashSet<String>(gameCreations);
     }
 
+    public void addGameCreation(String newGameID) {
+        this.gameCreations.add(newGameID);
+    }
     /**
      * @return online status of the user
      */
