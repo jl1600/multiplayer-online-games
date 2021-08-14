@@ -69,7 +69,7 @@ public class TemplateDataMapper implements TemplateDataGateway {
         for (String subfolder : SUB_FOLDERS) {
             File folder = new File(templateFolderPath + subfolder);
             for (File file : Objects.requireNonNull(folder.listFiles())) {
-                if (file.getName().equals(".gitignore")) {
+                if (file.getName().equals(".gitkeep")) {
                     continue;
                 }
                 String templateString = String.join("\n", Files.readAllLines(file.toPath()));

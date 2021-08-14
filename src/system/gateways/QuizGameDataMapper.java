@@ -69,7 +69,7 @@ public class QuizGameDataMapper {
         File folder = new File(folderPath);
         HashSet<Game> games = new HashSet<>();
         for (File file : Objects.requireNonNull(folder.listFiles())) {
-            if (file.getName().equals(".gitignore")) {
+            if (file.getName().equals(".gitkeep")) {
                 continue;
             }
             String gameString = String.join("\n", Files.readAllLines(file.toPath()));
