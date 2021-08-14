@@ -342,11 +342,9 @@ public class UserManager {
         return nameList;
     }
 
-    public void sendFriendRequest(String senderID, String recieverName) throws InvalidUserIDException, InvalidUsernameException {
+    public void sendFriendRequest(String senderID, String recieverID) throws InvalidUserIDException, InvalidUsernameException {
         if (!users.containsKey(senderID))
             throw new InvalidUserIDException();
-
-        String recieverID = getUserId(recieverName);
 
         if (!users.containsKey(recieverID))
             throw new InvalidUserIDException();
