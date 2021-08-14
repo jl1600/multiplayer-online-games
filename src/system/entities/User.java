@@ -19,6 +19,8 @@ public class User {
     private OnlineStatus onlineStatus;
     private final HashSet<String> gameCreations;
     private Date registerDate;
+    private HashSet<String> friendList;
+    private HashSet<String> pendingFriendList;
 
     /**
      *
@@ -35,6 +37,8 @@ public class User {
         this.onlineStatus = OnlineStatus.OFFLINE;
         this.gameCreations = new HashSet<>();
         this.registerDate = registerDate;
+        this.friendList = new HashSet<>();
+        this.pendingFriendList = new HashSet<>();
     }
 
     /**
@@ -129,4 +133,26 @@ public class User {
     }
 
     public Date getRegisterDate(){return registerDate;}
+
+    public Set<String> getFriendList() {
+        return friendList;
+    }
+
+    public void addFriend(String senderID) {
+        this.friendList.add(senderID);
+    }
+    public void removeFriend(String friendID) {
+        this.friendList.remove(friendID);
+    }
+
+    public Set<String> getPendingFriendList() {
+        return pendingFriendList;
+    }
+
+    public void addPendingFriend(String senderID) {
+        this.pendingFriendList.add(senderID);
+    }
+    public void removePendingFriend(String friendID) {
+        this.pendingFriendList.remove(friendID);
+    }
 }

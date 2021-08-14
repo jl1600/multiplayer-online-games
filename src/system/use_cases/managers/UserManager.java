@@ -305,4 +305,90 @@ public class UserManager {
     public ArrayList<User> getAllUsers() {
         return (ArrayList<User>) users.values();
     }
+
+    public Set<String> getFriendListUserID(String userID) throws InvalidUserIDException {
+        if (!users.containsKey(userID))
+            throw new InvalidUserIDException();
+
+        return users.get(userID).getFriendList();
+    }
+
+    public Set<String> getFriendListUsername(String userID) throws InvalidUserIDException {
+        if (!users.containsKey(userID))
+            throw new InvalidUserIDException();
+        HashSet<String> nameList = new HashSet<>();
+        for (String i : users.get(userID).getFriendList()){
+            nameList.add(getUsername(i));
+        }
+
+        return nameList;
+    }
+
+    public Set<String> getPendingFriendListUserID(String userID) throws InvalidUserIDException {
+        if (!users.containsKey(userID))
+            throw new InvalidUserIDException();
+
+        return users.get(userID).getPendingFriendList();
+    }
+
+    public Set<String> getPendingFriendListUsername(String userID) throws InvalidUserIDException {
+        if (!users.containsKey(userID))
+            throw new InvalidUserIDException();
+        HashSet<String> nameList = new HashSet<>();
+        for (String i : users.get(userID).getPendingFriendList()){
+            nameList.add(getUsername(i));
+        }
+
+        return nameList;
+    }
+
+    public void sendFriendRequest(String senderID, String recieverName) throws InvalidUserIDException, InvalidUsernameException {
+        if (!users.containsKey(senderID))
+            throw new InvalidUserIDException();
+
+        String recieverID = getUserId(recieverName);
+
+        if (!users.containsKey(recieverID))
+            throw new InvalidUserIDException();
+
+        if (!users.get(recieverID).getPendingFriendList().contains(senderID)){//to avoid duplicate sends
+            users.get(recieverID).addPendingFriend(senderID);
+        }
+
+        //notify reciever?
+    }
+
+    public void rejectFriendRequest(String ownerID, String senderID) throws InvalidUserIDException{
+        if (!users.containsKey(senderID))
+            throw new InvalidUserIDException();
+        if (!users.containsKey(ownerID))
+            throw new InvalidUserIDException();
+        users.get(ownerID).removePendingFriend(senderID);
+
+
+        //notify sender?
+    }
+
+    public void acceptFriendRequest(String ownerID, String senderID) throws InvalidUserIDException{
+        if (!users.containsKey(senderID))
+            throw new InvalidUserIDException();
+        if (!users.containsKey(ownerID))
+            throw new InvalidUserIDException();
+        users.get(ownerID).removePendingFriend(senderID);
+        users.get(ownerID).addFriend(senderID);
+
+        //notify sender?
+    }
+
+    public void removeFriend(String ownerID, String senderID) throws InvalidUserIDException{
+        if (!users.containsKey(senderID))
+            throw new InvalidUserIDException();
+        if (!users.containsKey(ownerID))
+            throw new InvalidUserIDException();
+        users.get(ownerID).removeFriend(senderID);
+
+        //notify sender?
+    }
+
+
 }
