@@ -238,6 +238,7 @@ public class UserRequestHandler extends RequestHandler {
 
     private void handleRegister(HttpExchange exchange) throws IOException {
         RegisterRequestBody body = gson.fromJson(getRequestBody(exchange), RegisterRequestBody.class);
+        System.out.println("Trying to register");
         try {
             userManager.createUser(body.username, body.password, body.role);
             sendResponse(exchange, 204, null);

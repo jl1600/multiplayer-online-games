@@ -1,6 +1,5 @@
 package system.controllers;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.CancelBuilderRequestBody;
 import shared.DTOs.Requests.CreateTemplateBuilderRequestBody;

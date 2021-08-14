@@ -4,11 +4,9 @@
   "password": "1",
   "role": "MEMBER",
   "onlineStatus": "OFFLINE",
-  "gameCreations": [
-  ],
+  "gameCreations": [],
   "registerDate": "Jul 31, 2021 10:31:58 AM",
-  "friendList": [
-  ],
+  "friendList": [],
   "pendingFriendList": [],
   "lastBanDate": "Jul 31, 2021 10:31:58 AM"
 }

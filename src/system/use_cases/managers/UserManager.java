@@ -107,7 +107,7 @@ public class UserManager {
         try {
             gateway.addUser(user);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Fatal Error: Database malfunction.");
         }
     }
 
@@ -116,7 +116,7 @@ public class UserManager {
      * The user is stored within the class but not in the database
      * @return id of the trial user created
      */
-    public String createTrialUser() throws IOException {
+    public String createTrialUser() {
         String userId = idManager.getNextId();
         String username = "TrialUser" + userId;
 
@@ -126,7 +126,6 @@ public class UserManager {
 
         userIds.put(username, userId);
         users.put(userId, user);
-
         return userId;
     }
 
