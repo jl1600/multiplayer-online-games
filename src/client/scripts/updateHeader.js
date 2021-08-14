@@ -11,6 +11,9 @@ function updateHeader() {
 		case "MEMBER":
 			showMemberHeader();
 		    break;
+		case "TEMP":
+        	showMemberHeader();
+            break;
 	}
 }
 

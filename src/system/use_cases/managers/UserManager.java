@@ -111,7 +111,7 @@ public class UserManager {
      * The user is stored within the class but not in the database
      * @return id of the trial user created
      */
-    public String createTrialUser() {
+    public String createTrialUser() throws IOException {
         String userId = idManager.getNextId();
         String username = "TrialUser" + userId;
 
@@ -122,6 +122,7 @@ public class UserManager {
         userIds.put(username, userId);
         users.put(userId, user);
 
+        gateway.addUser(user);
         return userId;
     }
 
@@ -134,7 +135,7 @@ public class UserManager {
      * @throws IncorrectPasswordException if the specified password does not match the user's password
      */
     public String login(String username, String password)
-            throws InvalidUsernameException, IncorrectPasswordException, InvalidUserIDException, ExpiredUserException {
+            throws InvalidUsernameException, IncorrectPasswordException, InvalidUserIDException, ExpiredUserException, IOException {
 
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
@@ -150,6 +151,7 @@ public class UserManager {
 
 
         getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
+        gateway.updateUser(getUser(userId));
         return userId;
     }
 
@@ -190,7 +192,6 @@ public class UserManager {
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
         getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
-        System.out.println("Logged out!");
     }
 
     public String getUsername(String userId) throws InvalidUserIDException {
@@ -395,6 +396,13 @@ public class UserManager {
         users.get(ownerID).removeFriend(subjectID);
         gateway.updateUser(users.get(ownerID));
 
+    }
+
+    public void addGameCreation(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
+        if (!users.containsKey(ownerID))
+            throw new InvalidUserIDException();
+        users.get(ownerID).addGameCreation(subjectID);
+        gateway.updateUser(users.get(ownerID));
     }
 
 
