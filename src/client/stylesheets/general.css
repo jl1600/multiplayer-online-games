@@ -3,7 +3,7 @@
 body {
 	margin: 0;
 	background-color: #f5d5c0;
-	color: #23272a;
+	color: #424549;
 	font-family: "Open Sans", sans-serif;
 }
 iframe {
@@ -14,4 +14,7 @@ iframe {
 main {
 	width: 90%;
 	margin: auto;
+}
+input {
+	color: #424549;
 }

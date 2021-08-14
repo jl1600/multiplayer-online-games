@@ -71,10 +71,3 @@ function createEditButtons(publicity) {
 
 	return [visibilityImg, deleteImg];
 }
-
-function getDescription(genre) {
-    switch (genre) {
-        case "QUIZ": return "Description for the quiz game";
-        case "HANGMAN": return "Try to guess the word before the man is hung";
-    }
-}

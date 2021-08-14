@@ -3,23 +3,32 @@
 	<head>
 		<link rel="icon" href="../static/favicon.ico" type="image/x-icon" />
 		<link href="../stylesheets/general.css" rel="stylesheet" />
+		<link href="../stylesheets/gameplay.css" rel="stylesheet">
 		<title>Multiplayer Games</title>
 	</head>
 	<body>
-		<link href="../stylesheets/gameplay.css" rel="stylesheet">
 		<iframe id="header" src="../components/header.html" width="100%"></iframe>
-		<script src="../scripts/requests/playMatch.js"></script>
 
-		<div id="content-box">
-			<textarea id="matchContent" name="matchContent" rows="30" cols="80" readonly></textarea>
-			<textarea id="matchInput" name="matchInput" rows="1" cols="70"></textarea>
-			<input name="answerButton" onclick="sendInput(document.getElementsByName('matchInput')[0].value)" type="button" value="Answer" />
-		</div>
-		<div id="player-stats">
-			<textarea id="playerStats" rows="20" cols="20" readonly></textarea>
-		</div>
-		<div align="center">
-			<input id="startButton" name="startMatch" onclick="startMatch()" type="button" value="Start"/>
-		</div>
+		<main>
+			<h1>Playing a match</h1>
+			<div id="content-wrapper" class="wrapper">
+				<div id="content-box">
+					<textarea id="match-content" name="matchContent" readonly></textarea>
+					<div class="input-wrapper">
+						<input id="match-input" name="matchInput" placeholder="Your answer here" />
+						<button name="answerButton" onclick="sendInput(document.getElementsByName('matchInput')[0].value)" type="button">Answer</button>
+					</div>
+				</div>
+
+				<div class="column">
+					<h3>Game log</h3>
+					<textarea id="player-stats" readonly></textarea>
+				</div>
+			</div>
+
+			<button id="start-button" name="startMatch" onclick="startMatch()" type="button" hidden>Start</button>
+		</main>
+
+		<script src="../scripts/requests/playMatch.js"></script>
 	</body>
 </html>

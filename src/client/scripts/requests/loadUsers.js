@@ -1,39 +1,56 @@
-if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
+if (typeof xhr1 === "undefined") xhr1 = new XMLHttpRequest();
 
-document.addEventListener("DOMContentLoaded", fetchAllGames, false);
+document.addEventListener("DOMContentLoaded", loadUsers, false);
 
-function fetchAllGames() {
-	xhr.open("GET", "http://localhost:8000/game/all-public-games");
+function loadUsers() {
+	const userType = sessionStorage.getItem("userType");
+	xhr1.open("GET", "http://localhost:8000/user/all-members" +
+		userType === "ADMIN" ? "" : `?userid=${ sessionStorage.getItem("userId") }`);
 
-	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-			JSON.parse(xhr.response).forEach(match => createCard(match, "CREATE"));
-			listenForClicks();
+	xhr1.onreadystatechange = () => {
+		if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 200) {
+			JSON.parse(xhr1.response).forEach(user => createRow("users", user, userType === "ADMIN" ? "EDIT" : "Add friend"));
+			listenForClicks(userType);
+		} else if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 400) {
+			alert("Invalid id");
 		}
 	}
 
-	xhr.send();
+	xhr1.send();
 }
 
-function listenForClicks() {
-	document.querySelectorAll("#cards-container .card .overlay .img-container .button").forEach(el => {
+function listenForClicks(userType) {
+	document.querySelectorAll("#users .button")?.forEach(el => {
+		const userId = el.parentElement.getAttribute("data-id");
 		el.addEventListener("click", () => {
-		    xhr.open("POST", "http://localhost:8000/game/create-match");
-
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
-                    window.location = "http://localhost:8080/pages/play-match.html";
-                } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
-                    alert("You're already in a match. Please finish it before starting another one");
-                } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {
-                    alert("Invalid userID or gameID");
-                }
-            };
-
-            xhr.send(JSON.stringify({
-                userID: sessionStorage.getItem("userId"),
-                gameID: el.parentElement.parentElement.parentElement.getAttribute("data-id")
-            }));
+			switch (userType) {
+				case "ADMIN":
+					window.location = `http://localhost:8080/pages/my-games?userId=${ userId }`;
+				break;
+				case "MEMBER":
+					addFriend(userId);
+				break;
+				case "TRIAL":
+					window.location = "http://localhost:8080";
+				break;
+			}
 		});
 	});
+}
+
+function addFriend(receiverID) {
+	xhr1.open("POST", "http://localhost:8000/user/send-friend-request");
+
+	xhr1.onreadystatechange = () => {
+		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 200) {
+			alert("Friend request sent!");
+		} else if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 400) {
+			alert("userID is invalid");
+		}
+	}
+
+	xhr1.send(JSON.stringify({
+		senderID: sessionStorage.getItem("userId"),
+		receiverID
+	}));
 }

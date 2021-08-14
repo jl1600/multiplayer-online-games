@@ -11,19 +11,16 @@
 		<iframe id="header" src="../components/header.html" width="100%"></iframe>
 
 		<main>
-			<h1>My Friends</h1>
-
-			<div id="cards-container" class="cards-container">
-				<a id="create-card" class="card" href="./send-friend-request.html">+</a>
+			<div id="friends" class="column">
+				<h1>My friends</h1>
 			</div>
-
-			<h1>My Pending Friends</h1>
-			<div id="pending-friends" class="cards-container">
-
+			<div id="users" class="column">
+				<h1>All users</h1>
 			</div>
 		</main>
-		<script src="../scripts/requests/loadUsers.js"></script>
-		<script src="../scripts/requests/loadFriends.js"></script>
 
+		<script src="../scripts/createRow.js"></script>
+		<script src="../scripts/requests/loadFriends.js"></script>
+		<script src="../scripts/requests/loadUsers.js"></script>
 	</body>
 </html>

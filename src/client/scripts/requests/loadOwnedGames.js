@@ -3,7 +3,9 @@ if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 document.addEventListener("DOMContentLoaded", fetchOwnedGames, false);
 
 function fetchOwnedGames() {
-	xhr.open("GET", "http://localhost:8000/game/all-owned-games?userid=" + sessionStorage.getItem("userId"));
+	xhr.open("GET", "http://localhost:8000/game/all-owned-games?userid=" +
+		sessionStorage.getItem("userType") === "ADMIN" ? window.location.href.split("?userId=")[1] :
+		sessionStorage.getItem("userId"));
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
