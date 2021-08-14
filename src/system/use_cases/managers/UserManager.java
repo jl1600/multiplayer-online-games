@@ -133,11 +133,8 @@ public class UserManager {
 //        System.out.println("usermanager address:"+this.toString());
 //        System.out.println("userlist keyset:"+this.getUsers().keySet());
 
+        System.out.println("created a trial user");
         return userId;
-    }
-
-    public HashMap<String, User> getUsers() {
-        return users;
     }
 
     /**
