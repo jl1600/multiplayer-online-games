@@ -16,8 +16,8 @@ import java.util.*;
 
 public class UserDataMapper implements UserDataGateway {
 
-    //Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    Gson gson = new Gson();
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    //Gson gson = new Gson();
 
     /**
      * Adds a user to the database and increases the total number of users created by 1
@@ -69,7 +69,7 @@ public class UserDataMapper implements UserDataGateway {
         HashSet<User> users = new HashSet<>();
 
         for (File file : Objects.requireNonNull(folder.listFiles())) {
-            String userString = String.join(",", Files.readAllLines(file.toPath()));
+            String userString = String.join("\n", Files.readAllLines(file.toPath()));
             User user = stringToUser(userString);
             users.add(user);
         }

@@ -1,6 +1,7 @@
 package system.gateways;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import system.entities.template.HangmanTemplate;
 import system.entities.template.QuizTemplate;
 import system.entities.template.Template;
@@ -12,10 +13,10 @@ import java.util.Objects;
 
 public class TemplateDataMapper implements TemplateDataGateway {
 
-    Gson gson = new Gson();
-    //Gson gson = new GsonBuilder().setPrettyPrinting().setLenient().create();
+    //Gson gson = new Gson();
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private final String[] SUB_FOLDERS = {"quiz/", "hangman/"};
+    private final String[] SUB_FOLDERS = {"quiz/" , "hangman/"};
     private final String SUFFIX = ".json";
 
     /**
@@ -68,7 +69,10 @@ public class TemplateDataMapper implements TemplateDataGateway {
         for (String subfolder : SUB_FOLDERS) {
             File folder = new File(templateFolderPath + subfolder);
             for (File file : Objects.requireNonNull(folder.listFiles())) {
-                String templateString = String.join(",", Files.readAllLines(file.toPath()));
+                if (file.getName().equals(".gitkeep")) {
+                    continue;
+                }
+                String templateString = String.join("\n", Files.readAllLines(file.toPath()));
                 Template template = jsonToTemplate(templateString, subfolder);
                 templates.add(template);
             }
