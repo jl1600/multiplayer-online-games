@@ -91,7 +91,7 @@ public class UserManager {
      * @throws IOException if the database is not found
      */
     public void createUser(String username, String password, UserRole role)
-            throws DuplicateUsernameException, IOException, UnaccountedUserRoleException {
+            throws DuplicateUsernameException, UnaccountedUserRoleException {
         if (role.equals(UserRole.TRIAL))
             throw new UnaccountedUserRoleException();
         if (userIds.containsKey(username))
@@ -103,7 +103,12 @@ public class UserManager {
         User user = new User(userId, username, password, role, currentTime);
         userIds.put(username, userId);
         users.put(userId, user);
-        //gateway.addUser(user);
+        System.out.println("Trying to add the user to gateway");
+        try {
+            gateway.addUser(user);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -335,12 +340,6 @@ public class UserManager {
         return users.get(userID).getGameCreationSet();
     }
 
-    /**
-     * @return all users entity within this class
-     */
-    public ArrayList<User> getAllUsers() {
-        return (ArrayList<User>) users.values();
-    }
 
     public Set<String> getFriendList(String userID) throws InvalidUserIDException {
         if (!users.containsKey(userID))
@@ -403,14 +402,6 @@ public class UserManager {
         gateway.updateUser(users.get(ownerID));
 
     }
-
-    public void addGameCreation(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
-        if (!users.containsKey(ownerID))
-            throw new InvalidUserIDException();
-        users.get(ownerID).addGameCreation(subjectID);
-        gateway.updateUser(users.get(ownerID));
-    }
-
 
 
     public void banUser(String adminID, String subjectID, int duration) throws InvalidUserIDException, IOException{
