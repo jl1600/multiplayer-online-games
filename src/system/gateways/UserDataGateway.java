@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.util.HashSet;
 
 public interface UserDataGateway {
-    String path = System.getProperty("user.dir");
-    String userFolderPath = path + "/src/system/database/users/";
-    File userCountFile = new File(path + "/src/system/database/countFiles/user.txt");
 
     void addUser(User user) throws IOException;
 

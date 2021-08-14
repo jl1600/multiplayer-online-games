@@ -2,22 +2,19 @@ package system.gateways;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.entities.User;
-import system.entities.game.quiz.QuizGame;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class UserDataMapper implements UserDataGateway {
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    //Gson gson = new Gson();
+    private final String PATH = System.getProperty("user.dir");
+    private final String USER_FOLDER = PATH + "/src/system/database/users/";
+    private final File USER_COUNT_FILE = new File(PATH + "/src/system/database/countFiles/user.txt");
+    private final String SUFFIX = ".json";
+    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     /**
      * Adds a user to the database and increases the total number of users created by 1
@@ -38,7 +35,7 @@ public class UserDataMapper implements UserDataGateway {
      * @throws IOException if the database is not found
      */
     public void deleteUser(String userId) throws IOException {
-        File file = new File(userFolderPath + userId + ".json");
+        File file = new File(USER_FOLDER + userId + SUFFIX);
         if (!file.delete()) {
             throw new IOException();
         }
@@ -65,15 +62,15 @@ public class UserDataMapper implements UserDataGateway {
      * @throws IOException if the database is not found
      */
     public HashSet<User> getAllUsers() throws IOException {
-        File folder = new File(userFolderPath);
+        File folder = new File(USER_FOLDER);
         HashSet<User> users = new HashSet<>();
-
         for (File file : Objects.requireNonNull(folder.listFiles())) {
-            String userString = String.join("\n", Files.readAllLines(file.toPath()));
-            User user = stringToUser(userString);
-            users.add(user);
+            if (file.getName().endsWith(SUFFIX)) {
+                String userString = String.join("\n", Files.readAllLines(file.toPath()));
+                User user = jsonToUser(userString);
+                users.add(user);
+            }
         }
-
         return users;
     }
 
@@ -82,33 +79,32 @@ public class UserDataMapper implements UserDataGateway {
      * @throws IOException if the database is not found
      */
     public int getUserCount() throws IOException {
-        BufferedReader rd = new BufferedReader(new FileReader(userCountFile));
+        BufferedReader rd = new BufferedReader(new FileReader(USER_COUNT_FILE));
         return new Integer(rd.readLine());
     }
 
-    private User stringToUser(String userString) {
+    private User jsonToUser(String userString) {
         return gson.fromJson(userString, User.class);
     }
 
-    private String userToString(User user) {
+    private String userToJson(User user) {
         return gson.toJson(user);
     }
 
-
     private void incrementUserCount() throws IOException {
-        BufferedReader rd = new BufferedReader(new FileReader(userCountFile));
+        BufferedReader rd = new BufferedReader(new FileReader(USER_COUNT_FILE));
         int count = Integer.parseInt(rd.readLine()) + 1;
         rd.close();
 
-        Writer wr = new FileWriter(userCountFile, false);
+        Writer wr = new FileWriter(USER_COUNT_FILE, false);
         wr.write(count + System.getProperty("line.separator"));
         wr.close();
     }
 
     private void addUser(User user, boolean increment) throws IOException {
-        File userFile = new File(userFolderPath + user.getUserId() + ".json");
+        File userFile = new File(USER_FOLDER + user.getUserId() + SUFFIX);
         Writer wr = new FileWriter(userFile);
-        wr.write(userToString(user));
+        wr.write(userToJson(user));
         wr.close();
 
         if (increment) incrementUserCount();

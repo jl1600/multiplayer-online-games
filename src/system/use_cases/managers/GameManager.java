@@ -155,7 +155,7 @@ public class GameManager {
     public void removeGame(String gameId) throws InvalidGameIDException {
         if (games.containsKey(gameId)) {
             try {
-                gateway.deleteGame(games.get(gameId));
+                gateway.deleteGame(gameId);
             } catch (IOException e) {
                 throw new RuntimeException("Cannot delete game from the database");
             }
