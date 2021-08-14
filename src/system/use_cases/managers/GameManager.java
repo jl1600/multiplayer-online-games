@@ -124,7 +124,9 @@ public class GameManager {
         String id;
         try {
             id = idManager.getNextId();
-            addGame(gameBuilders.get(creatorID).build(id));
+            Game game = gameBuilders.get(creatorID).build(id);
+            games.put(id, game);
+            gateway.addGame(game);
         } catch (IDNotYetSetException e) {
             throw new IDNotYetSetException();
         } catch (IOException e) {
@@ -135,17 +137,35 @@ public class GameManager {
     }
 
     /**
-     * Add the game to the system and stores it in database.
+     * Conclude the building process. Provide the game with and ID and stores it. Remove the CreatorID
+     * from the collection of users that are in building process.
+     *
+     * @param creatorID The string identifier of the user that is building this game.
+     * @throws NoCreationInProgressException No such user with such ID is building any game.
+     * @throws InsufficientInputException Game is not ready to be built. Need more input.
      * */
-    private void addGame(Game game) throws IOException {
+    public String buildTemporaryGame(String creatorID)
+            throws NoCreationInProgressException, InsufficientInputException {
 
-        if (games.containsKey(game.getID())) {
-            throw new DuplicateGameIDException();
+        if (!gameBuilders.containsKey(creatorID)) {
+            throw new NoCreationInProgressException();
         }
 
-        games.put(game.getID(), game);
-        gateway.addGame(game);
+        if (!gameBuilders.get(creatorID).isReadyToBuild())
+            throw new InsufficientInputException();
+
+        String id;
+        try {
+            id = idManager.getNextId();
+            Game game = gameBuilders.get(creatorID).build(id);
+            games.put(id, game);
+        } catch (IDNotYetSetException e) {
+            throw new IDNotYetSetException();
+        }
+        gameBuilders.remove(creatorID);
+        return id;
     }
+
     /**
      * Removes the game from the system and database.
      *

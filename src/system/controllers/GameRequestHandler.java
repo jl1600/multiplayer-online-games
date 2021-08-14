@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.*;
 import shared.DTOs.Responses.DesignQuestionResponseBody;
 import shared.DTOs.Responses.MatchDataResponseBody;
+import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
 import shared.DTOs.Responses.GameDataResponseBody;
 import system.use_cases.managers.GameManager;
@@ -162,7 +163,8 @@ public class GameRequestHandler extends RequestHandler {
         try {
             gameManager.makeDesignChoice(body.userID, body.designChoice);
             try {
-                String gameID = gameManager.buildGame(body.userID);
+                String gameID = (userManager.getUserRole(body.userID) == UserRole.TRIAL)?
+                        gameManager.buildTemporaryGame(body.userID):gameManager.buildGame(body.userID);
                 userManager.addOwnedGameID(body.userID, gameID);
                 sendResponse(exchange, 201, "Success!");
             } catch (InsufficientInputException e) {

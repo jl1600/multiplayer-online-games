@@ -126,6 +126,7 @@ public class UserManager {
 
         userIds.put(username, userId);
         users.put(userId, user);
+        System.out.println("created a trial user");
         return userId;
     }
 
