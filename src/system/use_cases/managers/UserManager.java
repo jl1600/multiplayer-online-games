@@ -122,7 +122,6 @@ public class UserManager {
         userIds.put(username, userId);
         users.put(userId, user);
 
-        gateway.addUser(user);
         return userId;
     }
 
