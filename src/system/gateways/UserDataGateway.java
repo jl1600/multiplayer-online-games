@@ -4,6 +4,8 @@ import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.entities.User;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 public interface UserDataGateway {
@@ -15,6 +17,8 @@ public interface UserDataGateway {
      * @throws IOException if there is a problem saving to the database
      */
     void addUser(User user) throws IOException;
+
+    void banUser(User user, Date duration) throws IOException;
 
     /**
      * Updates the input user in the database.

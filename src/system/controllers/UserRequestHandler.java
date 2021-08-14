@@ -300,4 +300,18 @@ public class UserRequestHandler extends RequestHandler {
             return null;
         }
     }
+
+    private Response handleBanUserRequest(BanUserRequest request) {
+        String sessionID = request.getSessionID();
+
+        try {
+            userManager.banUser(request.getAdminId(), request.getUserId(), request.getBanLength());
+            return new SimpleTextResponse(sessionID, "Successfully banned user");
+        }
+        catch (InvalidUserIDException e) {
+            return new ErrorMessageResponse(sessionID, "Error: Invalid Id");
+        } catch (IOException e) {
+            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
+        }
+    }
 }
