@@ -1,6 +1,7 @@
 package system.controllers;
 
 import com.sun.net.httpserver.HttpServer;
+import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.gateways.*;
 import system.use_cases.managers.*;
 
@@ -27,12 +28,17 @@ public class WordGameSystem {
         TemplateManager tm = new TemplateManager(templateDataGateway);
 
         UserDataGateway userGateway = new UserDataMapper();
-        UserManager um = new UserManager(userGateway);
 
-        MatchManager mm = new MatchManager();
-        gameRH = new GameRequestHandler(gm, tm, um, mm);
-        templateRH = new TemplateRequestHandler(tm, um);
-        userRH = new UserRequestHandler(um);
+        try{
+            UserManager um = new UserManager(userGateway);
+
+            MatchManager mm = new MatchManager();
+            gameRH = new GameRequestHandler(gm, tm, um, mm);
+            templateRH = new TemplateRequestHandler(tm, um);
+            userRH = new UserRequestHandler(um);
+        } catch (InvalidUserIDException e) {
+            throw new RuntimeException("User ID not found in database");
+        }
 
         server = HttpServer.create(new InetSocketAddress("localhost", 8000), 20);
 

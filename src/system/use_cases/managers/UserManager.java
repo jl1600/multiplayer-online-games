@@ -18,7 +18,7 @@ public class UserManager {
     private final HashMap<String, String> userIds; // username to userId
     private final UserDataGateway gateway;
 
-    public UserManager(UserDataGateway gateway) throws IOException {
+    public UserManager(UserDataGateway gateway) throws IOException, InvalidUserIDException {
         users = new HashMap<>();
         userIds = new HashMap<>();
         this.gateway = gateway;
@@ -31,6 +31,7 @@ public class UserManager {
             if (user.getOnlineStatus().equals(OnlineStatus.BANNED)){
                 if (user.getLastBanDate().before(currentTime)){//current time has gone over last ban date
                     user.setOnlineStatus(OnlineStatus.OFFLINE);
+                    this.gateway.updateUser(user);
                 }
             }
 
@@ -348,7 +349,7 @@ public class UserManager {
         return users.get(userID).getPendingFriendList();
     }
 
-    public void addPendingFriend(String ownerID, String subjectID) throws InvalidUserIDException {
+    public void addPendingFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
         if (!users.containsKey(subjectID))
             throw new InvalidUserIDException();
 
@@ -357,6 +358,7 @@ public class UserManager {
 
         if (!users.get(ownerID).getPendingFriendList().contains(subjectID)){//to avoid duplicate sends
             users.get(ownerID).addPendingFriend(subjectID);
+            gateway.updateUser(users.get(ownerID));
         }
 
     }
@@ -365,36 +367,40 @@ public class UserManager {
         return new HashSet<>(users.keySet());
     }
 
-    public void removePendingFriend(String ownerID, String subjectID) throws InvalidUserIDException{
+    public void removePendingFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
         if (!users.containsKey(subjectID))
             throw new InvalidUserIDException();
         if (!users.containsKey(ownerID))
             throw new InvalidUserIDException();
         users.get(ownerID).removePendingFriend(subjectID);
+        gateway.updateUser(users.get(ownerID));
     }
 
-    public void addFriend(String ownerID, String subjectID) throws InvalidUserIDException{
+    public void addFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
         if (!users.containsKey(subjectID))
             throw new InvalidUserIDException();
         if (!users.containsKey(ownerID))
             throw new InvalidUserIDException();
         users.get(ownerID).addFriend(subjectID);
+        gateway.updateUser(users.get(ownerID));
 
     }
 
-    public void removeFriend(String ownerID, String subjectID) throws InvalidUserIDException{
+    public void removeFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
         if (!users.containsKey(subjectID))
             throw new InvalidUserIDException();
         if (!users.containsKey(ownerID))
             throw new InvalidUserIDException();
         users.get(ownerID).removeFriend(subjectID);
+        gateway.updateUser(users.get(ownerID));
 
     }
 
 
 
-    public void banUser(String adminID, String userID, int duration) throws InvalidUserIDException, IOException{
-        if (!users.containsKey(userID) || !users.containsKey(adminID))
+    public void banUser(String adminID, String subjectID, int duration) throws InvalidUserIDException, IOException{
+
+        if (!users.containsKey(subjectID) || !users.containsKey(adminID))
             throw new InvalidUserIDException();
 
         if (users.get(adminID).getRole() != UserRole.ADMIN)
@@ -402,6 +408,8 @@ public class UserManager {
 
         Calendar date = Calendar.getInstance();
         date.add(Calendar.DAY_OF_YEAR, duration);
-        getUser(userID).setLastBanDate(date.getTime());
+        getUser(subjectID).setLastBanDate(date.getTime());
+
+        gateway.updateUser(users.get(subjectID));
     }
 }
