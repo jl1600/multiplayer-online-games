@@ -126,7 +126,6 @@ public class UserManager {
 
         userIds.put(username, userId);
         users.put(userId, user);
-        System.out.println("created a trial user");
         return userId;
     }
 
@@ -197,7 +196,9 @@ public class UserManager {
             throw new InvalidUserIDException();
         getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
         if (getUserRole(userId).equals(UserRole.TRIAL)){
-            deleteUser(userId);
+            String username = users.get(userId).getUsername();
+            users.remove(userId);
+            userIds.remove(username);
         } else {
             gateway.updateUser(getUser(userId));
         }
