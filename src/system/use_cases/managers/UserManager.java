@@ -127,7 +127,6 @@ public class UserManager {
         userIds.put(username, userId);
         users.put(userId, user);
 
-        gateway.addUser(user);
         return userId;
     }
 
@@ -402,6 +401,7 @@ public class UserManager {
         gateway.updateUser(users.get(ownerID));
 
     }
+
 
 
     public void banUser(String adminID, String subjectID, int duration) throws InvalidUserIDException, IOException{
