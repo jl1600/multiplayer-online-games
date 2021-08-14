@@ -99,7 +99,6 @@ public class QuizGameMatch extends GameMatch {
         } else if (getPlayerCount() >= getPlayerLimit()) {
             throw new MaxPlayerReachedException();
         }
-        System.out.println("Trying to add player");
         playerStats.put(userID, new PlayerStat(username));
         setChanged();
         notifyObservers();
@@ -123,7 +122,7 @@ public class QuizGameMatch extends GameMatch {
     public String getTextContent()  {
 
         if (getStatus() == MatchStatus.PREPARING) {
-            return "";
+            return "Waiting for the host to start the match...";
         }
 
         if (getStatus() == MatchStatus.FINISHED) {
@@ -145,8 +144,8 @@ public class QuizGameMatch extends GameMatch {
                             game.getQuestion(currQuestionIndex - 1).getAnswer(correctAnswerIndex);
             }
             if (!template.isMultipleChoice())
-                return lastRes + "\n" + game.getQuestion(currQuestionIndex).getQuestionData() + "\nEnter exact answer";
-            return lastRes + "\n" + currQuestion;
+                return lastRes + "\n\n" + game.getQuestion(currQuestionIndex).getQuestionData() + "\nEnter exact answer";
+            return lastRes + "\n\n" + currQuestion;
         }
     }
 
@@ -189,9 +188,9 @@ public class QuizGameMatch extends GameMatch {
         Map<String, String> playersMove = new HashMap<>();
         for (PlayerStat player: playerStats.values()) {
             if (numMovedPlayers == getPlayerCount())
-                playersMove.put(player.username, player.lastInput);
+                playersMove.put(player.username, "\nLast turn input: " + player.lastInput);
             else {
-                playersMove.put(player.username, player.lastInput != null?"Answer hidden":"Waiting for player input...");
+                playersMove.put(player.username, player.lastInput != null?"Answer hidden":"Waiting for input...");
             }
         }
         return playersMove;
@@ -239,6 +238,13 @@ public class QuizGameMatch extends GameMatch {
         if (!containPlayer(playerID)) {
             throw new InvalidUserIDException();
         }
+
+        if (getStatus() == MatchStatus.PREPARING) {
+            setChanged();
+            notifyObservers();
+            return;
+        }
+
         PlayerStat player = playerStats.get(playerID);
         if (player.numAttempted >= game.getMaxAttempts())
             return;

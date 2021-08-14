@@ -48,7 +48,6 @@ public class MatchManager {
      * @throws InvalidMatchIDException When there is no such match with the PREPARING status.
      * */
     public void startMatch(String matchID) throws InvalidMatchIDException {
-        System.out.println("starting match number " + matchID);
         if (preparingMatches.containsKey(matchID)) {
             ongoingMatches.put(matchID, preparingMatches.remove(matchID));
             ongoingMatches.get(matchID).startMatch();
@@ -260,6 +259,10 @@ public class MatchManager {
             if (ongoingMatches.get(matchID).getStatus() == MatchStatus.FINISHED) {
                 finishedMatches.put(matchID, ongoingMatches.remove(matchID));
             }
+        } else if (preparingMatches.containsKey(matchID)) {
+            preparingMatches.get(matchID).playMove(playerID, move);
+        } else if (finishedMatches.containsKey(matchID)) {
+            finishedMatches.get(matchID).playMove(playerID, move);
         }
         else {
             throw new InvalidMatchIDException();
