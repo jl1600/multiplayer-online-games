@@ -54,6 +54,8 @@ function startMatch() {
                                   sysCommand: "start",
                                   gameMove: ""
                               }));
+    var elem = document.getElementById('startButton');
+    elem.parentNode.removeChild(elem);
 }
 
 function leaveMatch() {

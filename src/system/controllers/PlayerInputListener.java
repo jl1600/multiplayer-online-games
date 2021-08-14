@@ -56,12 +56,21 @@ public class PlayerInputListener extends Thread {
                 try {
                     ClientSocketSeeker.sendWSMessage(outStream, "Invalid input.");
                 } catch (IOException ioException) {
-                   return; // Terminate this thread.
+                    try {
+                        manager.removePlayer(playerID, matchID);
+                    } catch (InvalidMatchIDException | InvalidUserIDException invalidMatchIDException) {
+                        System.out.println("Match no longer exist or player already removed.");
+                    }
+                    return; // Terminate this thread.
                 }
             } catch (InvalidUserIDException e) {
                 throw new RuntimeException("Invalid player ID. This should never happen.");
             } catch (IOException e) {
-                return;
+                try {
+                    manager.removePlayer(playerID, matchID);
+                } catch (InvalidMatchIDException | InvalidUserIDException invalidMatchIDException) {
+                    System.out.println("Match no longer exist or player already removed.");
+                }
             }
         }
     }

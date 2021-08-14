@@ -143,7 +143,7 @@ public class QuizGameMatch extends GameMatch {
                     lastRes = "Correct answer: " +
                             game.getQuestion(currQuestionIndex - 1).getAnswer(correctAnswerIndex);
             }
-            return lastRes + "\n" + ". " + currQuestion;
+            return lastRes + "\n" + currQuestion;
         }
     }
 
@@ -164,10 +164,10 @@ public class QuizGameMatch extends GameMatch {
             }
             return  result.toString();
         } else { // Simple Multiple choice or simple exact answer.
-            int correctAnswerIndex = game.getQuestion(currQuestionIndex - 1).getCorrectAnswerIndex();
+            int correctAnswerIndex = game.getQuestion(currQuestionIndex).getCorrectAnswerIndex();
             if (correctAnswerIndex != -1) {
                 result.append("Correct answer: ").
-                        append(game.getQuestion(currQuestionIndex - 1).getAnswer(correctAnswerIndex)).
+                        append(game.getQuestion(currQuestionIndex).getAnswer(correctAnswerIndex)).
                         append("\n");
             }
             result.append("Quiz ended. Player scores are:");

@@ -5,17 +5,19 @@
 		<link href="../stylesheets/general.css" rel="stylesheet" />
 		<title>Multiplayer Games</title>
 	</head>
-
 	<body>
+		<link href="../stylesheets/gameplay.css" rel="stylesheet">
 		<iframe id="header" src="../components/header.html" width="100%"></iframe>
 		<script src="../scripts/requests/playMatch.js"></script>
-		<div align="center">
+
+		<div id="content-box">
 			<textarea id="matchContent" name="matchContent" rows="30" cols="80" readonly></textarea>
+			<textarea id="matchInput" name="matchInput" rows="1" cols="70"></textarea>
+			<input name="answerButton" onclick="sendInput(document.getElementsByName('matchInput')[0].value)" type="button" value="Answer" />
 		</div>
+
 		<div align="center">
-		<textarea id="matchInput" name="matchInput" rows="1" cols="70"></textarea>
-		<input name="answerButton" onclick="sendInput(document.getElementsByName('matchInput')[0].value)" type="button" value="Answer" />
-		</div>>
-		<input name="startMatch" onclick="startMatch()" type="button" value="Start"/>
+		<input id="startButton" name="startMatch" onclick="startMatch()" type="button" value="Start"/>
+		</div>
 	</body>
 </html>

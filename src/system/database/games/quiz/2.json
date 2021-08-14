@@ -36,6 +36,6 @@
   "ownerId": "2",
   "templateId": "1",
   "gameAccessLevel": "PUBLIC",
-  "previousGameAccessLevel": "PRIVATE",
+  "previousGameAccessLevel": "FRIEND",
   "title": "My First Game"
 }

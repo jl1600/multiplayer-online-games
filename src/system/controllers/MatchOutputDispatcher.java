@@ -55,6 +55,7 @@ public class MatchOutputDispatcher implements Observer {
             try {
                 ClientSocketSeeker.sendWSMessage(out, gson.toJson(matchOutput));
             } catch (IOException e) {
+                outStreams.remove(out);
                 System.out.println("Can't connect to this player. They may have left the match.");
             }
         }
