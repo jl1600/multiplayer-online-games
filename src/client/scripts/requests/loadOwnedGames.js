@@ -11,7 +11,9 @@ function fetchOwnedGames() {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 			JSON.parse(xhr.response).forEach(game => createCard(game, "EDIT"));
 			listenForClicks();
-		}
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+            alert("invalid id");
+        }
 	}
 
 	xhr.send();

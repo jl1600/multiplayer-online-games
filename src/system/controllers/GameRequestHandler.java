@@ -163,6 +163,12 @@ public class GameRequestHandler extends RequestHandler {
             gameManager.makeDesignChoice(body.userID, body.designChoice);
             try {
                 String gameID = gameManager.buildGame(body.userID);
+//                System.out.println("executing GameRequestHandler.handleMakeDesignChoice.gameManager.buildGame(body.userID);");
+//                System.out.println("userID:"+body.userID);
+//                System.out.println("address of user manager"+userManager.toString());
+//                System.out.println("the current keyset of user"+userManager.getUsers().keySet());
+
+
                 userManager.addOwnedGameID(body.userID, gameID);
                 sendResponse(exchange, 201, "Success!");
             } catch (InsufficientInputException e) {
@@ -356,7 +362,13 @@ public class GameRequestHandler extends RequestHandler {
 
 
     private String getOwnedGamesData(String userID) throws InvalidUserIDException {
-            Set<String> ownedIds = userManager.getOwnedGamesID(userID);
+//        System.out.println("executing GameRequestHandler.getOwnedGameData(String userID)");
+//        System.out.println("userID:"+userID);
+//        System.out.println("address of user manager"+userManager.toString());
+//        System.out.println("the current keyset of user"+userManager.getUsers().keySet());
+
+
+        Set<String> ownedIds = userManager.getOwnedGamesID(userID);
             Set<GameDataResponseBody> dataSet = new HashSet<>();
             for (String id: ownedIds) {
                 GameDataResponseBody data = new GameDataResponseBody();

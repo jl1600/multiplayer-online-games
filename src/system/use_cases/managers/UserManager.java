@@ -117,6 +117,7 @@ public class UserManager {
      * @return id of the trial user created
      */
     public String createTrialUser() {
+
         String userId = idManager.getNextId();
         String username = "TrialUser" + userId;
 
@@ -126,7 +127,17 @@ public class UserManager {
 
         userIds.put(username, userId);
         users.put(userId, user);
+
+//        System.out.println("executing UserManager.createTrial");
+//        System.out.println("userid:"+userId);
+//        System.out.println("usermanager address:"+this.toString());
+//        System.out.println("userlist keyset:"+this.getUsers().keySet());
+
         return userId;
+    }
+
+    public HashMap<String, User> getUsers() {
+        return users;
     }
 
     /**
@@ -192,13 +203,16 @@ public class UserManager {
      * @throws InvalidUserIDException if no user has the specified userId
      */
     public void logout(String userId) throws InvalidUserIDException, IOException {
+        System.out.println("logout");
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
-        getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
-        if (getUserRole(userId).equals(UserRole.TRIAL)){
-            deleteUser(userId);
-        } else {
-            gateway.updateUser(getUser(userId));
+        if (!getUserRole(userId).equals(UserRole.TRIAL)){//need this bracket else trial user keeps logging out
+            getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
+            if (getUserRole(userId).equals(UserRole.TRIAL)){
+                deleteUser(userId);
+            } else {
+                gateway.updateUser(getUser(userId));
+            }
         }
 
     }
