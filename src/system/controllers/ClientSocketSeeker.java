@@ -27,7 +27,6 @@ public class ClientSocketSeeker extends Thread {
         this.matchID = matchID;
         this.matchManager = matchManager;
         this.serverSocket = serverSocket;
-        System.out.println("TRying to contruct client seeker for player " + userID);
     }
 
     public void run() {
@@ -51,8 +50,8 @@ public class ClientSocketSeeker extends Thread {
             playerID = readWSMessage(connection.getInputStream());
         }
         PlayerInputListener inputListener = new PlayerInputListener(connection, matchManager, matchID, playerID);
-        MatchOutputDispatcher outputDispatcher = new MatchOutputDispatcher(matchManager, matchID);
-        outputDispatcher.addPlayerOutput(connection);
+        MatchOutputDispatcher outputDispatcher = new MatchOutputDispatcher(connection.getOutputStream(),
+                matchManager, matchID, userID);
         matchManager.addObserver(outputDispatcher, matchID);
         inputListener.start();
     }

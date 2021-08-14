@@ -3,12 +3,9 @@ package system.gateways;
 import system.entities.template.Template;
 
 import java.io.*;
-import java.util.HashSet;
+import java.util.Set;
 
 public interface TemplateDataGateway {
-    String path = System.getProperty("user.dir");
-    String templateFolderPath = path + "/src/system/database/templates/";
-    File templateCountFile = new File(path + "/src/system/database/countFiles/template.txt");
 
     void addTemplate(Template template) throws IOException;
 
@@ -16,7 +13,7 @@ public interface TemplateDataGateway {
 
     void deleteTemplate(String templateID) throws IOException;
 
-    HashSet<Template> getAllTemplates() throws IOException;
+    Set<Template> getAllTemplates() throws IOException;
 
     int getTemplateCount() throws IOException;
 }
