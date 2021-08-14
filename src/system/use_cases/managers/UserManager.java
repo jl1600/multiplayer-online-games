@@ -332,7 +332,6 @@ public class UserManager {
             users.get(ownerID).addPendingFriend(senderID);
         }
 
-        //notify reciever?
     }
 
     public void removePendingFriend(String ownerID, String senderID) throws InvalidUserIDException{
@@ -343,7 +342,6 @@ public class UserManager {
         users.get(ownerID).removePendingFriend(senderID);
 
 
-        //notify sender?
     }
 
     public void addFriend(String ownerID, String senderID) throws InvalidUserIDException{
@@ -353,7 +351,6 @@ public class UserManager {
             throw new InvalidUserIDException();
         users.get(ownerID).addFriend(senderID);
 
-        //notify sender?
     }
 
     public void removeFriend(String ownerID, String senderID) throws InvalidUserIDException{
@@ -363,7 +360,6 @@ public class UserManager {
             throw new InvalidUserIDException();
         users.get(ownerID).removeFriend(senderID);
 
-        //notify sender?
     }
 
 

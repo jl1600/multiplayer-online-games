@@ -1,13 +1,13 @@
 if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 
-document.addEventListener("DOMContentLoaded", fetchAllGames, false);
+document.addEventListener("DOMContentLoaded", fetchAllFriends, false);
 
-function fetchAllGames() {
-	xhr.open("GET", "http://localhost:8000/user/all-users");
+function fetchAllFriends() {
+	xhr.open("GET", "http://localhost:8000/user/friends");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-			JSON.parse(xhr.response).forEach(user => createRow(user));
+			JSON.parse(xhr.response).forEach(userName => createRow(userName));
 			listenForClicks();
 		}
 	}

@@ -17,10 +17,10 @@ public class User {
     private String password;
     private UserRole role;
     private OnlineStatus onlineStatus;
-    private final HashSet<String> gameCreations;
-    private Date registerDate;
-    private HashSet<String> friendList;
-    private HashSet<String> pendingFriendList;
+    private final Set<String> gameCreations;
+    private final Date registerDate;
+    private final Set<String> friendList;
+    private final Set<String> pendingFriendList;
 
     /**
      *

@@ -1,16 +1,19 @@
 package system.controllers;
 
 import com.sun.net.httpserver.HttpExchange;
-import shared.DTOs.Requests.DeleteUserRequestBody;
-import shared.DTOs.Requests.LoginRequestBody;
-import shared.DTOs.Requests.LogoutRequestBody;
-import shared.DTOs.Requests.RegisterRequestBody;
+import shared.DTOs.Requests.*;
+import shared.DTOs.Responses.FriendResponseBody;
+import shared.DTOs.Responses.GeneralTemplateDataResponseBody;
 import shared.DTOs.Responses.LoginResponseBody;
+import shared.constants.GameGenre;
 import shared.exceptions.use_case_exceptions.*;
+import system.entities.template.QuizTemplate;
 import system.use_cases.managers.UserManager;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UserRequestHandler extends RequestHandler {
 
@@ -37,6 +40,8 @@ public class UserRequestHandler extends RequestHandler {
             case "userid":
                 handleGetUserID(exchange);
                 break;
+            case "friends":
+                handleGetFriends(exchange);
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
@@ -61,8 +66,28 @@ public class UserRequestHandler extends RequestHandler {
             case "delete":
                 handleDeleteUser(exchange);
                 break;
+            case "send-pending-friend":
+                handleSendPendingFriend(exchange);
+                break;
+            case "decline-pending-friend":
+                //handleDeclineFriend(exchange);
+                break;
+            case "accept-pending-friend":
+                break;
+            case "remove-friend":
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
+        }
+    }
+
+    private void handleSendPendingFriend(HttpExchange exchange) throws IOException {
+        SendPendingFriendBody body = gson.fromJson(getRequestBody(exchange), SendPendingFriendBody.class);
+        try {
+            userManager.getUser(body.ownerID).addPendingFriend(body.senderID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
 
@@ -114,6 +139,72 @@ public class UserRequestHandler extends RequestHandler {
         } catch (InvalidUserIDException e) {
             sendResponse(exchange, 404, "Invalid user ID.");
         }
+    }
+
+    private void handleGetFriends(HttpExchange exchange) throws IOException {
+        //handle get ownerID
+        String ownerID;
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            ownerID = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
+        }
+        //handle load friend list as response body
+        Set<FriendResponseBody> dataSet = new HashSet<>();
+
+        try{
+            Set<String> allfriends = userManager.getFriendList(ownerID);
+            for (String id : allfriends){
+                FriendResponseBody frb = new FriendResponseBody();
+                frb.userID = id;
+                frb.userName = userManager.getUsername(id);
+                dataSet.add(frb);
+            }
+
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 404, "Invalid user ID.");
+        }
+        //send response
+        sendResponse(exchange, 200, gson.toJson(dataSet));
+    }
+
+    private void handleGetPendingFriends(HttpExchange exchange) throws IOException {
+        //handle get ownerID
+        String ownerID;
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            ownerID = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
+        }
+        //handle load friend list as response body
+        Set<FriendResponseBody> dataSet = new HashSet<>();
+
+        try{
+            Set<String> allfriends = userManager.getPendingFriendList(ownerID);
+            for (String id : allfriends){
+                FriendResponseBody frb = new FriendResponseBody();
+                frb.userID = id;
+                frb.userName = userManager.getUsername(id);
+                dataSet.add(frb);
+            }
+
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 404, "Invalid user ID.");
+        }
+        //send response
+        sendResponse(exchange, 200, gson.toJson(dataSet));
     }
 
     private void handleGetUserID(HttpExchange exchange) throws IOException {
