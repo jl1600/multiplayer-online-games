@@ -212,7 +212,7 @@ public class UserRequestHandler extends RequestHandler {
             GeneralUserInfoResponseBody user = new GeneralUserInfoResponseBody();
             user.userID = uid;
             try {
-                if (userManager.getUserRole(uid)!= UserRole.MEMBER)
+                if (userManager.getUserRole(uid)!= UserRole.MEMBER || uid.equals(targetUser))
                     continue;
                 user.username = userManager.getUsername(uid);
             } catch (InvalidUserIDException e) {
