@@ -250,6 +250,8 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 204, null);
         } catch (DuplicateUsernameException e) {
             sendResponse(exchange, 403, "Duplicate username.");
+        } catch (WeakPasswordException e){
+            sendResponse(exchange, 400, "Password isn't strong enough.");
         }
     }
 

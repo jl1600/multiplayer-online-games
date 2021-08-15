@@ -1,5 +1,6 @@
 package system.use_cases.managers;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import shared.constants.OnlineStatus;
 import shared.constants.UserRole;
 import shared.exceptions.entities_exception.IDAlreadySetException;
@@ -11,6 +12,8 @@ import system.gateways.UserDataGateway;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UserManager {
     private final HashMap<String, User> users;     // userId to User entity
@@ -91,11 +94,13 @@ public class UserManager {
      * @throws IOException if the database is not found
      */
     public void createUser(String username, String password, UserRole role)
-            throws DuplicateUsernameException, UnaccountedUserRoleException {
+            throws DuplicateUsernameException, UnaccountedUserRoleException, WeakPasswordException {
         if (role.equals(UserRole.TRIAL))
             throw new UnaccountedUserRoleException();
         if (userIds.containsKey(username))
             throw new DuplicateUsernameException();
+        if (!checkPasswordStrength(password))
+            throw new WeakPasswordException();
 
         String userId = idManager.getNextId();
         Date currentTime = Calendar.getInstance().getTime();
@@ -109,6 +114,33 @@ public class UserManager {
         } catch (IOException e) {
             throw new RuntimeException("Fatal Error: Database malfunction.");
         }
+    }
+
+
+    private boolean checkPasswordStrength(String password){
+        boolean characters = false;
+        boolean hasNumbers = false;
+        boolean hasSpecialChar = false;
+        boolean isLong = password.length() >= 6;
+
+        Pattern characterPattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z]).+$");
+        Matcher characterMatcher = characterPattern.matcher(password);
+        if (characterMatcher.find()){
+            characters = true;
+        }
+
+        if (password.matches(".*\\d+.*")){
+            hasNumbers = true;
+        }
+
+        Pattern specialRegex = Pattern.compile("[$&+,:;=?@#|]");
+        Matcher specialMatcher = specialRegex.matcher(password);
+        if (specialMatcher.find()){
+            hasSpecialChar = true;
+        }
+
+        System.out.println(password + characters + hasNumbers + hasSpecialChar + isLong);
+        return characters && hasNumbers && hasSpecialChar && isLong;
     }
 
     /**
