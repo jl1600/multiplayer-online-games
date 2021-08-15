@@ -8,7 +8,7 @@ function login(username, password) {
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 			const data = JSON.parse(xhr.response);
-			if (data.role === "TEMP"){
+			if (data.role === "TEMP") {
 			    data.role = "MEMBER"
 			}
 			sessionStorage.setItem("userId", data.userID);
