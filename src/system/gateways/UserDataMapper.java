@@ -69,6 +69,19 @@ public class UserDataMapper implements UserDataGateway {
         return new Integer(rd.readLine());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void incrementUserCount() throws IOException {
+        BufferedReader rd = new BufferedReader(new FileReader(USER_COUNT_FILE));
+        int count = Integer.parseInt(rd.readLine()) + 1;
+        rd.close();
+
+        Writer wr = new FileWriter(USER_COUNT_FILE, false);
+        wr.write(count + System.getProperty("line.separator"));
+        wr.close();
+    }
+
     private void addUser(User user, boolean increment) throws IOException {
         File userFile = new File(USER_FOLDER + user.getUserId() + SUFFIX);
         Writer wr = new FileWriter(userFile);
@@ -78,16 +91,6 @@ public class UserDataMapper implements UserDataGateway {
         if (increment) {
             incrementUserCount();
         }
-    }
-
-    private void incrementUserCount() throws IOException {
-        BufferedReader rd = new BufferedReader(new FileReader(USER_COUNT_FILE));
-        int count = Integer.parseInt(rd.readLine()) + 1;
-        rd.close();
-
-        Writer wr = new FileWriter(USER_COUNT_FILE, false);
-        wr.write(count + System.getProperty("line.separator"));
-        wr.close();
     }
 
     private User jsonToUser(String userString) {

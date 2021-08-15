@@ -88,7 +88,6 @@ public class UserManager {
      * @param role role of the user to create. Must be one of ADMIN and MEMBER.
      *             Trial users should be created using this.createTrialUser
      * @throws DuplicateUsernameException if the username is already taken
-     * @throws IOException if the database is not found
      */
     public void createUser(String username, String password, UserRole role)
             throws DuplicateUsernameException, UnaccountedUserRoleException {
@@ -126,6 +125,13 @@ public class UserManager {
 
         userIds.put(username, userId);
         users.put(userId, user);
+
+        try {
+            gateway.incrementUserCount();
+        } catch (IOException e) {
+            throw new RuntimeException("Fatal Error: Database malfunction.");
+        }
+
         return userId;
     }
 
@@ -166,12 +172,9 @@ public class UserManager {
         Date currentTime = Calendar.getInstance().getTime();
 
         if (getUser(userId).getOnlineStatus().equals(OnlineStatus.BANNED)){//if banned go in bracket
-            if (getUser(userId).getLastBanDate().after(currentTime)) { //if the last ban date hasn't arrived yet
-                return true;
-            } else {
-                //online status will be set in login()
-                return false;
-            }
+            //if the last ban date hasn't arrived yet
+            //online status will be set in login()
+            return getUser(userId).getLastBanDate().after(currentTime);
 
         }
         return false;
@@ -193,11 +196,7 @@ public class UserManager {
         //add 30 days in millisec gives the expiration date
         // if current date > expiration date
         //return true (expired)
-        if (currentTime.getTime() > getUser(userId).getRegisterDate().getTime() + TimeUnit.DAYS.toMillis(30)){
-            return true;
-        }else{
-            return false;
-        }
+        return currentTime.getTime() > getUser(userId).getRegisterDate().getTime() + TimeUnit.DAYS.toMillis(30);
     }
 
     /**
@@ -290,6 +289,8 @@ public class UserManager {
             InvalidUserIDException, DuplicateUsernameException, IOException, UnaccountedUserRoleException {
         if (userIds.containsKey(userId))
             throw new InvalidUserIDException();
+        if (userIds.containsKey(username))
+            throw new DuplicateUsernameException();
 
         User user = getUser(userId);
         if (user.getRole() != UserRole.TRIAL)
@@ -419,8 +420,6 @@ public class UserManager {
         gateway.updateUser(users.get(ownerID));
 
     }
-
-
 
     public void banUser(String adminID, String subjectID, int duration) throws InvalidUserIDException, IOException{
 
