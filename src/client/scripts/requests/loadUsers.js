@@ -20,7 +20,7 @@ function loadUsers() {
 
 function listenForClicks(userType) {
 	document.querySelectorAll("#users .button")?.forEach(el => {
-		const userId = el.parentElement.getAttribute("data-id");
+		const userId = el.parentElement.parentElement.getAttribute("data-id");
 		el.addEventListener("click", () => {
 			switch (userType) {
 				case "ADMIN":

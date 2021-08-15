@@ -31,10 +31,10 @@ function loadFriends() {
 }
 
 function listenForRemoveFriends() {
-	document.querySelectorAll("#friends .button")?.forEach(el => {
+	document.querySelectorAll("#friends .remove-button")?.forEach(el => {
 		el.addEventListener("click", () => {
 		    if (confirm("Are you sure you want to remove this friend?")) {
-			    removeFriend(el.parentElement.getAttribute("data-id"));
+			    removeFriend(el.parentElement.parentElement.getAttribute("data-id"));
 			}
 		});
 	});
@@ -60,7 +60,7 @@ function removeFriend(receiverID) {
 function listenForAcceptances() {
 	document.querySelectorAll("#friends .accept-button")?.forEach(el => {
 		el.addEventListener("click", () => {
-			acceptFriendRequest(el.parentElement.getAttribute("data-id"));
+			acceptFriendRequest(el.parentElement.parentElement.getAttribute("data-id"));
 		});
 	});
 }
@@ -85,7 +85,7 @@ function acceptFriendRequest(receiverID) {
 function listenForDeclines() {
 	document.querySelectorAll("#friends .decline-button")?.forEach(el => {
 		el.addEventListener("click", () => {
-			declineFriendRequest(el.parentElement.getAttribute("data-id"));
+			declineFriendRequest(el.parentElement.parentElement.getAttribute("data-id"));
 		});
 	});
 }

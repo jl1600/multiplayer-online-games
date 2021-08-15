@@ -19,6 +19,7 @@ public abstract class RequestHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        System.out.println(exchange.getRequestURI());
         switch (exchange.getRequestMethod()) {
             case "GET":
                 handleGetRequest(exchange);

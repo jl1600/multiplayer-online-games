@@ -8,42 +8,44 @@ function createRow(id, userData, buttonText = null) {
 		const button = createTextButton(buttonText);
 		row.appendChild(button);
 	} else {
-		createPendingButtons(row);
+		const buttons = createPendingButtons();
+	    row.appendChild(buttons);
 	}
 
 	document.getElementById(id).appendChild(row);
 }
 
 function createTextButton(text) {
-	const button = createButton("button");
-	button.innerHTML = text;
+	const button = createButton("remove-button", text);
 
-	return button;
+	return buttonWrapper(button);
 }
 
-function createPendingButtons(row) {
+function createPendingButtons() {
 	const accept = createButton("accept-button", "Accept");
 	const decline = createButton("decline-button", "Decline");
-	row.appendChild(accept);
-	row.appendChild(decline);
+
+    const wrapper = buttonWrapper(accept);
+	wrapper.appendChild(decline);
+
+	return wrapper;
 }
 
-function createButton(className, img = null) {
+function createButton(className, buttonText) {
 	const button = document.createElement("button");
 	button.classList.add(className);
+	button.classList.add("button");
 	button.type = "button";
-
-	if (img) {
-		const imgEl = createImg(img);
-		button.appendChild(imgEl);
-	}
+	button.innerHTML = buttonText;
 
 	return button;
 }
 
-function createImg(src) {
-	const img = document.createElement("img");
-	img.src = `../static/${ src }.png`;
+function buttonWrapper(buttons) {
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("button-wrapper");
 
-	return img;
+    wrapper.appendChild(buttons);
+
+    return wrapper;
 }
