@@ -9,7 +9,7 @@ import system.entities.game.quiz.QuizGame;
 import system.entities.template.Template;
 import system.entities.game.Game;
 import system.gateways.GameDataGateway;
-import system.use_cases.builders.interactive_builders.GameInteractiveBuilder;
+import system.use_cases.builders.GameInteractiveBuilder;
 import system.use_cases.factories.GameBuilderFactory;
 
 import java.io.IOException;

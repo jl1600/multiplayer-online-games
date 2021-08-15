@@ -1,13 +1,10 @@
 package system.use_cases.managers;
 
-
 import shared.constants.GameGenre;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.template.Template;
 import system.gateways.TemplateDataGateway;
-import system.use_cases.builders.interactive_builders.TemplateInteractiveBuilder;
 import system.use_cases.editors.TemplateEditor;
-import system.use_cases.factories.TemplateBuilderFactory;
 import system.use_cases.factories.TemplateEditorFactory;
 
 import java.io.IOException;
@@ -19,13 +16,11 @@ import java.util.Set;
 public class TemplateManager {
 
     private final HashMap<String, Template> templates;
-    private final HashMap<String, TemplateInteractiveBuilder> templateBuilders; // mapping of username to builder object
     private final TemplateDataGateway gateway;
     private final IdManager idManager;
 
     public TemplateManager(TemplateDataGateway gateway) throws IOException {
         templates = new HashMap<>();
-        templateBuilders = new HashMap<>();
         this.gateway = gateway;
 
         for (Template template: this.gateway.getAllTemplates()) {
@@ -36,6 +31,20 @@ public class TemplateManager {
 
     public String getTemplateTitle(String templateID) {
         return templates.get(templateID).getTitle();
+    }
+
+    /**
+     * Create a default template, save it, and returns the template ID.
+     * */
+    public void createTemplate(Map<String, String> attrMap, GameGenre type) {
+
+    }
+
+    /**
+     * Returns the default version of a template attribute map.
+     * */
+    public Map<String, String> getDefaultAttrMap(GameGenre type) {
+
     }
 
     public void editTemplate(Map<String, String> attrMap, String templateID) throws
@@ -67,51 +76,6 @@ public class TemplateManager {
         return editor.getAttributeMap();
     }
 
-    public void initiateTemplateBuilder(String creatorName, GameGenre type) throws CreationInProgressException {
-
-        if (templateBuilders.containsKey(creatorName)) {
-            throw new CreationInProgressException();
-        }
-
-        TemplateBuilderFactory factory = new TemplateBuilderFactory();
-        TemplateInteractiveBuilder builder = factory.getTemplateBuilder(type);
-
-        templateBuilders.put(creatorName, builder);
-    }
-
-    public String getDesignQuestion(String creatorName) throws NoCreationInProgressException {
-
-        if (!templateBuilders.containsKey(creatorName)) {
-            throw new NoCreationInProgressException();
-        }
-        return templateBuilders.get(creatorName).getDesignQuestion();
-    }
-
-    public void makeDesignChoice(String creatorName, String designChoice)
-            throws NoCreationInProgressException, InvalidInputException {
-
-        if (!templateBuilders.containsKey(creatorName)) {
-            throw new NoCreationInProgressException();
-        }
-
-        templateBuilders.get(creatorName).makeDesignChoice(designChoice);
-    }
-
-    public void buildTemplate(String creatorName)
-            throws NoCreationInProgressException, InsufficientInputException, IOException {
-
-        if (!templateBuilders.containsKey(creatorName)) {
-            throw new NoCreationInProgressException();
-        }
-
-        if (!templateBuilders.get(creatorName).isReadyToBuild()) {
-            throw new InsufficientInputException();
-        }
-
-        addTemplate(templateBuilders.get(creatorName).build(idManager.getNextId()));
-        templateBuilders.remove(creatorName);
-    }
-
     private void addTemplate(Template template) throws IOException {
         templates.put(template.getID(), template);
         gateway.addTemplate(template);
@@ -134,13 +98,5 @@ public class TemplateManager {
         }
         templates.remove(templateID);
         gateway.deleteTemplate(templateID);
-    }
-
-    public void destroyBuilder(String userID) throws NoCreationInProgressException {
-        if (templateBuilders.containsKey(userID)) {
-            templateBuilders.remove(userID);
-        } else {
-            throw new NoCreationInProgressException();
-        }
     }
 }

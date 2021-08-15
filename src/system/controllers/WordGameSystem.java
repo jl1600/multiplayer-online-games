@@ -13,10 +13,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class WordGameSystem {
 
-    private final GameRequestHandler gameRH;
-    private final TemplateRequestHandler templateRH;
-    private final UserRequestHandler userRH;
-
     private final HttpServer server;
 
     public WordGameSystem() throws IOException, InvalidUserIDException{
@@ -32,9 +28,9 @@ public class WordGameSystem {
         UserManager um = new UserManager(userGateway);
 
         MatchManager mm = new MatchManager();
-        gameRH = new GameRequestHandler(gm, tm, um, mm);
-        templateRH = new TemplateRequestHandler(tm, um);
-        userRH = new UserRequestHandler(um);
+        GameRequestHandler gameRH = new GameRequestHandler(gm, tm, um, mm);
+        TemplateRequestHandler templateRH = new TemplateRequestHandler(tm, um);
+        UserRequestHandler userRH = new UserRequestHandler(um);
 
         server = HttpServer.create(new InetSocketAddress("localhost", 8000), 20);
 

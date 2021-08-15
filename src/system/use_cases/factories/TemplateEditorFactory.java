@@ -9,8 +9,7 @@ public class TemplateEditorFactory {
     public TemplateEditor getTemplateEditor(Template template) {
         if (template instanceof QuizTemplate) {
             return new QuizTemplateEditor((QuizTemplate) template);
-        }
-        else {
+        } else {
             return null;
         }
     }

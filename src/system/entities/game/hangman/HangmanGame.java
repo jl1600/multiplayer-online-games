@@ -11,8 +11,10 @@ import java.util.List;
  * Hangman Game
  */
 public class HangmanGame extends Game {
-    //private String title;
     private List<List<String>> puzzles;
+    private int numPuzzles;
+    private int numLives;
+    private int numHints;
 
     /**
      * Hangman Game Constructor
@@ -29,9 +31,9 @@ public class HangmanGame extends Game {
      * @param prompt the prompt of the puzzle
      * @throws InsufficientInputException when parameters are illegal and passed a null value
      */
-    public void addPuzzle(String answer, String prompt) throws InsufficientInputException {
+    public void addPuzzle(String answer, String prompt) throws InvalidInputException {
         if (answer == null | prompt == null) {
-            throw new InsufficientInputException();
+            throw new InvalidInputException();
         }
         List<String> combined = new ArrayList<>();
         combined.add(answer);
@@ -67,6 +69,56 @@ public class HangmanGame extends Game {
             puzzles.get(puzzleIndex).set(1, prompt);
         }
 
+    }
+
+    public void setNumPuzzles(int numPuzzles) throws InvalidInputException {
+        if (numPuzzles < 1) {
+            throw new InvalidInputException();
+        }
+        this.numPuzzles = numPuzzles;
+    }
+
+    /**
+     * @return number of puzzles
+     */
+    public int getNumPuzzles() {
+        return this.numPuzzles;
+    }
+
+    /**
+     * @param numLives number of lives
+     * @throws InsufficientInputException when numLives is illegal and less than 1
+     */
+    public void setNumLives(int numLives) throws InvalidInputException {
+        if (numLives < 1) {
+            throw new InvalidInputException();
+        }
+        this.numLives = numLives;
+    }
+
+    /**
+     * @return number of lives
+     */
+    public int getNumLives() {
+        return this.numLives;
+    }
+
+    /**
+     * @param numHints number of hints
+     * @throws InsufficientInputException when numHints is illegal and less than 0
+     */
+    public void setNumHints(int numHints) throws InvalidInputException {
+        if (numHints < 0) {
+            throw new InvalidInputException();
+        }
+        this.numHints = numHints;
+    }
+
+    /**
+     * @return number of hints
+     */
+    public int getNumHints() {
+        return this.numHints;
     }
 
     /**

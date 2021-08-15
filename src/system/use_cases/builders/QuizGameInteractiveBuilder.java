@@ -1,4 +1,4 @@
-package system.use_cases.builders.interactive_builders;
+package system.use_cases.builders;
 
 import shared.constants.GameAccessLevel;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
