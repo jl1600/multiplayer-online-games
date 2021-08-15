@@ -394,6 +394,8 @@ public class UserRequestHandler extends RequestHandler {
     private void handleBanUser(HttpExchange exchange) throws IOException {
         BanUserRequestBody body = gson.fromJson(getRequestBody(exchange), BanUserRequestBody.class);
         try {
+            if (!hasPermission(exchange, userManager.getUserRole(body.userID), UserRole.ADMIN))
+                return;
             userManager.banUser(body.adminID, body.userID, body.banLength);
             sendResponse(exchange, 204, null);
         } catch (InvalidUserIDException e) {

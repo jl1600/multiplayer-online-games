@@ -86,7 +86,7 @@ function recoverGame(el) {
 
 	xhr.send(JSON.stringify({
 		gameID: el.parentElement.parentElement.parentElement.getAttribute("data-id"),
-		userID: sessionStorage.getItem("userId"),
+		userID: sessionStorage.getItem("userId")
 	}));
 }
 

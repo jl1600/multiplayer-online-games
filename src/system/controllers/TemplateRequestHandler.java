@@ -9,6 +9,7 @@ import shared.DTOs.Responses.DesignQuestionResponseBody;
 import shared.DTOs.Responses.GeneralTemplateDataResponseBody;
 import shared.DTOs.Responses.TemplateAllAttrsResponseBody;
 import shared.constants.GameGenre;
+import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.template.QuizTemplate;
 import system.use_cases.managers.TemplateManager;
@@ -23,7 +24,7 @@ import java.util.Set;
 public class TemplateRequestHandler extends RequestHandler {
 
     private final TemplateManager templateManager;
-
+    private final UserManager userManager;
     /**
      * Constructor for TemplateRequestHandler()
      * @param templateManager template manager that contains all templates and able to make change to them
@@ -31,6 +32,7 @@ public class TemplateRequestHandler extends RequestHandler {
      */
     public TemplateRequestHandler(TemplateManager templateManager, UserManager userManager) {
         this.templateManager = templateManager;
+        this.userManager = userManager;
     }
 
     @Override
@@ -95,6 +97,8 @@ public class TemplateRequestHandler extends RequestHandler {
                 gson.fromJson(getRequestBody(exchange), CreateTemplateBuilderRequestBody.class);
         DesignQuestionResponseBody question = new DesignQuestionResponseBody();
         try {
+            if (!hasPermission(exchange, userManager.getUserRole(body.userID), UserRole.ADMIN))
+                return;
             templateManager.initiateTemplateBuilder(body.userID, body.genre);
             question.designQuestion = templateManager.getDesignQuestion(body.userID);
             sendResponse(exchange, 201, gson.toJson(question));
@@ -107,6 +111,8 @@ public class TemplateRequestHandler extends RequestHandler {
             }
         } catch (NoCreationInProgressException e) {
             throw new RuntimeException("No creation in progress. This should never happen.");
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 404, "Invalid ID.");
         }
     }
 
