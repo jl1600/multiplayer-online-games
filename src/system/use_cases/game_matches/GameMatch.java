@@ -100,8 +100,8 @@ public abstract class GameMatch extends Observable {
      *
      * @param playerID The unique string identifier of the player.
      * */
-
     public abstract void removePlayer(String playerID) throws InvalidUserIDException;
+
     /**
      * Play a game move. Do nothing if the match status is finished.
      *

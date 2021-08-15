@@ -40,7 +40,6 @@ public class QuizGameMatch extends GameMatch {
             numAttempted = 0;
         }
 
-
         public void increaseScores(Map<String, Double> valuesToAdd) {
             for (String category: valuesToAdd.keySet()) {
                 increaseScore(category, valuesToAdd.get(category));
@@ -54,7 +53,6 @@ public class QuizGameMatch extends GameMatch {
         public void increaseScoreByAnswer(int answerIndex) {
             this.increaseScores(game.getQuestion(currQuestionIndex).getAnswerScoreRewards(answerIndex));
         }
-
 
         public String getCategoryWithHighestScore() {
             Double max = -1.0;
