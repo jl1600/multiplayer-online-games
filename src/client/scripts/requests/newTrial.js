@@ -1,11 +1,11 @@
 const xhr = new XMLHttpRequest();
 newTrial();
 
-//window.addEventListener("beforeunload", () => {
-//    navigator.sendBeacon("http://localhost:8000/user/logout", JSON.stringify({
-//        userID: sessionStorage.getItem("userId")
-//    }));
-//});
+window.addEventListener("unload", () => {
+    navigator.sendBeacon("http://localhost:8000/user/logout", JSON.stringify({
+        userID: sessionStorage.getItem("userId")
+    }));
+});
 
 function newTrial() {
 	if (!!sessionStorage.getItem("userType")) return;

@@ -70,7 +70,7 @@ function addFriend(receiverID) {
 	xhr1.open("POST", "http://localhost:8000/user/send-friend-request");
 
 	xhr1.onreadystatechange = () => {
-		if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 200) {
+		if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 204) {
 			alert("Friend request sent!");
 		} else if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 400) {
 			alert("userID is invalid");
