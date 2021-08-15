@@ -5,8 +5,10 @@
   "role": "ADMIN",
   "onlineStatus": "OFFLINE",
   "gameCreations": [],
-  "friendList": ["2"],
-  "pendingFriendList": [],
   "registerDate": "Jul 31, 2021 10:31:58 AM",
+  "friendList": [
+    "2"
+  ],
+  "pendingFriendList": [],
   "lastBanDate": "Jul 31, 2021 10:31:58 AM"
 }
