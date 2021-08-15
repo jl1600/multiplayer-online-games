@@ -56,7 +56,9 @@ function suspendUser(userID) {
 			alert("User suspended");
 		} else if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 400) {
 			alert("Invalid userID or adminID");
-		}
+		} else if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 403) {
+         	alert("Error: You don't have the permission to perform this command.");
+        }
 	}
 
 	xhr1.send(JSON.stringify({
