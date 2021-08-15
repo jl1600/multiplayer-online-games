@@ -3,6 +3,7 @@ package system.controllers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import shared.constants.UserRole;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,5 +61,14 @@ public abstract class RequestHandler implements HttpHandler {
         br.close();
         isr.close();
         return buf.toString();
+    }
+
+    protected static boolean hasPermission(HttpExchange exchange, UserRole userRole, UserRole targetRole) throws IOException {
+        if (userRole != targetRole) {
+            sendResponse(exchange, 403, "This user doesn't have the permission to perform this command.");
+            return false;
+        } else {
+            return true;
+        }
     }
 }
