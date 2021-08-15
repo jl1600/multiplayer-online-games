@@ -18,7 +18,9 @@ function login(username, password) {
 			document.getElementById("header").contentWindow.updateHeader();
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
 		    alert("Wrong username or password");
-		}
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
+            alert(xhr.responseText);
+        }
 	};
 
 	xhr.send(JSON.stringify({ username, password }));

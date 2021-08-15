@@ -62,7 +62,7 @@ function suspendUser(userID) {
 	xhr1.send(JSON.stringify({
 		adminID: sessionStorage.getItem("userId"),
 		userID,
-		length
+		banLength: length
 	}));
 }
 

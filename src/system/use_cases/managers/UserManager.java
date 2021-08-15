@@ -208,7 +208,10 @@ public class UserManager {
     public void logout(String userId) throws InvalidUserIDException, IOException {
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
-        getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
+        if (getUser(userId).getOnlineStatus() != OnlineStatus.BANNED){
+            getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
+        }
+
         if (getUserRole(userId).equals(UserRole.TRIAL)){
             String username = users.get(userId).getUsername();
             users.remove(userId);
@@ -430,6 +433,7 @@ public class UserManager {
         Calendar date = Calendar.getInstance();
         date.add(Calendar.DAY_OF_YEAR, duration);
         getUser(subjectID).setLastBanDate(date.getTime());
+        getUser(subjectID).setOnlineStatus(OnlineStatus.BANNED);
 
         gateway.updateUser(users.get(subjectID));
     }
