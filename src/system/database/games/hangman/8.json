@@ -1,0 +1,22 @@
+{
+  "puzzles": [
+    [
+      "Shawshank Redemption",
+      "Get busy livin or get busy dyin"
+    ],
+    [
+      "Finding Nemo",
+      "This father will do anything he can to reunite with his son"
+    ],
+    [
+      "The Godfather",
+      "End of an organized crime dynasty"
+    ]
+  ],
+  "gameId": "8",
+  "ownerId": "7",
+  "templateId": "6",
+  "gameAccessLevel": "PUBLIC",
+  "previousGameAccessLevel": "PRIVATE",
+  "title": "Movie Hangman Quiz"
+}
