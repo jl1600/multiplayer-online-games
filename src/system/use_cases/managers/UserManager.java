@@ -138,23 +138,27 @@ public class UserManager {
      * @throws IncorrectPasswordException if the specified password does not match the user's password
      */
     public String login(String username, String password)
-            throws InvalidUsernameException, IncorrectPasswordException, InvalidUserIDException, ExpiredUserException, IOException {
+            throws InvalidUsernameException, BannedUserException, IncorrectPasswordException,
+             ExpiredUserException, IOException {
 
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
 
         String userId = getUserId(username);
-        if (isPasswordIncorrect(userId, password)) throw new IncorrectPasswordException();
-        if (isBanned(userId)) throw new BannedUserException();
-        if (getUserRole(userId) == UserRole.TEMP){
-            if (isExpiredUser(userId)){
-                throw new ExpiredUserException();
+        try {
+            if (isPasswordIncorrect(userId, password)) throw new IncorrectPasswordException();
+            if (isBanned(userId)) throw new BannedUserException();
+            if (getUserRole(userId) == UserRole.TEMP){
+                if (isExpiredUser(userId)){
+                    throw new ExpiredUserException();
+                }
             }
+            getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
+            gateway.updateUser(getUser(userId));
+        } catch (InvalidUserIDException e) {
+            throw new RuntimeException("System failure: The ID associated with this username is invalid.");
         }
 
-
-        getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
-        gateway.updateUser(getUser(userId));
         return userId;
     }
 

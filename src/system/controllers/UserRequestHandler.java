@@ -263,6 +263,8 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 400, "User doesn't exist, is expired, or the password is incorrect.");
         } catch (InvalidUserIDException e) {
             throw new RuntimeException("Invalid user ID. This should never happen.");
+        } catch (BannedUserException e) {
+            sendResponse(exchange, 403, "This account has been suspended.");
         }
     }
 
