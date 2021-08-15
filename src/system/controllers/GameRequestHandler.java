@@ -423,7 +423,6 @@ public class GameRequestHandler extends RequestHandler {
     private String getAvailableGameDataByUserID(String userID) throws InvalidUserIDException {
         Set<GameDataResponseBody> dataSet = new HashSet<>();
         Set<String> userFriendList = userManager.getFriendList(userID);
-        Set<String> availableGames = gameManager.getAvailableGames(userID, userFriendList);
 
         //duplicates will be take cared by built in
         Set<String> availableGameIDs = new HashSet<>();
