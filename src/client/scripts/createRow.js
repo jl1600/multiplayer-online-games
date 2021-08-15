@@ -8,7 +8,7 @@ function createRow(id, userData, buttonText = null) {
 		const button = createTextButton(buttonText);
 		row.appendChild(button);
 	} else {
-		createPendingButtons();
+		createPendingButtons(row);
 	}
 
 	document.getElementById(id).appendChild(row);
@@ -21,17 +21,11 @@ function createTextButton(text) {
 	return button;
 }
 
-function createPendingButtons() {
-	const wrapper = document.createElement("div");
-	wrapper.classList.add("button-wrapper");
-
-	const accept = createButton("accept-button", "accept");
-	const decline = createButton("decline-button", "decline");
-
-	wrapper.appendChild(accept);
-	wrapper.appendChild(decline);
-
-	return wrapper;
+function createPendingButtons(row) {
+	const accept = createButton("accept-button", "Accept");
+	const decline = createButton("decline-button", "Decline");
+	row.appendChild(accept);
+	row.appendChild(decline);
 }
 
 function createButton(className, img = null) {

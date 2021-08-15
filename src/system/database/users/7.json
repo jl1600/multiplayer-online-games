@@ -3,10 +3,14 @@
   "username": "zachary",
   "password": "password",
   "role": "MEMBER",
-  "onlineStatus": "OFFLINE",
+  "onlineStatus": "ONLINE",
   "gameCreations": [],
-  "friendList": ["2"],
-  "pendingFriendList": [],
   "registerDate": "Aug 14, 2021 12:02:16 AM",
+  "friendList": [
+    "2"
+  ],
+  "pendingFriendList": [
+    "8"
+  ],
   "lastBanDate": "Aug 14, 2021 12:02:16 AM"
 }
