@@ -199,7 +199,7 @@ public class GameManager {
     /**
      * Returns a mapping of all Game Ids to game titles.
      * */
-    public Set<String> getAllGamesID() {
+    public Set<String> getAllGameIDs() {
         return new HashSet<>(games.keySet());
     }
 

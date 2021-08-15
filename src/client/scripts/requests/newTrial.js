@@ -1,9 +1,9 @@
 const xhr = new XMLHttpRequest();
+let isCmdHeld;
 newTrial();
 
 window.addEventListener("mouseover", () => window.onunload = null);
 window.addEventListener("mouseout", () => window.onunload = logoutOnLeave);
-let isCmdHeld;
 document.addEventListener("keydown", event => {
     if (event.key === "Meta" || event.key === "Control") {
         window.onunload = logoutOnLeave;

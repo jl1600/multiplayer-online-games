@@ -97,7 +97,7 @@ public class User {
      * @return all ids of the games created by the user
      */
     public Set<String> getGameCreationSet() {
-        return new HashSet<String>(gameCreations);
+        return new HashSet<>(gameCreations);
     }
 
     /**
