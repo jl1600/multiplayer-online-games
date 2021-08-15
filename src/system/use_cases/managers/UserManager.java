@@ -177,6 +177,16 @@ public class UserManager {
         return false;
     }
 
+    /**
+     *
+     * @throws InvalidUserIDException when the user is not banned or there is no such user.
+     */
+    public Date getBanLiftingDate(String userID) throws InvalidUserIDException {
+        if (!users.containsKey(userID) || users.get(userID).getOnlineStatus() != OnlineStatus.BANNED)
+            throw new InvalidUserIDException();
+        return users.get(userID).getLastBanDate();
+    }
+
     private boolean isExpiredUser(String userId) throws InvalidUserIDException {
         Date currentTime = Calendar.getInstance().getTime();
         //getTime return a long that is total millisec since Jan 1st 1970

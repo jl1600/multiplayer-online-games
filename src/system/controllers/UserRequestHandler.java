@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.*;
 import shared.DTOs.Responses.GeneralUserInfoResponseBody;
 import shared.DTOs.Responses.LoginResponseBody;
-import shared.exceptions.entities_exception.IDAlreadySetException;
 import shared.exceptions.use_case_exceptions.*;
 import system.use_cases.managers.UserManager;
 
@@ -92,6 +91,9 @@ public class UserRequestHandler extends RequestHandler {
                 break;
             case "edit-password":
                 handleEditPassword(exchange);
+                break;
+            case "suspend":
+                handleBanUser(exchange);
                 break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
@@ -264,7 +266,12 @@ public class UserRequestHandler extends RequestHandler {
         } catch (InvalidUserIDException e) {
             throw new RuntimeException("Invalid user ID. This should never happen.");
         } catch (BannedUserException e) {
-            sendResponse(exchange, 403, "This account has been suspended.");
+            try {
+                sendResponse(exchange, 403, "This account has been suspended. Last suspension date: " +
+                        userManager.getBanLiftingDate(userManager.getUserId(body.username)));
+            } catch (InvalidUserIDException | InvalidUsernameException exc) {
+                throw new RuntimeException("Fatal: Banned user has invalid user ID or username.");
+            }
         }
     }
 
