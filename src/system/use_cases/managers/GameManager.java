@@ -328,4 +328,29 @@ public class GameManager {
         return games.get(gameID).getPreviousGameAccessLevel();
     }
 
+    public Set<String> getOwnedNotDeletedGameID(String userID){
+        Set<String> ownedNotDeletedGameIDs = new HashSet<>();
+        for (String id: games.keySet()) {
+            //if owner id match and game is not deleted
+            if ( games.get(id).getOwnerId() == userID &&
+                    !(games.get(id).getGameAccessLevel() == GameAccessLevel.DELETED)) {
+                ownedNotDeletedGameIDs.add(id);
+            }
+        }
+        return ownedNotDeletedGameIDs;
+    }
+
+    public Set<String> getOwnedFriendOnlyGameID(String userID){
+        Set<String> friendOnlyGameIDs = new HashSet<>();
+
+        for (String id: games.keySet()) {
+            //if owner id match and game is FRIEND only
+            if ( games.get(id).getOwnerId() == userID &&
+                    (games.get(id).getGameAccessLevel() == GameAccessLevel.FRIEND)) {
+                friendOnlyGameIDs.add(id);
+            }
+        }
+
+        return friendOnlyGameIDs;
+    }
 }

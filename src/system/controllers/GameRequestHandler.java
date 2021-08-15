@@ -63,10 +63,14 @@ public class GameRequestHandler extends RequestHandler {
                 break;
             case "prev-access-level":
                 handleGetPrevAccessLevel(exchange);
+            case "available-games":
+                handleGetAvailableGamesByUserID(exchange);
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
+
+
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().toString().split("/")[2];
         switch (specification) {
@@ -313,6 +317,30 @@ public class GameRequestHandler extends RequestHandler {
         sendResponse(exchange, 200, getAllPublicGamesData());
     }
 
+    private void handleGetAvailableGamesByUserID(HttpExchange exchange) throws IOException {
+        String userID;
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            userID = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
+        }
+
+        try{
+            sendResponse(exchange, 200, getAvailableGameDataByUserID(userID));
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid User ID.");
+            return;
+        }
+
+    }
+
+
     private void handleGetAllOwnedGames(HttpExchange exchange) throws IOException {
         String userID;
         try {
@@ -378,11 +406,6 @@ public class GameRequestHandler extends RequestHandler {
 
 
     private String getOwnedGamesData(String userID) throws InvalidUserIDException {
-//        System.out.println("executing GameRequestHandler.getOwnedGameData(String userID)");
-//        System.out.println("userID:"+userID);
-//        System.out.println("address of user manager"+userManager.toString());
-//        System.out.println("the current keyset of user"+userManager.getUsers().keySet());
-
 
         Set<String> ownedIds = userManager.getOwnedGamesID(userID);
             Set<GameDataResponseBody> dataSet = new HashSet<>();
@@ -403,6 +426,42 @@ public class GameRequestHandler extends RequestHandler {
 
             return gson.toJson(dataSet);
     }
+
+    private String getAvailableGameDataByUserID(String userID) throws InvalidUserIDException {
+        Set<GameDataResponseBody> dataSet = new HashSet<>();
+        Set<String> userFriendList = userManager.getFriendList(userID);
+        Set<String> availableGames = gameManager.getAvailableGames(userID, userFriendList);
+
+        //duplicates will be take cared by built in
+        Set<String> availableGameIDs = new HashSet<>();
+
+        //Step 1: get all public games
+        availableGameIDs.addAll(gameManager.getAllPublicGamesID());
+        //Step 2: get all owned creations that are not DELETED
+        availableGameIDs.addAll(gameManager.getOwnedNotDeletedGameID(userID));
+        //Step 3: for every friend, get all of their friend only games
+        for (String friendID : userFriendList){
+            availableGameIDs.addAll(gameManager.getOwnedFriendOnlyGameID(friendID));
+        }
+
+        for (String id: availableGameIDs) {
+            GameDataResponseBody game = new GameDataResponseBody();
+            game.id = id;
+            try {
+                game.title = gameManager.getGameTitle(id);
+                game.ownerName = userManager.getUsername(gameManager.getOwnerID(id));
+                game.accessLevel = gameManager.getAccessLevel(id);
+                game.previousAccessLevel = gameManager.getPreviousAccessLevel(id);
+                game.genre = gameManager.getGenre(id);
+            } catch (InvalidGameIDException | InvalidUserIDException e) {
+                throw new RuntimeException("Game ID or user ID got from public game list is invalid.");
+            }
+
+            dataSet.add(game);
+        }
+        return gson.toJson(dataSet);
+    }
+
 
     private String getAllPublicGamesData() {
         Set<GameDataResponseBody> dataSet = new HashSet<>();
