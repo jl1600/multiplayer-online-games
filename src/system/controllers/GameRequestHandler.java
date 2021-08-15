@@ -182,13 +182,6 @@ public class GameRequestHandler extends RequestHandler {
             try {
                 String gameID = (userManager.getUserRole(body.userID) == UserRole.TRIAL)?
                         gameManager.buildTemporaryGame(body.userID):gameManager.buildGame(body.userID);
-
-//                System.out.println("executing GameRequestHandler.handleMakeDesignChoice.gameManager.buildGame(body.userID);");
-//                System.out.println("userID:"+body.userID);
-//                System.out.println("address of user manager"+userManager.toString());
-//                System.out.println("the current keyset of user"+userManager.getUsers().keySet());
-
-
                 userManager.addOwnedGameID(body.userID, gameID);
                 sendResponse(exchange, 201, "Success!");
             } catch (InsufficientInputException e) {
