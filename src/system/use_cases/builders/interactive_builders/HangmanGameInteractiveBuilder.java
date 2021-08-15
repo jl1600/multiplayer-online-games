@@ -1,5 +1,6 @@
 package system.use_cases.builders.interactive_builders;
 
+import shared.constants.GameAccessLevel;
 import shared.exceptions.use_case_exceptions.CreationInProgressException;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
 import system.entities.game.Game;
@@ -91,9 +92,9 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
 
     private void handlePublicDesignQuestion(String designChoice) {
         if (designChoice.equals("yes")) {
-            builder.setIsPublic(true);
+            builder.setGameAccessLevel(GameAccessLevel.PUBLIC);
         } else if (designChoice.equals("no")) {
-            builder.setIsPublic(false);
+            builder.setGameAccessLevel(GameAccessLevel.PRIVATE);
         } else {
             currentDesignQuestionText = "Invalid input. " + DESIGN_QUESTION_TEXT[1];
         }
