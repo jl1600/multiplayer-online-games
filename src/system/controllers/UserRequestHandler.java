@@ -392,7 +392,7 @@ public class UserRequestHandler extends RequestHandler {
             userManager.banUser(body.adminID, body.userID, body.banLength);
             sendResponse(exchange, 204, null);
         } catch (InvalidUserIDException e) {
-            sendResponse(exchange, 404, "Invalid user ID.");
+            sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
 }
