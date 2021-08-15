@@ -24,7 +24,7 @@ function listenForEdits() {
 	document.querySelectorAll("#users .edit-button")?.forEach(el => {
 		const user = el.parentElement.parentElement;
 		el.addEventListener("click", () => {
-		    window.location = `http://localhost:8080/pages/my-games?userId=${ user.getAttribute("data-id") }&username=${ user.childNodes[0].nodeValue }`;
+		    window.location = `http://localhost:8080/pages/my-games.html?userId=${ user.getAttribute("data-id") }&username=${ user.childNodes[0].nodeValue }`;
 		});
 	});
 }
