@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	if (!!matchId) joinMatch(matchId);
 	else document.getElementById("start-button").hidden = false;
 	createSocket();
-}, false);g
+}, false);
 document.getElementById("match-input").addEventListener("keyup", event => {
     if (event.keyCode === 13) sendInput();
 });
