@@ -58,6 +58,9 @@ public class HangmanMatch extends GameMatch {
 
     @Override
     public String getTextContent() {
+        if (getStatus() == MatchStatus.PREPARING) {
+            return "Waiting for the host to start the match...";
+        }
         return this.output;
     }
 
@@ -147,6 +150,12 @@ public class HangmanMatch extends GameMatch {
      */
     @Override
     public void playMove(String PlayerID, String move) {
+        if (getStatus() == MatchStatus.PREPARING) {
+            setChanged();
+            notifyObservers();
+            return;
+        }
+
         if (activePlayerId.equals(PlayerID)) {
             char moveChar = Character.toLowerCase(move.charAt(0));
             switch (parseMove(move)) {
