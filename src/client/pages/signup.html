@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel="icon" href="../static/favicon.ico" type="image/x-icon" />
+		<link href="../stylesheets/general.css" rel="stylesheet" />
+		<link href="../stylesheets/form.css" rel="stylesheet" />
+		<script src="../scripts/requests/newTrial.js"></script>
+		<title>Sign up for Multiplayer Games</title>
+	</head>
+
+	<body>
+		<iframe id="header" src="../components/header.html" width="100%"></iframe>
+
+		<form onsubmit="signup(this.username.value, this.password.value, this.confirmPassword.value, this.userType.value); return false">
+			<h1>Sign up</h1>
+
+			<input type="text" name="username" placeholder="Username" required>
+			<input id="password" type="password" name="password" placeholder="Password" required>
+			<input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm password" required onfocusout="checkPassword()">
+			<div id="errorMessage"></div>
+			<div id="user-type">User type:
+				<label>
+					<input type="radio" name="userType" value="TEMP" />Temporary
+				</label>
+				<label>
+					<input type="radio" name="userType" value="MEMBER" checked />Normal
+				</label>
+				<label>
+					<input type="radio" name="userType" value="ADMIN" />Admin
+				</label>
+			</div>
+			<button type="submit">Sign up</button>
+		</form>
+
+		<script src="../scripts/requests/signup.js"></script>
+	</body>
+</html>

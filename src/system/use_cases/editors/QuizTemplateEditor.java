@@ -51,7 +51,7 @@ public class QuizTemplateEditor extends TemplateEditor {
     private void editHasCustomEndingMessage(@NotNull String value) throws InvalidInputException {
         if (!value.equals("true") && !value.equals("false"))
             throw new InvalidInputException();
-        template.setMultipleChoice(Boolean.parseBoolean(value));
+        template.setHasCustomEndingMessage(Boolean.parseBoolean(value));
     }
 
     private void editHasMultipleScoreCategories(@NotNull String value) throws InvalidInputException {

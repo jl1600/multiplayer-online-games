@@ -1,10 +1,5 @@
 package system.entities.template;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import shared.response.Response;
-import system.entities.template.Template;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Quiz Template Class

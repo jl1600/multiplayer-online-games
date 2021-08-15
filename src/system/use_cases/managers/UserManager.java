@@ -18,20 +18,31 @@ public class UserManager {
     private final HashMap<String, String> userIds; // username to userId
     private final UserDataGateway gateway;
 
-    public UserManager(UserDataGateway gateway) throws IOException {
+    public UserManager(UserDataGateway gateway) throws IOException, InvalidUserIDException {
         users = new HashMap<>();
         userIds = new HashMap<>();
         this.gateway = gateway;
 
+        Date currentTime = Calendar.getInstance().getTime();
+
          for (User user: this.gateway.getAllUsers()) {
             String userId = user.getUserId();
+            //unban the user who have gone over their last ban date
+            if (user.getOnlineStatus().equals(OnlineStatus.BANNED)){
+                if (user.getLastBanDate().before(currentTime)){//current time has gone over last ban date
+                    user.setOnlineStatus(OnlineStatus.OFFLINE);
+                    this.gateway.updateUser(user);
+                }
+            }
+
             users.put(userId, user);
             userIds.put(user.getUsername(), userId);
          }
+
         idManager = new IdManager(gateway.getUserCount() + 1);
     }
 
-    private String getUserId(String username) throws InvalidUsernameException {
+    public String getUserId(String username) throws InvalidUsernameException {
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
 
@@ -80,10 +91,10 @@ public class UserManager {
      * @throws IOException if the database is not found
      */
     public void createUser(String username, String password, UserRole role)
-            throws DuplicateUsernameException, IOException, UnaccountedUserRoleException {
+            throws DuplicateUsernameException, UnaccountedUserRoleException {
         if (role.equals(UserRole.TRIAL))
             throw new UnaccountedUserRoleException();
-        if (users.containsKey(username))
+        if (userIds.containsKey(username))
             throw new DuplicateUsernameException();
 
         String userId = idManager.getNextId();
@@ -92,7 +103,12 @@ public class UserManager {
         User user = new User(userId, username, password, role, currentTime);
         userIds.put(username, userId);
         users.put(userId, user);
-        gateway.addUser(user);
+        System.out.println("Trying to add the user to gateway");
+        try {
+            gateway.addUser(user);
+        } catch (IOException e) {
+            throw new RuntimeException("Fatal Error: Database malfunction.");
+        }
     }
 
     /**
@@ -110,7 +126,6 @@ public class UserManager {
 
         userIds.put(username, userId);
         users.put(userId, user);
-
         return userId;
     }
 
@@ -123,21 +138,53 @@ public class UserManager {
      * @throws IncorrectPasswordException if the specified password does not match the user's password
      */
     public String login(String username, String password)
-            throws InvalidUsernameException, IncorrectPasswordException, InvalidUserIDException, ExpiredUserException {
+            throws InvalidUsernameException, BannedUserException, IncorrectPasswordException,
+             ExpiredUserException, IOException {
+
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
 
         String userId = getUserId(username);
-        if (isPasswordIncorrect(userId, password)) throw new IncorrectPasswordException();
-        if (getUserRole(userId) == UserRole.TEMP){
-            if (isExpiredUser(userId)){
-                throw new ExpiredUserException();
+        try {
+            if (isPasswordIncorrect(userId, password)) throw new IncorrectPasswordException();
+            if (isBanned(userId)) throw new BannedUserException();
+            if (getUserRole(userId) == UserRole.TEMP){
+                if (isExpiredUser(userId)){
+                    throw new ExpiredUserException();
+                }
             }
+            getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
+            gateway.updateUser(getUser(userId));
+        } catch (InvalidUserIDException e) {
+            throw new RuntimeException("System failure: The ID associated with this username is invalid.");
         }
 
-
-        getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
         return userId;
+    }
+
+    private boolean isBanned(String userId) throws InvalidUserIDException {
+        Date currentTime = Calendar.getInstance().getTime();
+
+        if (getUser(userId).getOnlineStatus().equals(OnlineStatus.BANNED)){//if banned go in bracket
+            if (getUser(userId).getLastBanDate().after(currentTime)) { //if the last ban date hasn't arrived yet
+                return true;
+            } else {
+                //online status will be set in login()
+                return false;
+            }
+
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @throws InvalidUserIDException when the user is not banned or there is no such user.
+     */
+    public Date getBanLiftingDate(String userID) throws InvalidUserIDException {
+        if (!users.containsKey(userID) || users.get(userID).getOnlineStatus() != OnlineStatus.BANNED)
+            throw new InvalidUserIDException();
+        return users.get(userID).getLastBanDate();
     }
 
     private boolean isExpiredUser(String userId) throws InvalidUserIDException {
@@ -158,10 +205,24 @@ public class UserManager {
      * @param userId id of the user to log out
      * @throws InvalidUserIDException if no user has the specified userId
      */
-    public void logout(String userId) throws InvalidUserIDException {
+    public void logout(String userId) throws InvalidUserIDException, IOException {
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
         getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
+        if (getUserRole(userId).equals(UserRole.TRIAL)){
+            String username = users.get(userId).getUsername();
+            users.remove(userId);
+            userIds.remove(username);
+        } else {
+            gateway.updateUser(getUser(userId));
+        }
+
+    }
+
+    public String getUsername(String userId) throws InvalidUserIDException {
+        if (!users.containsKey(userId))
+            throw new InvalidUserIDException();
+        return users.get(userId).getUsername();
     }
 
     /**
@@ -195,11 +256,11 @@ public class UserManager {
      * @throws IOException if the database is not found
      */
     public void editUsername(String userId, String newUsername) throws
-            IDAlreadySetException, IOException, InvalidUserIDException {
+             IOException, InvalidUserIDException, DuplicateUsernameException {
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
-        if (users.containsKey(newUsername))
-            throw new IDAlreadySetException();
+        if (userIds.containsKey(newUsername) && !newUsername.equals(getUser(userId).getUsername()))
+            throw new DuplicateUsernameException();
 
         User user = getUser(userId);
         userIds.remove(user.getUsername());
@@ -240,32 +301,17 @@ public class UserManager {
     /**
      * Delete the user with the specified id from this class and the database
      * @param userId id of the user to delete
-     * @param password password of the user to delete to confirm the action
      * @throws InvalidUserIDException if no user has the specified userId
-     * @throws IncorrectPasswordException if the specified password does not match the user's password
-     * @throws IOException if the database is not found
      */
-    public void deleteUser(String userId, String password)
-            throws IncorrectPasswordException, IOException, InvalidUserIDException {
-
-        //not trial check password, trial just delete
-        if (users.get(userId).getRole().equals(UserRole.TRIAL)){
+    public void deleteUser(String userId) throws InvalidUserIDException {
             String username = users.get(userId).getUsername();
             users.remove(userId);
             userIds.remove(username);
-
-        } else {
-            if (isPasswordIncorrect(userId, password)) {
-                throw new IncorrectPasswordException();
-            }
-
-            String username = users.get(userId).getUsername();
-            users.remove(userId);
-            userIds.remove(username);
+        try {
             gateway.deleteUser(userId);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot connect to the database");
         }
-
-
     }
 
     /**
@@ -308,10 +354,83 @@ public class UserManager {
         return users.get(userID).getGameCreationSet();
     }
 
-    /**
-     * @return all users entity within this class
-     */
-    public ArrayList<User> getAllUsers() {
-        return (ArrayList<User>) users.values();
+
+    public Set<String> getFriendList(String userID) throws InvalidUserIDException {
+        if (!users.containsKey(userID))
+            throw new InvalidUserIDException();
+
+        return users.get(userID).getFriendList();
+    }
+
+
+    public Set<String> getPendingFriendList(String userID) throws InvalidUserIDException {
+        if (!users.containsKey(userID))
+            throw new InvalidUserIDException();
+
+        return users.get(userID).getPendingFriendList();
+    }
+
+    public void addPendingFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
+        if (!users.containsKey(subjectID))
+            throw new InvalidUserIDException();
+
+        if (!users.containsKey(ownerID))
+            throw new InvalidUserIDException();
+
+        if (!users.get(ownerID).getPendingFriendList().contains(subjectID)){//to avoid duplicate sends
+            users.get(ownerID).addPendingFriend(subjectID);
+            gateway.updateUser(users.get(ownerID));
+        }
+
+    }
+
+    public Set<String> getAllUserIDs() {
+        return new HashSet<>(users.keySet());
+    }
+
+    public void removePendingFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
+        if (!users.containsKey(subjectID))
+            throw new InvalidUserIDException();
+        if (!users.containsKey(ownerID))
+            throw new InvalidUserIDException();
+        users.get(ownerID).removePendingFriend(subjectID);
+        gateway.updateUser(users.get(ownerID));
+    }
+
+    public void addFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
+        if (!users.containsKey(subjectID))
+            throw new InvalidUserIDException();
+        if (!users.containsKey(ownerID))
+            throw new InvalidUserIDException();
+        users.get(ownerID).addFriend(subjectID);
+        gateway.updateUser(users.get(ownerID));
+
+    }
+
+    public void removeFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
+        if (!users.containsKey(subjectID))
+            throw new InvalidUserIDException();
+        if (!users.containsKey(ownerID))
+            throw new InvalidUserIDException();
+        users.get(ownerID).removeFriend(subjectID);
+        gateway.updateUser(users.get(ownerID));
+
+    }
+
+
+
+    public void banUser(String adminID, String subjectID, int duration) throws InvalidUserIDException, IOException{
+
+        if (!users.containsKey(subjectID) || !users.containsKey(adminID))
+            throw new InvalidUserIDException();
+
+        if (users.get(adminID).getRole() != UserRole.ADMIN)
+            throw new InsufficientPrivilegeException();
+
+        Calendar date = Calendar.getInstance();
+        date.add(Calendar.DAY_OF_YEAR, duration);
+        getUser(subjectID).setLastBanDate(date.getTime());
+
+        gateway.updateUser(users.get(subjectID));
     }
 }

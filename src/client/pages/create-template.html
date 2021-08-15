@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel="icon" href="../static/favicon.ico" type="image/x-icon" />
+		<link href="../stylesheets/general.css" rel="stylesheet" />
+		<link href="../stylesheets/form.css" rel="stylesheet" />
+		<link href="../stylesheets/questions.css" rel="stylesheet" />
+		<title>Multiplayer Games</title>
+	</head>
+
+	<body>
+		<iframe id="header" src="../components/header.html" width="100%"></iframe>
+
+		<main>
+			<h1>Create a template</h1>
+
+			<div id="form">
+				<div id="template-genre">Select a genre:
+					<label>
+						<input type="radio" name="templateGenre" value="QUIZ" checked />Quiz
+					</label>
+					<label>
+						<input type="radio" name="templateGenre" value="HANGMAN" />Hangman
+					</label>
+				</div>
+
+				<div class="buttons">
+					<button type="reset" onclick="resetQuestions()">Reset</button>
+					<button type="button" onclick="createTemplateBuilder()">Next</button>
+				</div>
+			</div>
+		</main>
+
+		<script src="../scripts/promptQuestion.js"></script>
+		<script src="../scripts/requests/createTemplate.js"></script>
+	</body>
+</html>

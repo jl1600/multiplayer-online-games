@@ -1,0 +1,71 @@
+form, #form {
+	background-color: whitesmoke;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+	max-width: 450px;
+	margin: auto;
+	margin-top: 15px;
+	border-radius: 12px;
+	padding: 25px;
+}
+form input[type="text"], form input[type="password"], #form input[type="text"] {
+	background-color: whitesmoke;
+	outline-width: 0px;
+	outline: none;
+	border: none;
+	border-bottom: 3px solid #999;
+	border-radius: 3px;
+	font-size: 30px;
+	padding: 5px;
+	margin-bottom: 30px;
+	transition-duration: 0.1s;
+}
+form #user-type, #form #template-genre {
+	font-size: 20px;
+	width: 100%;
+	display: flex;
+	justify-content: space-evenly;
+	margin-bottom: 20px;
+}
+form input[type="radio"], #form input[type="radio"] {
+	width: auto;
+}
+form input:focus, #form input:focus {
+	border-color: #7289da;
+	transition-duration: 0.4s;
+}
+form button, #form button {
+	background-color: #ffcccc;
+	font-size: 28px;
+	border: none;
+	cursor: pointer;
+	padding: 5px 15px;
+	border-radius: 4px;
+	box-shadow: 1px 1px 2px gray;
+	transition-duration: 0.2s;
+}
+button:hover {
+    filter: brightness(0.9);
+    transform: translate(1px, 1px);
+}
+
+#errorMessage {
+	margin-top: -15px;
+	margin-bottom: 10px;
+	color: red;
+}
+
+form label, #form label {
+	font-size: 20px;
+}
+form label input, #form label input {
+	font-size: 26px;
+	width: 200px;
+	margin-left: 10px;
+}
+#delete-button {
+    background-color: #ff6454;
+    color: whitesmoke;
+}

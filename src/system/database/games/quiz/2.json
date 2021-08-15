@@ -1,0 +1,41 @@
+{
+  "maxAttempts": 2,
+  "questions": [
+    {
+      "question": "2+2",
+      "answerChoices": [
+        {
+          "text": "4",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "question": "4-1",
+      "answerChoices": [
+        {
+          "text": "3",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    }
+  ],
+  "scoreCategories": {
+    "General": {
+      "name": "General",
+      "weight": 1.0,
+      "minAcceptable": 0.0,
+      "endingMessage": "Quiz Game Finished."
+    }
+  },
+  "gameId": "2",
+  "ownerId": "2",
+  "templateId": "1",
+  "gameAccessLevel": "PUBLIC",
+  "previousGameAccessLevel": "FRIEND",
+  "title": "My First Game"
+}

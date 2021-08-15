@@ -1,21 +1,19 @@
 package system.controllers;
 
+import com.sun.net.httpserver.HttpExchange;
+import shared.DTOs.Requests.*;
+import shared.DTOs.Responses.GeneralUserInfoResponseBody;
+import shared.DTOs.Responses.LoginResponseBody;
 import shared.constants.UserRole;
-import shared.exceptions.entities_exception.IDAlreadySetException;
-import shared.exceptions.entities_exception.UnaccountedUserRoleException;
 import shared.exceptions.use_case_exceptions.*;
-import shared.request.Request;
-import shared.request.user_request.*;
-import shared.response.*;
-import shared.response.misc.ErrorMessageResponse;
-import shared.response.misc.SimpleTextResponse;
-import shared.response.user.LoginResponse;
-import shared.response.user.UserRoleResponse;
 import system.use_cases.managers.UserManager;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.HashSet;
+import java.util.Set;
 
-public class UserRequestHandler implements RequestHandler {
+public class UserRequestHandler extends RequestHandler {
 
     /**
      * a user manager that can manipulate all user entities
@@ -30,243 +28,376 @@ public class UserRequestHandler implements RequestHandler {
         this.userManager = um;
     }
 
-    /**
-     * @param request the request to handle
-     * @return a response message regarding the success of the request
-     */
     @Override
-    public Response handleRequest(Request request) {
-        if (request instanceof DeleteUserRequest) {
-            return handleDeleteUserRequest((DeleteUserRequest) request);
-        } else if (request instanceof EditPasswordRequest) {
-            return handleEditPasswordRequest((EditPasswordRequest) request);
-        } else if (request instanceof EditUsernameRequest) {
-            return handleEditUsernameRequest((EditUsernameRequest) request);
-        } else if (request instanceof LoginRequest) {
-            return handleLoginRequest((LoginRequest) request);
-        } else if (request instanceof LogoutRequest) {
-            return handleLogoutRequest((LogoutRequest) request);
-        } else if (request instanceof NewNormalUserRequest) {
-            return handleNewNormalUserRequest((NewNormalUserRequest) request);
-        } else if (request instanceof NewAdminUserRequest) {
-            return handleNewAdminUserRequest((NewAdminUserRequest) request);
-        } else if (request instanceof NewTrialUserRequest) {
-            return handleNewTrialUserRequest((NewTrialUserRequest) request);
-        } else if (request instanceof  NewTempUserRequest){
-            return handleNewTempUserRequest((NewTempUserRequest) request);
-        } else if (request instanceof PromoteTrialUserRequest) {
-            return handlePromoteTrialUserRequest((PromoteTrialUserRequest) request);
-        } else if (request instanceof GetUserRoleRequest) {
-            return handleGetUserRoleRequest((GetUserRoleRequest) request);
-        } else {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: unidentified request");
+    protected void handleGetRequest(HttpExchange exchange) throws IOException {
+        String specification = exchange.getRequestURI().getPath().split("/")[2];
+        switch (specification) {
+            case "username":
+                handleGetUsername(exchange);
+                break;
+            case "userid":
+                handleGetUserID(exchange);
+                break;
+            case "friends":
+                handleGetFriends(exchange);
+                break;
+            case "pending-friends":
+                handleGetPendingFriends(exchange);
+                break;
+            case "all-members":
+                handleGetAllMembers(exchange);
+                break;
+
+            default:
+                sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
 
-    private Response handleNewTempUserRequest(NewTempUserRequest request) {
-        String sessionID = request.getSessionID();
-        String username = request.getUsername();
-        String password = request.getPassword();
+    @Override
+    protected void handlePostRequest(HttpExchange exchange) throws IOException {
+        String specification = exchange.getRequestURI().getPath().split("/")[2];
+        switch (specification) {
+            case "login":
+                handleLogin(exchange);
+                break;
+            case "logout":
+                handleLogout(exchange);
+                break;
+            case "trial":
+                handleTrial(exchange);
+                break;
+            case "register":
+                handleRegister(exchange);
+                break;
+            case "delete":
+                handleDeleteUser(exchange);
+                break;
+            case "send-friend-request":
+                handleSendFriendRequest(exchange);
+                break;
+            case "cancel-friend-request":
+                handleCancelFriendRequest(exchange);
+                break;
+            case "decline-pending-friend":
+                handleDeclinePendingFriend(exchange);
+                break;
+            case "accept-pending-friend":
+                handleAcceptPendingFriend(exchange);
+                break;
+            case "remove-friend":
+                handleRemoveFriend(exchange);
+                break;
+            case "edit-username":
+                handleEditUsername(exchange);
+                break;
+            case "edit-password":
+                handleEditPassword(exchange);
+                break;
+            case "suspend":
+                handleBanUser(exchange);
+                break;
+            default:
+                sendResponse(exchange, 404, "Unidentified Request.");
+        }
+    }
 
+    private void handleEditPassword(HttpExchange exchange) throws IOException {
+        EditPasswordRequestBody body = gson.fromJson(getRequestBody(exchange), EditPasswordRequestBody.class);
         try {
-            userManager.createUser(username, password, UserRole.TEMP);
-            return new SimpleTextResponse(request.getSessionID(), "Successfully created the account!");
-        } catch (DuplicateUsernameException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Username already taken");
-        } catch (IOException e){
-            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
-        } catch (UnaccountedUserRoleException e) {
-            throw new RuntimeException("This will never happen because we are passing in UserRole.TEMP as the role parameter");
+            userManager.editPassword(body.userID,body.oldPassword,body.newPassword);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }catch (IncorrectPasswordException e) {
+            sendResponse(exchange, 403, "Incorrect password.");
         }
     }
 
-    /**
-     * ask the userManager to get user role based on request info and pass response back to super
-     * @param request a request that should contain appropriate information required to obtain user role
-     * @return a response that contains the gotten user role or error explaining the user was not found
-     */
-    private Response handleGetUserRoleRequest(GetUserRoleRequest request) {
-        String sessionID = request.getSessionID();
+    private void handleEditUsername(HttpExchange exchange) throws IOException {
+        EditUsernameRequestBody body = gson.fromJson(getRequestBody(exchange), EditUsernameRequestBody.class);
+        try {
+            userManager.editUsername(body.userID,body.newUsername);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        } catch (DuplicateUsernameException e){
+            sendResponse(exchange, 403, "Duplicate username.");
+        }
+    }
+
+    private void handleRemoveFriend(HttpExchange exchange) throws IOException {
+        FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
+        try {
+            userManager.removeFriend(body.senderID, body.receiverID);
+            userManager.removeFriend(body.receiverID, body.senderID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
+    private void handleCancelFriendRequest(HttpExchange exchange) throws IOException {
+        FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
+        try {
+            userManager.removePendingFriend(body.receiverID, body.senderID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
+    private void handleAcceptPendingFriend(HttpExchange exchange) throws IOException {
+        FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
+        try {
+            userManager.removePendingFriend(body.senderID, body.receiverID);
+            userManager.addFriend(body.senderID, body.receiverID);
+            userManager.addFriend(body.receiverID, body.senderID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
+    private void handleDeclinePendingFriend(HttpExchange exchange) throws IOException {
+        FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
+        try {
+            userManager.removePendingFriend(body.senderID, body.receiverID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
+    private void handleGetAllMembers(HttpExchange exchange) throws IOException {
+        if (exchange.getRequestURI().getQuery() == null) {
+            sendResponse(exchange, 200, gson.toJson(getAllMembers()));
+        }
+        else {
+            String userID = getQueryArgFromGET(exchange);
+            if (userID == null)
+                return;
+            try {
+                sendResponse(exchange, 200, gson.toJson(getAllMembersExcludeFriendsOf(userID)));
+            } catch (InvalidUserIDException e) {
+                sendResponse(exchange, 400, "Invalid user ID.");
+            }
+        }
+    }
+
+    private Set<GeneralUserInfoResponseBody> getAllMembers() {
+        Set<String> IDs = userManager.getAllUserIDs();
+        Set<GeneralUserInfoResponseBody> allMem = new HashSet<>();
+        for (String uid: IDs) {
+            GeneralUserInfoResponseBody user = new GeneralUserInfoResponseBody();
+            user.userID = uid;
+            try {
+                if (userManager.getUserRole(uid)!= UserRole.MEMBER)
+                    continue;
+                user.username = userManager.getUsername(uid);
+            } catch (InvalidUserIDException e) {
+                throw new RuntimeException("The user id got from the set of all user ids is invalid.");
+            }
+            allMem.add(user);
+        }
+        return allMem;
+    }
+
+    private Set<GeneralUserInfoResponseBody> getAllMembersExcludeFriendsOf(String targetUser) throws InvalidUserIDException {
+        Set<String> AllIDs = userManager.getAllUserIDs();
+        Set<String> friendIDs = userManager.getFriendList(targetUser);
+        Set<GeneralUserInfoResponseBody> allMem = new HashSet<>();
+        for (String uid: AllIDs) {
+            if (friendIDs.contains(uid))
+                continue;
+            GeneralUserInfoResponseBody user = new GeneralUserInfoResponseBody();
+            user.userID = uid;
+            try {
+                if (userManager.getUserRole(uid)!= UserRole.MEMBER || uid.equals(targetUser))
+                    continue;
+                user.username = userManager.getUsername(uid);
+            } catch (InvalidUserIDException e) {
+                throw new RuntimeException("The user id got from the set of all user ids is invalid.");
+            }
+            allMem.add(user);
+        }
+        return allMem;
+    }
+
+    private void handleSendFriendRequest(HttpExchange exchange) throws IOException {
+        FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
+        try {
+            userManager.addPendingFriend(body.receiverID, body.senderID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
+    private void handleDeleteUser(HttpExchange exchange) throws IOException {
+        DeleteUserRequestBody body = gson.fromJson(getRequestBody(exchange), DeleteUserRequestBody.class);
+        try {
+            userManager.deleteUser(body.userID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
+    private void handleRegister(HttpExchange exchange) throws IOException {
+        RegisterRequestBody body = gson.fromJson(getRequestBody(exchange), RegisterRequestBody.class);
+        try {
+            userManager.createUser(body.username, body.password, body.role);
+            sendResponse(exchange, 204, null);
+        } catch (DuplicateUsernameException e) {
+            sendResponse(exchange, 403, "Duplicate username.");
+        }
+    }
+
+    private void handleTrial(HttpExchange exchange) throws IOException {
+        String trialID = userManager.createTrialUser();
+        sendResponse(exchange, 200, "{\"userID\":\"" + trialID+"\"}");
+    }
+
+    private void handleLogin(HttpExchange exchange) throws IOException {
+        LoginRequestBody body = gson.fromJson(getRequestBody(exchange), LoginRequestBody.class);
+        try {
+            String userID = userManager.login(body.username, body.password);
+            LoginResponseBody resBody = new LoginResponseBody();
+            resBody.userID = userID;
+            resBody.role = userManager.getUserRole(userID);
+            sendResponse(exchange, 200, gson.toJson(resBody));
+        } catch (InvalidUsernameException | IncorrectPasswordException | ExpiredUserException e) {
+            sendResponse(exchange, 400, "User doesn't exist, is expired, or the password is incorrect.");
+        } catch (InvalidUserIDException e) {
+            throw new RuntimeException("Invalid user ID. This should never happen.");
+        } catch (BannedUserException e) {
+            try {
+                sendResponse(exchange, 403, "This account has been suspended. Last suspension date: " +
+                        userManager.getBanLiftingDate(userManager.getUserId(body.username)));
+            } catch (InvalidUserIDException | InvalidUsernameException exc) {
+                throw new RuntimeException("Fatal: Banned user has invalid user ID or username.");
+            }
+        }
+    }
+
+    private void handleLogout(HttpExchange exchange) throws IOException {
+        LogoutRequestBody body = gson.fromJson(getRequestBody(exchange), LogoutRequestBody.class);
+        try {
+            userManager.logout(body.userID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 404, "Invalid user ID.");
+        }
+    }
+
+    private void handleGetFriends(HttpExchange exchange) throws IOException {
+        String ownerID = getQueryArgFromGET(exchange);
+        if (ownerID == null)
+            return;
+        //handle load friend list as response body
+        Set<GeneralUserInfoResponseBody> dataSet = new HashSet<>();
+
         try{
-            return new UserRoleResponse(sessionID,
-                    userManager.getUserRole(request.getUserId())
-            );
-        } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: User does not exist");
-        }
+            Set<String> allFriends = userManager.getFriendList(ownerID);
+            for (String id : allFriends){
+                GeneralUserInfoResponseBody frb = new GeneralUserInfoResponseBody();
+                frb.userID = id;
+                frb.username = userManager.getUsername(id);
+                dataSet.add(frb);
+            }
 
+        } catch (InvalidUserIDException e) {
+            throw new RuntimeException("A friend ID in the friend list is invalid. This should never happen.");
+        }
+        //send response
+        sendResponse(exchange, 200, gson.toJson(dataSet));
     }
 
-    /**
-     * ask the userManager to delete based on request info and pass response back to super
-     * @param request a request that should contain appropriate information required to delete user
-     * @return a response that contains success text or error with explanation
-     */
-    private Response handleDeleteUserRequest(DeleteUserRequest request) {
-        String sessionID = request.getSessionID();
+    private void handleGetPendingFriends(HttpExchange exchange) throws IOException {
+        //handle get ownerID
+        String ownerID = getQueryArgFromGET(exchange);
+        if (ownerID == null)
+            return;
+        //handle load friend list as response body
+        Set<GeneralUserInfoResponseBody> dataSet = new HashSet<>();
 
-        try {
-            userManager.deleteUser(request.getUserId(), request.getPassword());
-            return new SimpleTextResponse(sessionID, "Deleted user");
-        } catch (IncorrectPasswordException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Incorrect password");
+        try{
+            Set<String> allFriends = userManager.getPendingFriendList(ownerID);
+            for (String id : allFriends){
+                GeneralUserInfoResponseBody frb = new GeneralUserInfoResponseBody();
+                frb.userID = id;
+                frb.username = userManager.getUsername(id);
+                dataSet.add(frb);
+            }
         } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: User does not exist");
-        } catch (IOException e){
-            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
+            throw new RuntimeException("A user in this pending list has an invalid ID. This means illegal datum.");
         }
+        //send response
+        sendResponse(exchange, 200, gson.toJson(dataSet));
     }
 
-    /**
-     * ask the userManager to "edit password" based on request info and pass response back to super
-     * @param request a request that should contain appropriate information required to edit password
-     * @return a response that contains success text or error with explanation
-     */
-    private Response handleEditPasswordRequest(EditPasswordRequest request) {
-        String sessionID = request.getSessionID();
-
+    private void handleGetUserID(HttpExchange exchange) throws IOException {
+        String username;
         try {
-            userManager.editPassword(request.getUserID(), request.getPassword(), request.getNewPassword());
-            return new SimpleTextResponse(sessionID, "Password changed successfully");
-        } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: User does not exist");
-        } catch (IncorrectPasswordException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Incorrect password");
-        } catch (IOException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            username = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
         }
-    }
-
-    /**
-     * ask the userManager to edit username based on request info and pass response back to super
-     * @param request a request that should contain appropriate information required to edit username
-     * @return a response that contains success text or error with explanation
-     */
-    private Response handleEditUsernameRequest(EditUsernameRequest request){
-        String sessionID = request.getSessionID();
-
         try {
-            userManager.editUsername(request.getUserId(), request.getNewUsername());
-            return new SimpleTextResponse(sessionID, "Username changed successfully");
-        } catch (IDAlreadySetException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Username already taken");
-        } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: User does not exist");
-        } catch (IOException e){
-            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
-        }
-    }
-
-    /**
-     * ask the userManager to perform login based on request info and pass response back to super
-     * @param request a request that should contain appropriate information required to perform login
-     * @return a response that contains success text and loggedIn user id used for further
-     * communication or return response of error with explanation
-     */
-    private Response handleLoginRequest(LoginRequest request) {
-        String sessionID = request.getSessionID();
-
-        try {
-            String userId = userManager.login(request.getUsername(), request.getPassword());
-            return new LoginResponse(sessionID, "Logged in", userId);
+            sendResponse(exchange, 200, "{\"userID\":\"" + userManager.getUserId(username)+"\"}");
         } catch (InvalidUsernameException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Username does not exist");
+            sendResponse(exchange, 400, "Invalid username.");
+        }
+
+    }
+
+    private void handleGetUsername(HttpExchange exchange) throws IOException {
+        String userID;
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            userID = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
+        }
+        try {
+            sendResponse(exchange, 200, "{\"username\":\"" + userManager.getUsername(userID)+"\"}");
         } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: User does not exist");
-        } catch (IncorrectPasswordException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Incorrect password");
-        } catch (ExpiredUserException e){
-            return  new ErrorMessageResponse(sessionID, "Error: This temporary user has expired");
+            e.printStackTrace();
         }
     }
 
-    /**
-     * ask the userManager to perform logout based on request info and pass response back to super
-     * @param request a request that should contain appropriate information required to logout
-     * @return a response that contains success text or error with explanation
-     */
-    private Response handleLogoutRequest(LogoutRequest request) {
-        String sessionID = request.getSessionID();
-
+    private String getQueryArgFromGET(HttpExchange exchange) throws IOException {
         try {
-            userManager.logout(request.getUserId());
-            return new SimpleTextResponse(sessionID, "Logged out");
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return null;
+            }
+            return query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return null;
+        }
+    }
+
+    private void handleBanUser(HttpExchange exchange) throws IOException {
+        BanUserRequestBody body = gson.fromJson(getRequestBody(exchange), BanUserRequestBody.class);
+        try {
+            userManager.banUser(body.adminID, body.userID, body.banLength);
+            sendResponse(exchange, 204, null);
         } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Username does not exist");
-        }
-    }
-
-    /**
-     * ask the userManager to perform create new normal user based on request info and pass response back to super
-     * @param request a request that should contain appropriate information required to create new normal user
-     * @return a response that contains success text and userId for further communication or error with explanation
-     */
-    private Response handleNewNormalUserRequest(NewNormalUserRequest request) {
-        String sessionID = request.getSessionID();
-        String username = request.getUsername();
-        String password = request.getPassword();
-
-        try {
-            userManager.createUser(username, password, UserRole.MEMBER);
-            return new SimpleTextResponse(request.getSessionID(), "Successfully created the account!");
-        } catch (DuplicateUsernameException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Username already taken");
-        } catch (IOException e){
-            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
-        } catch (UnaccountedUserRoleException e) {
-            throw new RuntimeException("This will never happen because we are passing in UserRole.MEMBER as the role parameter");
-        }
-    }
-
-    /**
-     * ask the userManager to create new admin user based on request info and pass response back to super
-     * @param request a request that should contain appropriate information required to create new admin user
-     * @return a response that contains success text and userId for further communication or error with explanation
-     */
-    private Response handleNewAdminUserRequest(NewAdminUserRequest request) {
-        String sessionID = request.getSessionID();
-        String username = request.getUsername();
-        String password = request.getPassword();
-
-        try {
-            userManager.createUser(username, password, UserRole.ADMIN);
-            return new SimpleTextResponse(request.getSessionID(), "Successfully created the account!");
-        } catch (DuplicateUsernameException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Username already taken");
-        } catch (IOException e){
-            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
-        } catch (UnaccountedUserRoleException e) {
-            throw new RuntimeException("This will never happen because we are passing in UserRole.ADMIN as the role parameter");
-        }
-    }
-
-
-    /**
-     * ask the userManager to create new trial user based on request info and pass response back to super
-     * @param request a request that should contain appropriate information required to create new admin user
-     * @return a response that contains success text and userId for further communication or error with explanation
-     */
-    private Response handleNewTrialUserRequest(NewTrialUserRequest request){
-        String sessionID = request.getSessionID();
-        String userId = userManager.createTrialUser();
-        return new LoginResponse(sessionID, "Successfully created user", userId);
-    }
-
-    private Response handlePromoteTrialUserRequest(PromoteTrialUserRequest request) {
-        String sessionID = request.getSessionID();
-
-        try {
-            userManager.promoteTrialUser(request.getUserId(), request.getUsername(), request.getPassword());
-            return new SimpleTextResponse(sessionID, "Successfully promoted user");
-        } catch (DuplicateUsernameException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Username already taken");
-        } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Invalid Id");
-
-        } catch (UnaccountedUserRoleException e) {
-            return new ErrorMessageResponse(sessionID, "Error: User is not a trial user");
-        } catch (IOException e){
-            return new ErrorMessageResponse(sessionID, "Error: Invalid Database");
+            sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
 }

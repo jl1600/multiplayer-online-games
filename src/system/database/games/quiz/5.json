@@ -1,0 +1,201 @@
+{
+  "maxAttempts": 1,
+  "questions": [
+    {
+      "question": "You are returning to your dorm after your afternoon class. It is then when you notice Harry accessing a prohibited site with a serious face. What would you do?",
+      "answerChoices": [
+        {
+          "text": "Follow him in silence.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 7.0,
+            "Slytherin": 1.0,
+            "Ravenclaw": 1.0,
+            "Gryffindor": 1.0
+          }
+        },
+        {
+          "text": "Go tell professor Snape",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 0.0,
+            "Slytherin": 10.0,
+            "Ravenclaw": 2.0,
+            "Gryffindor": 0.0
+          }
+        },
+        {
+          "text": "Shout out to Harry and join him.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 2.0,
+            "Slytherin": 0.0,
+            "Ravenclaw": 4.0,
+            "Gryffindor": 11.0
+          }
+        },
+        {
+          "text": "Ignore him and go take a good nap.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 5.0,
+            "Slytherin": 1.0,
+            "Ravenclaw": 10.0,
+            "Gryffindor": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "question": "You are on a school trip. It\u0027s dark and you and your buddies are going for a stroll. Then, your buddy suddenly got caught by an Evil tree and was dragged down a dark path. What would you do?",
+      "answerChoices": [
+        {
+          "text": "Immediately run after him to rescue him.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 10.0,
+            "Slytherin": 2.0,
+            "Ravenclaw": 1.0,
+            "Gryffindor": 4.0
+          }
+        },
+        {
+          "text": "Go tell professor Snape.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 2.0,
+            "Slytherin": 10.0,
+            "Ravenclaw": 2.0,
+            "Gryffindor": 1.0
+          }
+        },
+        {
+          "text": "Run to the camp and find a nearest professor. Tell him.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 4.0,
+            "Slytherin": 6.0,
+            "Ravenclaw": 10.0,
+            "Gryffindor": 2.0
+          }
+        },
+        {
+          "text": "Go after your friend, but cautiously",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 10.0,
+            "Slytherin": 1.0,
+            "Ravenclaw": 6.0,
+            "Gryffindor": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "question": "You notice Draco Malfoy and his buddies cornering a poor lad. Seems like they are about to beat him up. What would you do?",
+      "answerChoices": [
+        {
+          "text": "Immediately attack Malfoy\u0027s group in an attempt of rescuing the victim.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 5.0,
+            "Slytherin": 0.0,
+            "Ravenclaw": 0.0,
+            "Gryffindor": 10.0
+          }
+        },
+        {
+          "text": "Immediately go tell a professor.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 5.0,
+            "Slytherin": 3.0,
+            "Ravenclaw": 8.0,
+            "Gryffindor": 6.0
+          }
+        },
+        {
+          "text": "Immediately join Malfoy\u0027s group to beat him up.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 3.0,
+            "Slytherin": 8.0,
+            "Ravenclaw": 4.0,
+            "Gryffindor": 1.0
+          }
+        },
+        {
+          "text": "Shout out a warning to Malfoy\u0027s group to attract attention. Then call for the nearest teacher.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 5.0,
+            "Slytherin": 6.0,
+            "Ravenclaw": 10.0,
+            "Gryffindor": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "question": "You are being cornered by Draco Malfoy\u0027s group. They are about to beat you up. What would you do?",
+      "answerChoices": [
+        {
+          "text": "Tell them to take turn to fight",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 2.0,
+            "Slytherin": 1.0,
+            "Ravenclaw": 1.0,
+            "Gryffindor": 9.0
+          }
+        },
+        {
+          "text": "Kick in Malfoy\u0027s balls and run.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 7.0,
+            "Slytherin": 2.0,
+            "Ravenclaw": 1.0,
+            "Gryffindor": 8.0
+          }
+        },
+        {
+          "text": "Try to convince Malfoy that you guys can settle this with words.",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 10.0,
+            "Slytherin": 1.0,
+            "Ravenclaw": 7.0,
+            "Gryffindor": 4.0
+          }
+        },
+        {
+          "text": "Accept your fate",
+          "scoresRewardsByCategory": {
+            "Hufflepuff": 4.0,
+            "Slytherin": 10.0,
+            "Ravenclaw": 8.0,
+            "Gryffindor": 0.0
+          }
+        }
+      ]
+    }
+  ],
+  "scoreCategories": {
+    "Hufflepuff": {
+      "name": "Hufflepuff",
+      "weight": 1.0,
+      "minAcceptable": 0.0,
+      "endingMessage": "You are a Hufflepuff"
+    },
+    "Slytherin": {
+      "name": "Slytherin",
+      "weight": 1.0,
+      "minAcceptable": 0.0,
+      "endingMessage": "You are a Slytherin!"
+    },
+    "Ravenclaw": {
+      "name": "Ravenclaw",
+      "weight": 1.0,
+      "minAcceptable": 0.0,
+      "endingMessage": "You are a Ravenclaw!"
+    },
+    "Gryffindor": {
+      "name": "Gryffindor",
+      "weight": 1.0,
+      "minAcceptable": 0.0,
+      "endingMessage": "You are a Gryffindor!!"
+    }
+  },
+  "gameId": "5",
+  "ownerId": "2",
+  "templateId": "2",
+  "gameAccessLevel": "PUBLIC",
+  "previousGameAccessLevel": "PRIVATE",
+  "title": "What Harry Potter House Are you In?"
+}

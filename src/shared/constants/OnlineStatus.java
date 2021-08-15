@@ -19,5 +19,9 @@ public enum OnlineStatus {
     /**
      * Do Not Disturb status
      */
-    DO_NOT_DISTURB
+    DO_NOT_DISTURB,
+    /**
+     * Banned Status
+     */
+    BANNED
 }

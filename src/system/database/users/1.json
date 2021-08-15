@@ -1,0 +1,14 @@
+{
+  "userId": "1",
+  "username": "sm",
+  "password": "password",
+  "role": "ADMIN",
+  "onlineStatus": "OFFLINE",
+  "gameCreations": [],
+  "registerDate": "Jul 31, 2021 10:31:58 AM",
+  "friendList": [],
+  "pendingFriendList": [
+    "2"
+  ],
+  "lastBanDate": "Jul 31, 2021 10:31:58 AM"
+}

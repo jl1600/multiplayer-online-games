@@ -1,0 +1,136 @@
+{
+  "creatorName": "2",
+  "maxAttempts": 1,
+  "questions": [
+    {
+      "question": "Invented in 1603 by German astronomer Christoph Scheiner, which instrument was used for copying a drawing on an enlarged or a reduced scale in a given ratio?",
+      "answerChoices": [
+        {
+          "text": "camera lucida",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "protractor",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "pictograph",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "pantograph",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "question": "From the 16th century onward, the speed of a ship was measured by what English invention?",
+      "answerChoices": [
+        {
+          "text": "log",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "recorder",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "nautilus",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "knot",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "question": "Which astronomer, mathematician, and geographer developed a geocentric (earth-centered) model of the universe?",
+      "answerChoices": [
+        {
+          "text": "Aristotle",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "Ptolemy",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "Hipparchus",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "Aryabhata",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "question": "Which shadow clock consists of a straight base with a raised crosspiece at one end?",
+      "answerChoices": [
+        {
+          "text": "astrolabe",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "sundial",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "obelisk",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "timeball",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    }
+  ],
+  "scoreCategories": {
+    "General": {
+      "name": "General",
+      "weight": 1.0,
+      "minAcceptable": 0.0,
+      "endingMessage": "Quiz Game Finished."
+    }
+  },
+  "gameId": "6",
+  "ownerId": "2",
+  "templateId": "3",
+  "gameAccessLevel": "PUBLIC",
+  "previousGameAccessLevel": "PRIVATE",
+  "title": "Trivia 1"
+}

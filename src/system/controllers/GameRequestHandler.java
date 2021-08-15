@@ -1,28 +1,32 @@
 package system.controllers;
 
+import com.sun.net.httpserver.HttpExchange;
+import shared.DTOs.Requests.*;
+import shared.DTOs.Responses.DesignQuestionResponseBody;
+import shared.DTOs.Responses.MatchDataResponseBody;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
-import shared.request.Request;
-import shared.request.game_request.*;
-import shared.response.*;
-import shared.response.game.GameInfoMapResponse;
-import shared.response.game.NewGameMatchResponse;
-import shared.response.misc.ErrorMessageResponse;
-import shared.response.misc.SimpleTextResponse;
+import shared.DTOs.Responses.GameDataResponseBody;
 import system.use_cases.managers.GameManager;
 import system.use_cases.managers.MatchManager;
 import system.use_cases.managers.TemplateManager;
 import system.use_cases.managers.UserManager;
 
-import java.io.IOException;
+
+import java.io.*;
+
+import java.net.MalformedURLException;
+import java.net.ServerSocket;
+import java.util.HashSet;
 import java.util.Set;
 
-public class GameRequestHandler implements RequestHandler {
+public class GameRequestHandler extends RequestHandler {
 
     private final GameManager gameManager;
     private final TemplateManager templateManager;
     private final UserManager userManager;
     private final MatchManager matchManager;
+    private final ServerSocket serverSocket;
 
     public GameRequestHandler(GameManager gameManager,
                               TemplateManager templateManager,
@@ -32,178 +36,368 @@ public class GameRequestHandler implements RequestHandler {
         this.templateManager = templateManager;
         this.userManager = userManager;
         this.matchManager = matchManager;
-    }
-
-    @Override
-    public Response handleRequest(Request request) {
-
-        if (request instanceof NewGameRequest) {
-            return handleNewGameRequest((NewGameRequest) request);
-        } else if (request instanceof MakeGameDesignChoiceRequest) {
-            return handleMakeDesignChoiceRequest((MakeGameDesignChoiceRequest) request);
-        } else if (request instanceof PlayGameMoveRequest) {
-            return handlePlayMoveRequest((PlayGameMoveRequest) request);
-        } else if (request instanceof NewGameMatchRequest) {
-            return handleNewMatchRequest((NewGameMatchRequest) request);
-        } else if (request instanceof GetAllPublicGamesInfoRequest) {
-            return handleGetPublicGamesInfoRequest((GetAllPublicGamesInfoRequest) request);
-        } else  if (request instanceof DeleteGameRequest){
-            return handleDeleteGameRequest((DeleteGameRequest) request);
-        } else  if (request instanceof GetOwnedGameInfoRequest) {
-            return handleGetOwnedGameRequest((GetOwnedGameInfoRequest) request);
-        } else if (request instanceof SetGamePublicStatusRequest) {
-            return handleSetGamePublicStatus((SetGamePublicStatusRequest) request);
-        }
-
-        return new ErrorMessageResponse(request.getSessionID(), "Error: unidentified request");
-    }
-
-    private Response handleSetGamePublicStatus(SetGamePublicStatusRequest request) {
         try {
-            // checking if the request sender actually owns the game
-            Set<String> ownedGames = userManager.getOwnedGamesID(request.getSenderID());
-            if (!ownedGames.contains(request.getGameID()) &&
-                    userManager.getUserRole(request.getSenderID())!= UserRole.ADMIN) {
-                return new ErrorMessageResponse(request.getSessionID(), "You don't have the permission to do this.");
-            }
-            gameManager.setPublicStatus(request.getGameID(), request.isPublic());
-            return new SimpleTextResponse(request.getSessionID(),"Success.");
-        } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(),"Error: Invalid user ID");
-        } catch (InvalidGameIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: Invalid game ID");
-        }
-    }
-
-    private Response handleGetOwnedGameRequest(GetOwnedGameInfoRequest request) {
-        try {
-            if (request.getTargetUserID().equals(request.getSenderID())) {
-                return new GameInfoMapResponse(request.getSessionID(),
-                        gameManager.getAllGameTilesFromIdSet(userManager.getOwnedGamesID(request.getTargetUserID())));
-            } else {
-                return new GameInfoMapResponse(request.getSessionID(),
-                        gameManager.getPublicGameTilesFromIdSet(userManager.getOwnedGamesID(request.getTargetUserID())));
-            }
-        } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: Invalid user ID");
-        } catch (InvalidGameIDException e) {
-            throw new RuntimeException("Error: This User contains an invalid game ID");
-        }
-    }
-
-
-    private Response handleDeleteGameRequest(DeleteGameRequest request) {
-        try {
-            gameManager.removeGame(request.getGameID());
-            userManager.removeOwnedGameID(request.getSenderID(),request.getGameID());
-            return new SimpleTextResponse(request.getSessionID(), "Game successfully deleted");
-        } catch (InvalidGameIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: Game not found.");
-        } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: User not found.");
+            serverSocket = new ServerSocket(8888);
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException("Cannot create server socket, IO problem.");
+        }
+    }
+
+    protected void handleGetRequest(HttpExchange exchange) throws IOException {
+        String specification = exchange.getRequestURI().getPath().split("/")[2];
+        switch (specification) {
+            case "all-public-games":
+                handleGetAllPublicGames(exchange);
+                break;
+            case "all-owned-games":
+                handleGetAllOwnedGames(exchange);
+                break;
+            case "public-owned-games":
+                handleGetPublicOwnedGames(exchange);
+                break;
+            case "available-matches":
+                handleGetAllGameMatches(exchange);
+                break;
+            case "public-games-with-template":
+                handleGetPublicGamesByTemplate(exchange);
+                break;
+            default:
+                sendResponse(exchange, 404, "Unidentified Request.");
+        }
+    }
+
+    protected void handlePostRequest(HttpExchange exchange) throws IOException {
+        String specification = exchange.getRequestURI().toString().split("/")[2];
+        switch (specification) {
+            case "create-builder":
+                handleCreateBuilder(exchange);
+                break;
+            case "make-design-choice":
+                handleMakeDesignChoice(exchange);
+                break;
+            case "cancel-builder":
+                handleCancelBuilder(exchange);
+                break;
+            case "create-match":
+                handleCreateMatch(exchange);
+                break;
+            case "join-match":
+                handleJoinMatch(exchange);
+                break;
+            case "leave-match":
+                handleLeaveMatch(exchange);
+                break;
+            case "access-level":
+                handleAccessLevel(exchange);
+                break;
+            case "undo-access-level":
+                handleUndoAccessLevel(exchange);
+                break;
+            default:
+                sendResponse(exchange, 404, "Unidentified Request.");
+        }
+    }
+
+    private void handleUndoAccessLevel(HttpExchange exchange) throws IOException {
+        AccessLevelRequestBody body = gson.fromJson(getRequestBody(exchange), AccessLevelRequestBody.class);
+        try {
+            gameManager.undoSetGameAccessLevel(body.gameID);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidGameIDException e) {
+            sendResponse(exchange, 404, "The game ID is invalid.");
         }
 
     }
 
-    private Response handleGetPublicGamesInfoRequest(GetAllPublicGamesInfoRequest request) {
-        return new GameInfoMapResponse(request.getSessionID(), gameManager.getAllPublicIdAndTitles());
-    }
-
-    private Response handleNewGameRequest(NewGameRequest request) {
-
-        String sender = request.getSenderID();
-        String sessionID = request.getSessionID();
-
+    private void handleAccessLevel(HttpExchange exchange) throws IOException {
+        AccessLevelRequestBody body = gson.fromJson(getRequestBody(exchange), AccessLevelRequestBody.class);
         try {
-            if (userManager.getUserRole(request.getSenderID()) == UserRole.ADMIN) {
-                return new ErrorMessageResponse(request.getSessionID(),
-                        "Error: Admins cannot perform this action");
-            }
-            gameManager.initiateGameBuilder(sender, templateManager.getTemplate(request.getTemplateID()));
-        } catch (CreationInProgressException e) {
-            return new ErrorMessageResponse(sessionID, "Error: A creation is currently in progress");
-        } catch (InvalidIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Template doesn't exist.");
-        } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Sender has an invalid user ID.");
-        }
-
-        return getDesignQuestion(request);
-    }
-
-    private Response handleMakeDesignChoiceRequest(MakeGameDesignChoiceRequest request) {
-
-        String sender = request.getSenderID();
-        String sessionID = request.getSessionID();
-
-        try {
-            gameManager.makeDesignChoice(sender, request.getUserInput());
-            String gameId;
-            try {
-                gameId = gameManager.buildGame(sender);
-            }
-            catch (InsufficientInputException e) {
-                return getDesignQuestion(request);
-            }
-            userManager.addOwnedGameID(request.getSenderID(), gameId);
-            return new SimpleTextResponse(sessionID, "Game successfully built!");
-        } catch (NoCreationInProgressException e1) {
-            return new ErrorMessageResponse(sessionID, "Error: No game creating is in progress.");
-        } catch (InvalidInputException e2) {
-            return new ErrorMessageResponse(sessionID,"Error: Invalid input, please re-enter a different input");
-        } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(sessionID, "Error: Invalid user ID");
-        } catch (IOException e) {
-            throw new RuntimeException();
+            gameManager.setGameAccessLevel(body.gameID, body.accessLevel);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidGameIDException e) {
+            sendResponse(exchange, 404, "The game ID is invalid.");
         }
     }
 
-    private Response handlePlayMoveRequest(PlayGameMoveRequest request) {
+    private void handleLeaveMatch(HttpExchange exchange) throws IOException {
+        LeaveMatchRequestBody body = gson.fromJson(getRequestBody(exchange), LeaveMatchRequestBody.class);
         try {
-            matchManager.playGameMove(request.getSenderID(), request.getMatchID(), request.getMove());
-            Response res = new SimpleTextResponse(request.getSessionID(),
-                    matchManager.getMatchTextContent(request.getSenderID(), request.getMatchID()));
-            if (matchManager.checkFinished(request.getMatchID())) {
-                matchManager.deleteMatch(request.getMatchID());
-            }
-            return res;
+            matchManager.removePlayer(body.userID, body.matchID);
+            sendResponse(exchange, 204, null);
         } catch (InvalidMatchIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(),
-                    "Error: The game match doesn't exist");
+            sendResponse(exchange, 404, "Invalid ID.");
         } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(),
-                    "Error: The game match doesn't contain this player");
-        } catch (InvalidInputException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: Invalid input");
+            sendResponse(exchange, 400, "Match doesn't contain this user.");
         }
     }
 
-    private Response handleNewMatchRequest(NewGameMatchRequest request) {
+    private void handleJoinMatch(HttpExchange exchange) throws IOException {
+        JoinMatchRequestBody body = gson.fromJson(getRequestBody(exchange), JoinMatchRequestBody.class);
         try {
-            String matchID = matchManager.newMatch(request.getSenderID(),
-                    gameManager.getGame(request.getGameID()),
-                    templateManager.getTemplate(gameManager.getGame(request.getGameID()).getTemplateID()));
-            return new NewGameMatchResponse(request.getSessionID(), matchID,
-                    matchManager.getMatchTextContent(request.getSenderID(), matchID));
-        } catch (InvalidIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: Game ID doesn't exist");
+            matchManager.addPlayer(body.userID, userManager.getUsername(body.userID), body.matchID);
+            ClientSocketSeeker clientSeeker = new ClientSocketSeeker(matchManager, serverSocket, body.userID, body.matchID);
+            clientSeeker.start();
         } catch (InvalidMatchIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(),
-                    "Error: The game match doesn't exist");
+            sendResponse(exchange, 403, "Match already started or the given ID is invalid.");
+        } catch (DuplicateUserIDException e) {
+            sendResponse(exchange, 400, "The user is already in this match.");
+        } catch (MaxPlayerReachedException e) {
+            sendResponse(exchange, 403, "The max number of players is reached.");
         } catch (InvalidUserIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(),
-                    "Error: The game match doesn't contain this player");
+            sendResponse(exchange, 404, "The user ID is invalid.");
         }
     }
 
-    private Response getDesignQuestion(GameRequest request) {
-
+    private void handleCancelBuilder(HttpExchange exchange) throws IOException {
+        CancelBuilderRequestBody body = gson.fromJson(getRequestBody(exchange), CancelBuilderRequestBody.class);
         try {
-            return new SimpleTextResponse(request.getSessionID(), gameManager.getDesignQuestion(request.getSenderID()));
+            gameManager.destroyBuilder(body.userID);
+            sendResponse(exchange, 204, null);
         } catch (NoCreationInProgressException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: No game creation is in progress.");
+            sendResponse(exchange, 400, "User ID is invalid or no builder is in progress.");
         }
     }
+
+    private void handleMakeDesignChoice(HttpExchange exchange) throws IOException {
+        DesignChoiceRequestBody body = gson.fromJson(getRequestBody(exchange), DesignChoiceRequestBody.class);
+        try {
+            gameManager.makeDesignChoice(body.userID, body.designChoice);
+            try {
+                String gameID = (userManager.getUserRole(body.userID) == UserRole.TRIAL)?
+                        gameManager.buildTemporaryGame(body.userID):gameManager.buildGame(body.userID);
+                userManager.addOwnedGameID(body.userID, gameID);
+                sendResponse(exchange, 201, "Success!");
+            } catch (InsufficientInputException e) {
+                DesignQuestionResponseBody res = new DesignQuestionResponseBody();
+                res.designQuestion = gameManager.getDesignQuestion(body.userID);
+                sendResponse(exchange, 200, gson.toJson(res));
+            } catch (InvalidUserIDException e) {
+                throw new RuntimeException("user id is invalid. This should never happen.");
+            }
+        } catch (NoCreationInProgressException e) {
+            sendResponse(exchange, 404, "No game builder associated with this user.");
+        } catch (InvalidInputException e) {
+            sendResponse(exchange, 400, "Invalid Input");
+        }
+    }
+
+    private void handleCreateMatch(HttpExchange exchange) throws IOException {
+        String data = getRequestBody(exchange);
+        CreateMatchRequestBody body  = gson.fromJson(data, CreateMatchRequestBody.class);
+
+        try {
+            String templateID = gameManager.getTemplateID(body.gameID);
+            String matchID = matchManager.newMatch(body.userID, userManager.getUsername(body.userID),
+                                    gameManager.getGame(body.gameID),
+                                    templateManager.getTemplate(templateID));
+            sendResponse(exchange, 204, null); // Telling the client that match is successfully created.
+            ClientSocketSeeker clientSeeker = new ClientSocketSeeker(matchManager, serverSocket, body.userID, matchID);
+            clientSeeker.start();
+        } catch (InvalidUserIDException | InvalidIDException e) {
+            sendResponse(exchange, 400, "One of the provided IDs is invalid.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleCreateBuilder(HttpExchange exchange) throws IOException {
+        CreateGameBuilderRequestBody body = gson.fromJson(getRequestBody(exchange), CreateGameBuilderRequestBody.class);
+        DesignQuestionResponseBody question = new DesignQuestionResponseBody();
+        try {
+            gameManager.initiateGameBuilder(body.userID, templateManager.getTemplate(body.templateID));
+            question.designQuestion = gameManager.getDesignQuestion(body.userID);
+            sendResponse(exchange, 201, gson.toJson(question));
+        } catch (CreationInProgressException e) {
+            try {
+                question.designQuestion = gameManager.getDesignQuestion(body.userID);
+                sendResponse(exchange, 200, gson.toJson(question));
+            } catch (NoCreationInProgressException noCreationInProgressException) {
+                throw new RuntimeException("No creation in progress. This should never happen.");
+            }
+        } catch (InvalidIDException e) {
+            sendResponse(exchange, 404, "The provided ID is invalid.");
+        } catch (NoCreationInProgressException e) {
+            throw new RuntimeException("No creation in progress. This should never happen.");
+        }
+    }
+
+    private void handleGetPublicGamesByTemplate(HttpExchange exchange) throws IOException {
+        String templateID;
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            templateID = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
+        }
+        sendResponse(exchange, 200, getPublicGameDataByTemplate(templateID));
+    }
+
+    private String getPublicGameDataByTemplate(String templateID) {
+        Set<String> allPublicGames = gameManager.getAllPublicGamesID();
+        Set<GameDataResponseBody> dataSet = new HashSet<>();
+        for (String gameID: allPublicGames) {
+            try {
+                if (gameManager.getTemplateID(gameID).equals(templateID)) {
+                    GameDataResponseBody data = new GameDataResponseBody();
+                    data.id = gameID;
+                    data.ownerName = userManager.getUsername(gameManager.getOwnerID(gameID));
+                    data.title = gameManager.getGameTitle(gameID);
+                    data.accessLevel = gameManager.getAccessLevel(gameID);
+                    data.previousAccessLevel = gameManager.getPreviousAccessLevel(gameID);
+                    data.genre = gameManager.getGenre(gameID);
+                    dataSet.add(data);
+                }
+            } catch (InvalidGameIDException | InvalidUserIDException e) {
+                throw new RuntimeException("Invalid game ID from the list of public games. This should never happen.");
+            }
+        }
+
+        return gson.toJson(dataSet);
+    }
+
+    private void handleGetAllGameMatches(HttpExchange exchange) throws IOException {
+        sendResponse(exchange, 200, getAvailableGameMatchesData());
+    }
+
+    private String getAvailableGameMatchesData() {
+        Set<String> preparingMatches = matchManager.getAllPreparingMatchIds();
+        Set<MatchDataResponseBody> dataSet = new HashSet<>();
+        for (String id: preparingMatches) {
+            MatchDataResponseBody data = new MatchDataResponseBody();
+            try {
+                String gameId = matchManager.getGameIdFromMatch(id);
+                data.gameTitle = gameManager.getGameTitle(gameId);
+                data.matchId = id;
+                data.hostName = matchManager.getHostName(id);
+                data.numPlayers = matchManager.getPlayerCount(id);
+                data.maxPlayers = matchManager.getPlayerCountLimit(id);
+                data.genre = gameManager.getGenre(gameId);
+                dataSet.add(data);
+            } catch (InvalidMatchIDException e) {
+                throw new RuntimeException("The match ID returned from match manager doesn't exist anymore");
+            } catch (InvalidGameIDException e) {
+                throw new RuntimeException("The game ID or host ID got from match is invalid.");
+            }
+        }
+
+        return gson.toJson(dataSet);
+    }
+
+
+    private void handleGetAllPublicGames(HttpExchange exchange) throws IOException {
+        sendResponse(exchange, 200, getAllPublicGamesData());
+    }
+
+    private void handleGetAllOwnedGames(HttpExchange exchange) throws IOException {
+        String userID;
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            userID = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
+        }
+        try {
+            sendResponse(exchange, 200, getOwnedGamesData(userID));
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid User ID.");
+        }
+    }
+
+    private void handleGetPublicOwnedGames(HttpExchange exchange) throws IOException {
+        String userID;
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            userID = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
+        }
+        try {
+            sendResponse(exchange, 200, getPublicOwnedGamesData(userID));
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid User ID.");
+        }
+    }
+
+    private String getPublicOwnedGamesData(String userID) throws InvalidUserIDException {
+        Set<String> ownedIds = userManager.getOwnedGamesID(userID);
+        Set<GameDataResponseBody> dataSet = new HashSet<>();
+        for (String id: ownedIds) {
+            try {
+                if (gameManager.checkIsPublic(id)){
+                    GameDataResponseBody data = new GameDataResponseBody();
+                    data.ownerName = userManager.getUsername(userID);
+                    data.id = id;
+                    data.title = gameManager.getGameTitle(id);
+                    data.accessLevel = gameManager.getAccessLevel(id);
+                    data.previousAccessLevel = gameManager.getPreviousAccessLevel(id);
+                    data.genre = gameManager.getGenre(id);
+                    dataSet.add(data);
+                }
+            } catch (InvalidGameIDException e) {
+                throw new RuntimeException("Fatal Error: The user contains an invalid game ID.");
+            }
+        }
+
+        return gson.toJson(dataSet);
+    }
+
+
+    private String getOwnedGamesData(String userID) throws InvalidUserIDException {
+            Set<String> ownedIds = userManager.getOwnedGamesID(userID);
+            Set<GameDataResponseBody> dataSet = new HashSet<>();
+            for (String id: ownedIds) {
+                GameDataResponseBody data = new GameDataResponseBody();
+                data.ownerName = userManager.getUsername(userID);
+                data.id = id;
+                try {
+                    data.title = gameManager.getGameTitle(id);
+                    data.accessLevel = gameManager.getAccessLevel(id);
+                    data.previousAccessLevel = gameManager.getPreviousAccessLevel(id);
+                    data.genre = gameManager.getGenre(id);
+                } catch (InvalidGameIDException e) {
+                    throw new RuntimeException("Game ID from owned list is invalid.");
+                }
+                dataSet.add(data);
+            }
+
+            return gson.toJson(dataSet);
+    }
+
+    private String getAllPublicGamesData() {
+        Set<GameDataResponseBody> dataSet = new HashSet<>();
+        Set<String> publicGames = gameManager.getAllPublicGamesID();
+        for (String id: publicGames) {
+            GameDataResponseBody game = new GameDataResponseBody();
+            game.id = id;
+            try {
+                game.title = gameManager.getGameTitle(id);
+                game.ownerName = userManager.getUsername(gameManager.getOwnerID(id));
+                game.accessLevel = gameManager.getAccessLevel(id);
+                game.previousAccessLevel = gameManager.getPreviousAccessLevel(id);
+                game.genre = gameManager.getGenre(id);
+            } catch (InvalidGameIDException | InvalidUserIDException e) {
+                throw new RuntimeException("Game ID or user ID got from public game list is invalid.");
+            }
+
+            dataSet.add(game);
+        }
+        return gson.toJson(dataSet);
+    }
+
+
 }

@@ -1,0 +1,9 @@
+{
+  "multipleChoice": true,
+  "chooseAllThatApply": false,
+  "hasMultipleScoreCategories": true,
+  "hasScoreWeight": false,
+  "hasCustomEndingMessage": true,
+  "id": "2",
+  "title": "Mutiple choice multiple score categories with custom ending message quiz"
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel="icon" href="../static/favicon.ico" type="image/x-icon" />
+		<link href="../stylesheets/general.css" rel="stylesheet" />
+		<link href="../stylesheets/form.css" rel="stylesheet" />
+		<link href="../stylesheets/questions.css" rel="stylesheet" />
+		<title>Multiplayer Games</title>
+	</head>
+
+	<body>
+		<iframe id="header" src="../components/header.html" width="100%"></iframe>
+
+		<main>
+			<h1>Edit a template</h1>
+			<form id="form">
+				<label>
+					Title: <input required />
+				</label>
+
+				<button type="button" onclick="editTemplate()">Save</button>
+			</form>
+		</main>
+
+		<script src="../scripts/requests/editTemplate.js"></script>
+	</body>
+</html>

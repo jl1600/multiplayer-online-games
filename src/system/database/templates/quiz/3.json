@@ -1,0 +1,9 @@
+{
+  "multipleChoice": true,
+  "chooseAllThatApply": false,
+  "hasMultipleScoreCategories": false,
+  "hasScoreWeight": false,
+  "hasCustomEndingMessage": false,
+  "id": "3",
+  "title": "Simple multiple choice quiz"
+}

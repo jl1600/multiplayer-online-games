@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
+body {
+	margin: 0;
+}
+a {
+	text-decoration: none;
+	color: white;
+}
+header {
+	background-color: #7289da;
+	padding: 16px 60px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-family: "Open Sans", sans-serif;
+	font-weight: 700;
+}
+header .logo {
+	font-weight: 700;
+	font-size: 36px;
+	color: white;
+}
+header .menu a {
+	margin: 0 25px;
+	transition-duration: 0.2s;
+}
+header .menu a:hover {
+	filter: brightness(0.85);
+}
+header .user a {
+	background-color: white;
+	padding: 12px 20px;
+	margin: 0 10px;
+	border-radius: 30px;
+	color: #23272a;
+	transition-duration: 0.2s;
+}
+header .user a:hover {
+	filter: brightness(0.85);
+}
+header .user a#signup {
+	background-color: #36393f;
+	color: white;
+}
+#my-account {
+	color: white;
+	width: 146px;
+	text-align: right;
+}
+
+@media (max-width: 1000px) {
+    header .logo {
+    	font-size: 16px;
+    }
+    header {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 800px) {
+    header .logo {
+    	display: none;
+    }
+}

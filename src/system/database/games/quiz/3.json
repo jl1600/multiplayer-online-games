@@ -1,0 +1,53 @@
+{
+  "maxAttempts": 2,
+  "questions": [
+    {
+      "question": "9+10",
+      "answerChoices": [
+        {
+          "text": "19",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "21",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "question": "20+10",
+      "answerChoices": [
+        {
+          "text": "20",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        },
+        {
+          "text": "30",
+          "scoresRewardsByCategory": {
+            "General": 1.0
+          }
+        }
+      ]
+    }
+  ],
+  "scoreCategories": {
+    "General": {
+      "name": "General",
+      "weight": 1.0,
+      "minAcceptable": 0.0,
+      "endingMessage": "Quiz Game Finished."
+    }
+  },
+  "gameId": "3",
+  "ownerId": "2",
+  "templateId": "3",
+  "gameAccessLevel": "PUBLIC",
+  "previousGameAccessLevel": "PRIVATE",
+  "title": "Multiple choice"
+}

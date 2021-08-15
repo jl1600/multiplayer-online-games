@@ -1,25 +1,28 @@
 package system.controllers;
 
+import com.sun.net.httpserver.HttpExchange;
+import shared.DTOs.Requests.CancelBuilderRequestBody;
+import shared.DTOs.Requests.CreateTemplateBuilderRequestBody;
+import shared.DTOs.Requests.DesignChoiceRequestBody;
+import shared.DTOs.Requests.EditTemplateRequestBody;
+import shared.DTOs.Responses.DesignQuestionResponseBody;
+import shared.DTOs.Responses.GeneralTemplateDataResponseBody;
+import shared.DTOs.Responses.TemplateAllAttrsResponseBody;
 import shared.constants.GameGenre;
 import shared.exceptions.use_case_exceptions.*;
-import shared.request.Request;
-import shared.request.template_request.*;
-import shared.response.misc.ErrorMessageResponse;
-import shared.response.Response;
-
-import shared.response.misc.SimpleTextResponse;
-import shared.response.template.StartTemplateEditResponse;
-import shared.response.template.TemplateInfoMapResponse;
+import system.entities.template.QuizTemplate;
 import system.use_cases.managers.TemplateManager;
 import system.use_cases.managers.UserManager;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.HashSet;
+import java.util.Set;
 
 
-public class TemplateRequestHandler implements RequestHandler {
+public class TemplateRequestHandler extends RequestHandler {
 
     private final TemplateManager templateManager;
-    private final UserManager userManager;
 
     /**
      * Constructor for TemplateRequestHandler()
@@ -28,140 +31,145 @@ public class TemplateRequestHandler implements RequestHandler {
      */
     public TemplateRequestHandler(TemplateManager templateManager, UserManager userManager) {
         this.templateManager = templateManager;
-        this.userManager = userManager;
     }
 
-    /**
-     * @param request the request to handle
-     * @return a response message regarding the success of the request and send back appropriate requested info
-     */
     @Override
-    public Response handleRequest(Request request) {
-        if (request instanceof DeleteTemplateRequest) {
-            return handleDeleteTemplateRequest((DeleteTemplateRequest) request);
-        } else if (request instanceof NewTemplateRequest) {
-            return handleNewTemplateRequest((NewTemplateRequest) request);
-        } else if (request instanceof MakeTemplateDesignChoiceRequest) {
-            return handleMakeDesignChoiceRequest((MakeTemplateDesignChoiceRequest) request);
-        } else if (request instanceof GetAllTemplateInfoRequest) {
-            return handleGetAllTemplateInfoRequest((GetAllTemplateInfoRequest) request);
-        } else if (request instanceof StartTemplateEditRequest) {
-            return handleStartTemplateEditRequest((StartTemplateEditRequest) request);
-        } else if (request instanceof EditTemplateAttributeRequest) {
-            return handleEditTemplateAttributeRequest((EditTemplateAttributeRequest) request);
-        } else if (request instanceof CancelTemplateEditRequest) {
-            return handleCancelTemplateEditRequest((CancelTemplateEditRequest) request);
-        } else if (request instanceof SaveTemplateEditRequest) {
-            return handleSaveTemplateEditRequest((SaveTemplateEditRequest) request);
-        }
-        else {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: unidentified request");
+    protected void handleGetRequest(HttpExchange exchange) throws IOException {
+        String specification = exchange.getRequestURI().getPath().split("/")[2];
+        switch (specification) {
+            case "all-templates":
+                handleGetAllTemplates(exchange);
+                break;
+            case "all-attributes":
+                handleGetAllAttributes(exchange);
+                break;
+            default:
+                sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
 
-    private Response handleSaveTemplateEditRequest(SaveTemplateEditRequest request) {
-        try {
-            templateManager.saveTemplateEdit(request.getTemplateID());
-            return new SimpleTextResponse(request.getSessionID(), "Successfully saved template.");
-        } catch (NoEditingInProgressException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: no such editing is in progress");
+    protected void handlePostRequest(HttpExchange exchange) throws IOException {
+        String specification = exchange.getRequestURI().toString().split("/")[2];
+        switch (specification) {
+            case "create-builder":
+                handleCreateBuilder(exchange);
+                break;
+            case "make-design-choice":
+                handleMakeDesignChoice(exchange);
+                break;
+            case "edit":
+                handleEdit(exchange);
+                break;
+            case "cancel-builder":
+                handleCancelBuilder(exchange);
+                break;
+            default:
+                sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
 
-    private Response handleCancelTemplateEditRequest(CancelTemplateEditRequest request) {
+    private void handleCancelBuilder(HttpExchange exchange) throws IOException {
+        CancelBuilderRequestBody body = gson.fromJson(getRequestBody(exchange), CancelBuilderRequestBody.class);
         try {
-            templateManager.cancelTemplateEdit(request.getTemplateID());
-            return new SimpleTextResponse(request.getSessionID(), "Successfully cancelled template editing.");
-        } catch (NoEditingInProgressException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: no such editing is in progress.");
+            templateManager.destroyBuilder(body.userID);
+            sendResponse(exchange, 204, null);
+        } catch (NoCreationInProgressException e) {
+            sendResponse(exchange, 400, "User ID is invalid or no builder is in progress.");
         }
     }
 
-    private Response handleStartTemplateEditRequest(StartTemplateEditRequest request) {
+    private void handleEdit(HttpExchange exchange) throws IOException {
+        EditTemplateRequestBody body = gson.fromJson(getRequestBody(exchange), EditTemplateRequestBody.class);
         try {
-             return new StartTemplateEditResponse(request.getSessionID(),
-                     templateManager.startTemplateEdit(request.getTemplateID()));
-
+            templateManager.editTemplate(body.attrMap, body.templateID);
+            sendResponse(exchange, 204, null);
+        } catch (NoSuchAttributeException | InvalidInputException e) {
+            sendResponse(exchange, 400, "Invalid attribute name or attribute value.");
         } catch (InvalidTemplateIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: Template does not exist.");
-        } catch (EditingInProgressException e) {
-            return new ErrorMessageResponse(request.getSessionID(),
-                    "Error: someone is currently editing this template.");
+            sendResponse(exchange, 404, "Invalid template ID.");
         }
     }
 
-    private Response handleDeleteTemplateRequest(DeleteTemplateRequest request) {
+    private void handleCreateBuilder(HttpExchange exchange) throws IOException {
+        CreateTemplateBuilderRequestBody body =
+                gson.fromJson(getRequestBody(exchange), CreateTemplateBuilderRequestBody.class);
+        DesignQuestionResponseBody question = new DesignQuestionResponseBody();
         try {
-            templateManager.deleteTemplate(request.getTemplateID());
-            return new SimpleTextResponse(request.getSessionID(), "Template deleted");
-        } catch (InvalidIDException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: Template does not exist");
-        } catch (IOException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: Database not found");
-        }
-    }
-
-    private Response handleEditTemplateAttributeRequest(EditTemplateAttributeRequest request) {
-        try{
-            templateManager.editTemplate(request.getTemplateID(), request.getAttributeName(),
-                    request.getAttributeValue());
-            return new SimpleTextResponse(request.getSessionID(),"Success.");
-        } catch (NoEditingInProgressException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: No such an editing is in progress.");
-        } catch (NoSuchAttributeException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: Template has no such attribute");
-        } catch (InvalidInputException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: Invalid input");
-        }
-
-    }
-
-    private Response handleGetAllTemplateInfoRequest(GetAllTemplateInfoRequest request) {
-        return new TemplateInfoMapResponse(request.getSessionID(), templateManager.getAllIdAndTitles());
-    }
-
-    private Response handleNewTemplateRequest(NewTemplateRequest request) {
-
-        String sender = request.getSenderID();
-        String sessionID = request.getSessionID();
-        try {
-            templateManager.initiateTemplateBuilder(sender, GameGenre.QUIZ);
+            templateManager.initiateTemplateBuilder(body.userID, body.genre);
+            question.designQuestion = templateManager.getDesignQuestion(body.userID);
+            sendResponse(exchange, 201, gson.toJson(question));
         } catch (CreationInProgressException e) {
-            return new ErrorMessageResponse(sessionID, "Error: A Template is currently in creation process.");
-        } return getDesignQuestion(request);
-    }
-
-    private Response handleMakeDesignChoiceRequest(MakeTemplateDesignChoiceRequest request) {
-        String sender = request.getSenderID();
-        String sessionID = request.getSessionID();
-        try {
-            templateManager.makeDesignChoice(sender, request.getUserInput());
             try {
-                templateManager.buildTemplate(sender);
-            } catch (InsufficientInputException e) {
-                return getDesignQuestion(request);
-            } catch (IOException e) {
-                return new ErrorMessageResponse(sessionID, "Database not found");
+                question.designQuestion = templateManager.getDesignQuestion(body.userID);
+                sendResponse(exchange, 200, gson.toJson(question));
+            } catch (NoCreationInProgressException f) {
+                throw new RuntimeException("No creation in progress. This should never happen.");
             }
-            return new SimpleTextResponse(sessionID, "Template successfully built!");
-        }
-        catch (NoCreationInProgressException e1) {
-            return new ErrorMessageResponse(sessionID, "Error: No template creating is in progress.");
-        }
-        catch (InvalidInputException e2) {
-            return new ErrorMessageResponse(sessionID,
-                    "Error: Invalid input, please re-enter a different input");
+        } catch (NoCreationInProgressException e) {
+            throw new RuntimeException("No creation in progress. This should never happen.");
         }
     }
 
-    private Response getDesignQuestion(TemplateRequest request) {
+    private void handleMakeDesignChoice(HttpExchange exchange) throws IOException {
+        DesignChoiceRequestBody body = gson.fromJson(getRequestBody(exchange), DesignChoiceRequestBody.class);
         try {
-            return new SimpleTextResponse(request.getSessionID(),
-                    templateManager.getDesignQuestion(request.getSenderID()));
-        }
-
-        catch (NoCreationInProgressException e) {
-            return new ErrorMessageResponse(request.getSessionID(), "Error: No game creation is in progress.");
+            templateManager.makeDesignChoice(body.userID, body.designChoice);
+            try {
+                templateManager.buildTemplate(body.userID);
+                sendResponse(exchange, 201, "Success!");
+            } catch (InsufficientInputException e) {
+                DesignQuestionResponseBody res = new DesignQuestionResponseBody();
+                res.designQuestion = templateManager.getDesignQuestion(body.userID);
+                sendResponse(exchange, 200, gson.toJson(res));
+            }
+        } catch (NoCreationInProgressException e) {
+            sendResponse(exchange, 404, "No game builder associated with this user.");
+        } catch (InvalidInputException e) {
+            sendResponse(exchange, 400, "Invalid Input");
         }
     }
+    private void handleGetAllAttributes(HttpExchange exchange) throws IOException {
+        String templateID;
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            templateID = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
+        }
+        try {
+            TemplateAllAttrsResponseBody body = new TemplateAllAttrsResponseBody();
+            body.templateID = templateID;
+            body.attrMap = templateManager.getAttributeMap(templateID);
+            sendResponse(exchange, 200, gson.toJson(body));
+        } catch (InvalidTemplateIDException e) {
+            sendResponse(exchange, 400, "Invalid Template ID.");
+        }
+
+    }
+
+    private void handleGetAllTemplates(HttpExchange exchange) throws IOException {
+        Set<String> allIDs = templateManager.getAllTemplateIDs();
+        Set<GeneralTemplateDataResponseBody> dataSet = new HashSet<>();
+
+        for (String id: allIDs) {
+            try {
+                GeneralTemplateDataResponseBody datum = new GeneralTemplateDataResponseBody();
+                if (templateManager.getTemplate(id) instanceof QuizTemplate)
+                    datum.gameGenre = GameGenre.QUIZ;
+                else datum.gameGenre = GameGenre.HANGMAN;
+                datum.templateID = id;
+                datum.title = templateManager.getTemplateTitle(id);
+                dataSet.add(datum);
+            } catch (InvalidIDException e) {
+                e.printStackTrace();
+            }
+        }
+        sendResponse(exchange, 200, gson.toJson(dataSet));
+    }
+
 }

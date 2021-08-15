@@ -17,8 +17,11 @@ public class User {
     private String password;
     private UserRole role;
     private OnlineStatus onlineStatus;
-    private final HashSet<String> gameCreations;
-    private Date registerDate;
+    private final Set<String> gameCreations;
+    private final Date registerDate;
+    private final Set<String> friendList;
+    private final Set<String> pendingFriendList;
+    private Date lastBanDate; // a word play on the last ban date and the last given ban date
 
     /**
      *
@@ -35,6 +38,9 @@ public class User {
         this.onlineStatus = OnlineStatus.OFFLINE;
         this.gameCreations = new HashSet<>();
         this.registerDate = registerDate;
+        this.friendList = new HashSet<>();
+        this.pendingFriendList = new HashSet<>();
+        this.lastBanDate = registerDate;
     }
 
     /**
@@ -94,6 +100,9 @@ public class User {
         return new HashSet<String>(gameCreations);
     }
 
+    public void addGameCreation(String newGameID) {
+        this.gameCreations.add(newGameID);
+    }
     /**
      * @return online status of the user
      */
@@ -129,4 +138,33 @@ public class User {
     }
 
     public Date getRegisterDate(){return registerDate;}
+
+    public Set<String> getFriendList() {
+        return friendList;
+    }
+
+    public void addFriend(String senderID) {
+        this.friendList.add(senderID);
+    }
+    public void removeFriend(String friendID) {
+        this.friendList.remove(friendID);
+    }
+
+    public Set<String> getPendingFriendList() {
+        return pendingFriendList;
+    }
+
+    public void addPendingFriend(String senderID) {
+        this.pendingFriendList.add(senderID);
+    }
+    public void removePendingFriend(String friendID) {
+        this.pendingFriendList.remove(friendID);
+    }
+
+    public Date getLastBanDate() {
+        return lastBanDate;
+    }
+    public void setLastBanDate(Date lastBanDate) {
+        this.lastBanDate = lastBanDate;
+    }
 }

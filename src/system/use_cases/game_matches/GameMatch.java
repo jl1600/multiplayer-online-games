@@ -1,22 +1,41 @@
 package system.use_cases.game_matches;
 
-import shared.exceptions.entities_exception.IDAlreadyExistsException;
+import shared.constants.MatchStatus;
 import shared.exceptions.use_case_exceptions.DuplicateUserIDException;
-import shared.exceptions.use_case_exceptions.InvalidIDException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
-import system.entities.game.Game;
+import shared.exceptions.use_case_exceptions.MaxPlayerReachedException;
 
-public abstract class GameMatch {
+import java.util.Map;
+import java.util.Observable;
+
+public abstract class GameMatch extends Observable {
+
     private final String id;
-    private boolean finished;
     private final String hostID;
+    private final String hostName;
+    private MatchStatus status;
+    private int playerLimit;
 
-
-    public GameMatch(String matchID, String userID) {
+    public GameMatch(String matchID, String userID, String username, int playerLimit) {
         this.id = matchID;
         this.hostID = userID;
-        this.finished = false;
+        this.status = MatchStatus.PREPARING;
+        this.playerLimit = playerLimit;
+        this.hostName = username;
+    }
+
+
+    protected void setPlayerLimit(int value) {
+        playerLimit = value;
+    }
+
+    public int getPlayerLimit() {
+        return playerLimit;
+    }
+
+    public String getHostName() {
+        return this.hostName;
     }
 
     public String getID() {
@@ -26,22 +45,47 @@ public abstract class GameMatch {
     /**
      * Returns the current text content of this word game match. The content may be different depending on the player.
      *
-     * @param playerID The unique string identifier of the player.
      * @return The human-readable string that represents the state of this game.
+     * @throws InvalidUserIDException When the match doesn't contain such a player.
      * */
-    public abstract String getTextContent(String playerID) throws InvalidUserIDException;
+    public abstract String getTextContent();
 
-    public abstract Game getGame();
+    /**
+     * Returns the string representation of the stats of a player.
+     *
+     * @throws InvalidUserIDException When the match doesn't contain such a player.
+     * */
+    public abstract Map<String, String> getAllPlayerStats();
 
+    /**
+     * Returns te current number of players in this match.
+     * */
+    public abstract int getPlayerCount();
+
+    /**
+     * Returns the ID of the game of this match.
+     * */
+    public abstract String getGameId();
+
+    /**
+     * Returns the ID of the player who started this match.
+     * */
     public String getHostID() {
         return hostID;
     }
 
-    public boolean isFinished() {
-        return finished;
+    public MatchStatus getStatus() {
+        return status;
     }
-    protected void setFinished(boolean b) {
-        finished = b;
+
+    /**
+     * Turn the match status from PREPARING to ONGOING.
+     * If The status is not PREPARING, do nothing.
+     * */
+    public abstract void startMatch();
+
+    public void setStatus(MatchStatus status) {
+        this.status = status;
     }
 
     /**
@@ -49,10 +93,17 @@ public abstract class GameMatch {
      *
      * @param playerID The unique string identifier of the player.
      * */
-    public abstract void addPlayer(String playerID) throws DuplicateUserIDException;
+    public abstract void addPlayer(String playerID, String playerName) throws DuplicateUserIDException, MaxPlayerReachedException;
 
     /**
-     * Play a game move.
+     * Remove a player to the match.
+     *
+     * @param playerID The unique string identifier of the player.
+     * */
+
+    public abstract void removePlayer(String playerID) throws InvalidUserIDException;
+    /**
+     * Play a game move. Do nothing if the match status is finished.
      *
      * @param playerID The unique string identifier of the player.
      * @param move The string representing the player input

@@ -17,7 +17,7 @@ public enum UserRole {
      */
     ADMIN,
     /**
-     * Temporary Rolle
+     * Temporary Role
      */
     TEMP
 }

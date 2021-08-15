@@ -1,0 +1,9 @@
+{
+  "multipleChoice": true,
+  "chooseAllThatApply": true,
+  "hasMultipleScoreCategories": false,
+  "hasScoreWeight": false,
+  "hasCustomEndingMessage": false,
+  "id": "5",
+  "title": "edited title"
+}

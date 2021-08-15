@@ -1,5 +1,6 @@
 package system.use_cases.builders.normal_builders;
 
+import shared.constants.GameAccessLevel;
 import shared.exceptions.use_case_exceptions.CreationInProgressException;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
 import system.entities.game.hangman.HangmanGame;
@@ -10,7 +11,7 @@ public class HangmanGameBuilder {
     private boolean hasTemplateId;
     private boolean hasOwnerId;
     private boolean hasTitle;
-    private boolean hasIsPublic;
+    private boolean hasGameAccessLevel;
     private boolean hasPuzzle;
 
     public HangmanGameBuilder() {
@@ -37,9 +38,9 @@ public class HangmanGameBuilder {
         this.hasTitle = true;
     }
 
-    public void setIsPublic(boolean isPublic) {
-        this.currentGame.setIsPublic(isPublic);
-        this.hasIsPublic = true;
+    public void setGameAccessLevel(GameAccessLevel gameAccessLevel) {
+        this.currentGame.setGameAccessLevel(gameAccessLevel);
+        this.hasGameAccessLevel = true;
     }
 
     public void addPuzzle(String puzzle, String prompt) throws InsufficientInputException {
@@ -62,7 +63,7 @@ public class HangmanGameBuilder {
                 hasTemplateId &
                 hasOwnerId &
                 hasTitle &
-                hasIsPublic &
+                hasGameAccessLevel &
                 hasPuzzle;
     }
 

@@ -17,9 +17,4 @@ public class IdManager {
         return (nextId++).toString();
     }
 
-    public void markUsedID(String id) {
-        if (Integer.parseInt(id) >= nextId) {
-            nextId = Integer.parseInt(id) + 1;
-        }
-    }
 }

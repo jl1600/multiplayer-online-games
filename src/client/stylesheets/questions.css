@@ -1,0 +1,28 @@
+#form label {
+    font-size: 24px;
+    font-weight: 700;
+    width: 100%;
+    color: #5269ba;
+    margin-bottom: 25px
+}
+#form label input {
+    outline: none;
+    outline-width: 0;
+    width: 100%;
+    margin: 0;
+    border: none;
+    border-bottom: 3px solid #999;
+    background-color: whitesmoke;
+    font-size: 20px;
+    border-radius: 5px;
+}
+#form label input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+#form label input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+}
+#form #template-genre * {
+    width: auto;
+}

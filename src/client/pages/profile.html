@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel="icon" href="../static/favicon.ico" type="image/x-icon" />
+		<link href="../stylesheets/general.css" rel="stylesheet" />
+		<link href="../stylesheets/form.css" rel="stylesheet" />
+		<script src="../scripts/requests/logout.js"></script>
+		<title>Multiplayer Games</title>
+	</head>
+
+	<body>
+		<iframe id="header" src="../components/header.html" width="100%"></iframe>
+
+		<form onkeydown="return event.key !== 'Enter'">
+			<h1>My account</h1>
+
+			<label>
+				Username:
+				<input id="username" type="text" name="username" value="" readonly />
+				<button id="edit-username" onclick="allowEditUsername()" type="button">Edit</button>
+				<button id="save-username" onclick="updateUsername()" type="button" hidden>Save</button>
+			</label>
+			<label>
+				Password:
+				<input id="old-password" type="password" name="oldPassword" value="xxxxxxxx" placeholder="Password" readonly />
+				<button id="save-password" onclick="updatePassword()" type="button" hidden style="margin-left: 30px">Save</button>
+				<input id="new-password" type="password" name="newPassword" placeholder="New password" hidden style="margin-left: 100px" />
+				<input id="confirm-password" type="password" name="confirmPassword" placeholder="Confirm password" hidden style="margin-left: 100px" />
+				<button id="edit-password" onclick="allowEditPassword()" type="button" style="margin-left: 10px">Edit</button>
+			</label>
+
+			<div style="display: flex; justify-content: space-evenly; width: 100%;">
+				<button id="logout-button" onclick="logout()" type="button">Log out</button>
+				<button id="delete-button" onclick="deleteUser()" type="button">Delete account</button>
+			</div>
+		</form>
+
+		<script src="../scripts/requests/login.js"></script>
+		<script src="../scripts/requests/editUser.js"></script>
+	</body>
+</html>
