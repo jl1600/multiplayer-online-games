@@ -3,6 +3,7 @@ package system.use_cases.builders.normal_builders;
 import shared.constants.GameAccessLevel;
 import shared.exceptions.use_case_exceptions.CreationInProgressException;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
+import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.hangman.HangmanGame;
 
 public class HangmanGameBuilder {
@@ -45,6 +46,16 @@ public class HangmanGameBuilder {
 
     public void addPuzzle(String puzzle, String prompt) throws InsufficientInputException {
         this.currentGame.addPuzzle(puzzle, prompt);
+        this.hasPuzzle = true;
+    }
+
+    public void addAnswer(int puzzleIndex, String answer) throws InvalidInputException {
+        this.currentGame.addAnswer(puzzleIndex, answer);
+        this.hasPuzzle = true;
+    }
+
+    public void addPrompt(int puzzleIndex, String prompt) throws InvalidInputException {
+        this.currentGame.addPrompt(puzzleIndex, prompt);
         this.hasPuzzle = true;
     }
 

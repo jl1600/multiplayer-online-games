@@ -1,12 +1,10 @@
 const xhr = new XMLHttpRequest();
 newTrial();
 
-document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") {
-        navigator.sendBeacon("http://localhost:8000/user/logout", JSON.stringify({
-            userID: sessionStorage.getItem("userId")
-        }));
-    }
+window.addEventListener("unload", () => {
+    navigator.sendBeacon("http://localhost:8000/user/logout", JSON.stringify({
+        userID: sessionStorage.getItem("userId")
+    }));
 });
 
 function newTrial() {

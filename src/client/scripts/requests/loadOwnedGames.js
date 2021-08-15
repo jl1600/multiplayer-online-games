@@ -3,9 +3,12 @@ if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 document.addEventListener("DOMContentLoaded", fetchOwnedGames, false);
 
 function fetchOwnedGames() {
-	xhr.open("GET", "http://localhost:8000/game/all-owned-games?userid=" +
-		(sessionStorage.getItem("userType") === "ADMIN" ? window.location.href.split("?userId=")[1] :
-		sessionStorage.getItem("userId")));
+    if (sessionStorage.getItem("userType") === "ADMIN") {
+        document.getElementsByTagName("h1")[0].innerHTML = `${ window.location.href.match(/username=(\w+)/)[1] }'s games`;
+        xhr.open("GET", `http://localhost:8000/game/all-owned-games?userid=${ window.location.href.match(/userId=(\d+)/)[1] }`);
+    } else {
+        xhr.open("GET", `http://localhost:8000/game/all-owned-games?userid=${ sessionStorage.getItem("userId") }`);
+    }
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {

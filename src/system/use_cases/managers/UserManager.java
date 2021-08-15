@@ -117,7 +117,6 @@ public class UserManager {
      * @return id of the trial user created
      */
     public String createTrialUser() {
-
         String userId = idManager.getNextId();
         String username = "TrialUser" + userId;
 
@@ -127,13 +126,6 @@ public class UserManager {
 
         userIds.put(username, userId);
         users.put(userId, user);
-
-//        System.out.println("executing UserManager.createTrial");
-//        System.out.println("userid:"+userId);
-//        System.out.println("usermanager address:"+this.toString());
-//        System.out.println("userlist keyset:"+this.getUsers().keySet());
-
-        System.out.println("created a trial user");
         return userId;
     }
 
@@ -146,23 +138,27 @@ public class UserManager {
      * @throws IncorrectPasswordException if the specified password does not match the user's password
      */
     public String login(String username, String password)
-            throws InvalidUsernameException, IncorrectPasswordException, InvalidUserIDException, ExpiredUserException, IOException {
+            throws InvalidUsernameException, BannedUserException, IncorrectPasswordException,
+             ExpiredUserException, IOException {
 
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
 
         String userId = getUserId(username);
-        if (isPasswordIncorrect(userId, password)) throw new IncorrectPasswordException();
-        if (isBanned(userId)) throw new BannedUserException();
-        if (getUserRole(userId) == UserRole.TEMP){
-            if (isExpiredUser(userId)){
-                throw new ExpiredUserException();
+        try {
+            if (isPasswordIncorrect(userId, password)) throw new IncorrectPasswordException();
+            if (isBanned(userId)) throw new BannedUserException();
+            if (getUserRole(userId) == UserRole.TEMP){
+                if (isExpiredUser(userId)){
+                    throw new ExpiredUserException();
+                }
             }
+            getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
+            gateway.updateUser(getUser(userId));
+        } catch (InvalidUserIDException e) {
+            throw new RuntimeException("System failure: The ID associated with this username is invalid.");
         }
 
-
-        getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
-        gateway.updateUser(getUser(userId));
         return userId;
     }
 
@@ -179,6 +175,16 @@ public class UserManager {
 
         }
         return false;
+    }
+
+    /**
+     *
+     * @throws InvalidUserIDException when the user is not banned or there is no such user.
+     */
+    public Date getBanLiftingDate(String userID) throws InvalidUserIDException {
+        if (!users.containsKey(userID) || users.get(userID).getOnlineStatus() != OnlineStatus.BANNED)
+            throw new InvalidUserIDException();
+        return users.get(userID).getLastBanDate();
     }
 
     private boolean isExpiredUser(String userId) throws InvalidUserIDException {
@@ -200,16 +206,15 @@ public class UserManager {
      * @throws InvalidUserIDException if no user has the specified userId
      */
     public void logout(String userId) throws InvalidUserIDException, IOException {
-        System.out.println("logout");
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
-        if (!getUserRole(userId).equals(UserRole.TRIAL)){//need this bracket else trial user keeps logging out
-            getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
-            if (getUserRole(userId).equals(UserRole.TRIAL)){
-                deleteUser(userId);
-            } else {
-                gateway.updateUser(getUser(userId));
-            }
+        getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
+        if (getUserRole(userId).equals(UserRole.TRIAL)){
+            String username = users.get(userId).getUsername();
+            users.remove(userId);
+            userIds.remove(username);
+        } else {
+            gateway.updateUser(getUser(userId));
         }
 
     }

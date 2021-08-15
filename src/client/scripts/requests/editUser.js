@@ -9,7 +9,7 @@ function fillUsername() {
     		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
     		    document.getElementById("username").value = JSON.parse(xhr.response).username;
     		}
-    	};
+    	}
 
     	xhr.send();
 }
@@ -24,10 +24,14 @@ function updateUsername(username) {
 	xhr.open("POST", "http://localhost:8000/edit-username");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
             document.getElementById("edit-username").hidden = false;
             document.getElementById("save-username").hidden = true;
             document.getElementById("username").readOnly = true;
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+		    alert("Invalid userID");
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
+		    alert("Duplicate username");
 		}
 	}
 
@@ -59,8 +63,12 @@ function updatePassword(oldPassword, newPassword) {
 
             document.getElementById("old-password").value = "xxxxxxxx";
             document.getElementById("old-password").readOnly = true;
-		}
-	};
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+            alert("Invalid userID");
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
+            alert("Incorrect old password");
+        }
+	}
 
 	xhr.send(JSON.stringify({
 	    userID: sessionStorage.getItem("userId"),

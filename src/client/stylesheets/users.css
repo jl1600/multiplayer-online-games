@@ -17,20 +17,31 @@ main {
 	filter: brightness(0.95);
 }
 
-.column .row .button {
+.column .row .button-wrapper {
+    width: 200px;
+    float: right;
+}
+
+.column .row .button-wrapper .button {
 	background-color: #7289da;
 	padding: 6px 15px;
 	color: whitesmoke;
 	border-radius: 10px;
+	float: right;
 	box-shadow: 1px 0 3px #424549;
 	border: none;
-	float: right;
 	cursor: pointer;
 }
+
 .column .row .button:hover {
 	transform: translateY(1px);
 }
 
-#friends.column .row .button {
+#friends.column .row .button, .column .row .button-wrapper .button.suspend-button {
 	background-color: #ff6454;
+}
+
+#friends.column .row .accept-button {
+	background-color: #a7ffa4;
+	color: #424549;
 }

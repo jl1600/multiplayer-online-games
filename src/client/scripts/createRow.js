@@ -1,55 +1,33 @@
-function createRow(id, userData, buttonText = null) {
+function createRow(id, userData, buttonTexts) {
 	const row = document.createElement("div");
 	row.classList.add("row");
-	row.setAttribute("data-id", userData.id);
+	row.setAttribute("data-id", userData.userID);
 	row.innerHTML = userData.username;
 
-	if (buttonText) {
-		const button = createTextButton(buttonText);
-		row.appendChild(button);
-	} else {
-		createPendingButtons();
-	}
+    const buttons = createButtons(buttonTexts);
+    row.appendChild(buttons);
 
 	document.getElementById(id).appendChild(row);
 }
 
-function createTextButton(text) {
-	const button = createButton("button");
-	button.innerHTML = text;
+function createButtons(texts) {
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("button-wrapper");
 
-	return button;
-}
-
-function createPendingButtons() {
-	const wrapper = document.createElement("div");
-	wrapper.classList.add("button-wrapper");
-
-	const accept = createButton("accept-button", "accept");
-	const decline = createButton("decline-button", "decline");
-
-	wrapper.appendChild(accept);
-	wrapper.appendChild(decline);
+    texts.forEach(text => {
+        const button = createButton(text);
+        wrapper.appendChild(button);
+    });
 
 	return wrapper;
 }
 
-function createButton(className, img = null) {
+function createButton(text) {
 	const button = document.createElement("button");
-	button.classList.add(className);
+	button.classList.add(`${ text.toLowerCase().replace(/\s/g, "-") }-button`);
+	button.classList.add("button");
 	button.type = "button";
-
-	if (img) {
-		const imgEl = createImg(img);
-		button.appendChild(imgEl);
-	}
+	button.innerHTML = text;
 
 	return button;
-}
-
-function createImg(src) {
-	const img = document.createElement("img");
-	img.src = `../static/${ src }.png`;
-
-	return img;
 }

@@ -5,73 +5,98 @@ import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.Game;
 
 import java.util.ArrayList;
+import java.util.List;
 
-/** Hangman Game
- *
+/**
+ * Hangman Game
  */
 public class HangmanGame extends Game {
-    private String title;
-    private ArrayList<ArrayList<String>> puzzles;
+    //private String title;
+    private List<List<String>> puzzles;
 
-    /** Hangman Game Constructor
-     *
+    /**
+     * Hangman Game Constructor
      */
-
     public HangmanGame() {
         super();
         this.puzzles = new ArrayList<>();
     }
 
-    /** set title of Hangman game
+    /**
+     * add a puzzle
      *
-     * @param title the title of the Hangman Game
-     */
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    /** Get the title of Hangman Game
-     *
-     * @return the tile of the game
-     */
-    public String getTitle() {
-        return this.title;
-    }
-
-    /** add a puzzle
-     *
-     * @param puzzle the puzzle to be added
+     * @param answer the puzzle to be added
      * @param prompt the prompt of the puzzle
      * @throws InsufficientInputException when parameters are illegal and passed a null value
      */
-    public void addPuzzle(String puzzle, String prompt) throws InsufficientInputException {
-        assert puzzle != null;
-        if (puzzle == null | prompt == null) {
+    public void addPuzzle(String answer, String prompt) throws InsufficientInputException {
+        if (answer == null | prompt == null) {
             throw new InsufficientInputException();
         }
-        ArrayList<String> combined = new ArrayList<>();
-        combined.add(puzzle);
+        List<String> combined = new ArrayList<>();
+        combined.add(answer);
         combined.add(prompt);
         this.puzzles.add(combined);
     }
 
+    public void addAnswer(int puzzleIndex, String answer) throws InvalidInputException {
+        if (answer == null | answer.equals("")) {
+            throw new InvalidInputException();
+        }
+        if (puzzleIndex >= puzzles.size()) {
+            List<String> newPuzzle = new ArrayList<>();
+            newPuzzle.add(0, answer);
+            newPuzzle.add(1, "no prompt");
+            puzzles.add(newPuzzle);
+        } else {
+            puzzles.get(puzzleIndex).set(0, answer);
+        }
+
+    }
+
+    public void addPrompt(int puzzleIndex, String prompt) throws InvalidInputException {
+        if (prompt == null | prompt.equals("")) {
+            throw new InvalidInputException();
+        }
+        if (puzzleIndex >= puzzles.size()) {
+            List<String> newPuzzle = new ArrayList<>();
+            newPuzzle.add(0, "no answer");
+            newPuzzle.add(1, prompt);
+            puzzles.add(newPuzzle);
+        } else {
+            puzzles.get(puzzleIndex).set(1, prompt);
+        }
+
+    }
+
     /**
      * Get a puzzle
+     *
      * @param index of puzzle to add
      * @return a String ArrayList representative of the Puzzle
      * @throws InvalidInputException when the index is larger than total puzzle size
      */
-    public ArrayList<String> getPuzzle(int index) throws InvalidInputException {
+    public List<String> getPuzzle(int index) throws InvalidInputException {
         if (index >= this.puzzles.size()) {
             throw new InvalidInputException();
         }
-        ArrayList<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<>();
         result.addAll(this.puzzles.get(index));
         return result;
     }
 
+    public String getAnswer(int puzzleIndex) {
+        return puzzles.get(puzzleIndex).get(0);
+    }
+
+    public String getPrompt(int puzzleIndex) {
+        return puzzles.get(puzzleIndex).get(1);
+    }
+
+
     /**
      * Remove a puzzle
+     *
      * @param index of puzzle to remove
      * @throws InvalidInputException when the index is larger than total puzzle size
      */
@@ -84,11 +109,12 @@ public class HangmanGame extends Game {
 
     /**
      * Get All Puzzles
+     *
      * @return Nested ArrayList that represents all the puzzles
      */
-    public ArrayList<ArrayList<String>> getPuzzles() {
-        ArrayList<ArrayList<String>> result = new ArrayList<>();
-        for (ArrayList<String> set : this.puzzles) {
+    public List<List<String>> getPuzzles() {
+        List<List<String>> result = new ArrayList<>();
+        for (List<String> set : this.puzzles) {
             ArrayList<String> entry = new ArrayList<>();
             entry.addAll(set);
             result.add(entry);

@@ -1,10 +1,8 @@
 package system.use_cases.managers;
 
 
-import shared.DTOs.Responses.TemplateAllAttrsResponseBody;
 import shared.constants.GameGenre;
 import shared.exceptions.use_case_exceptions.*;
-import sun.security.x509.InvalidityDateExtension;
 import system.entities.template.Template;
 import system.gateways.TemplateDataGateway;
 import system.use_cases.builders.interactive_builders.TemplateInteractiveBuilder;
