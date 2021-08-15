@@ -14,8 +14,8 @@ function signup(username, password, confirmPassword, userType) {
 	if (!checkPassword(password, confirmPassword)) return false;
 
 	xhr.open("POST", "http://localhost:8000/user/register");
+
 	xhr.onreadystatechange = () => {
-	    console.log(xhr.status);
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
 			window.location = "http://localhost:8080/pages/login.html";
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
@@ -25,7 +25,12 @@ function signup(username, password, confirmPassword, userType) {
 		}
 	};
 
-	xhr.send(JSON.stringify({username, password, role: userType}));
+	xhr.send(JSON.stringify({
+	    userID: sessionStorage.getItem("userId"),
+	    username,
+	    password,
+	    role: userType
+	}));
 }
 
 function checkPassword() {

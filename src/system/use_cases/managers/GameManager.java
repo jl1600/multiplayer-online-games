@@ -199,7 +199,7 @@ public class GameManager {
     /**
      * Returns a mapping of all Game Ids to game titles.
      * */
-    public Set<String> getAllGamesID() {
+    public Set<String> getAllGameIDs() {
         return new HashSet<>(games.keySet());
     }
 
@@ -222,24 +222,37 @@ public class GameManager {
      * @param gameAccessLevel The value representing whether the game is public, private, friends only, deleted
      * */
     public void setGameAccessLevel(String gameID, GameAccessLevel gameAccessLevel) throws InvalidGameIDException {
+        System.out.println("setGML");
         if(!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
-        games.get(gameID).setGameAccessLevel(gameAccessLevel);
-        try {
-            gateway.updateGame(games.get(gameID));
-        } catch (IOException e) {
-            throw new RuntimeException("Dysfunctional Database.");
+        if (gameAccessLevel != null){
+            games.get(gameID).setGameAccessLevel(gameAccessLevel);
+            try {
+                gateway.updateGame(games.get(gameID));
+                System.out.println(games.get(gameID).getTitle());
+                System.out.println(games.get(gameID).getGameAccessLevel().name());
+            } catch (IOException e) {
+                throw new RuntimeException("Dysfunctional Database.");
+            }
         }
+
     }
 
     public void undoSetGameAccessLevel(String gameID) throws InvalidGameIDException {
+        System.out.println("undoGML");
         if(!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
-        games.get(gameID).setGameAccessLevel(games.get(gameID).getPreviousGameAccessLevel());
+        GameAccessLevel currentAC = games.get(gameID).getGameAccessLevel();
+        GameAccessLevel prevAC = games.get(gameID).getPreviousGameAccessLevel();
+        games.get(gameID).setGameAccessLevel(prevAC);
+        games.get(gameID).setPreviousGameAccessLevel(currentAC);
         try {
             gateway.updateGame(games.get(gameID));
+            System.out.println(games.get(gameID).getTitle());
+            System.out.println(games.get(gameID).getGameAccessLevel().name());
+            System.out.println(games.get(gameID).getPreviousGameAccessLevel().name());
         } catch (IOException e) {
             throw new RuntimeException("Dysfunctional Database.");
         }

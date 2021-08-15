@@ -61,11 +61,12 @@ public class GameRequestHandler extends RequestHandler {
             case "public-games-with-template":
                 handleGetPublicGamesByTemplate(exchange);
                 break;
+            case "prev-access-level":
+                handleGetPrevAccessLevel(exchange);
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
-
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().toString().split("/")[2];
         switch (specification) {
@@ -98,8 +99,20 @@ public class GameRequestHandler extends RequestHandler {
         }
     }
 
-    private void handleUndoAccessLevel(HttpExchange exchange) throws IOException {
+    private void handleGetPrevAccessLevel(HttpExchange exchange) throws IOException {
         AccessLevelRequestBody body = gson.fromJson(getRequestBody(exchange), AccessLevelRequestBody.class);
+        String prevAL;
+        try {
+            prevAL = gameManager.getPreviousAccessLevel(body.gameID).name();
+            sendResponse(exchange, 204, prevAL);
+        } catch (InvalidGameIDException e) {
+            sendResponse(exchange, 404, "The game ID is invalid.");
+        }
+    }
+
+
+    private void handleUndoAccessLevel(HttpExchange exchange) throws IOException {
+        UndoAccessLevelRequestBody body = gson.fromJson(getRequestBody(exchange), UndoAccessLevelRequestBody.class);
         try {
             gameManager.undoSetGameAccessLevel(body.gameID);
             sendResponse(exchange, 204, null);
@@ -165,13 +178,6 @@ public class GameRequestHandler extends RequestHandler {
             try {
                 String gameID = (userManager.getUserRole(body.userID) == UserRole.TRIAL)?
                         gameManager.buildTemporaryGame(body.userID):gameManager.buildGame(body.userID);
-
-//                System.out.println("executing GameRequestHandler.handleMakeDesignChoice.gameManager.buildGame(body.userID);");
-//                System.out.println("userID:"+body.userID);
-//                System.out.println("address of user manager"+userManager.toString());
-//                System.out.println("the current keyset of user"+userManager.getUsers().keySet());
-
-
                 userManager.addOwnedGameID(body.userID, gameID);
                 sendResponse(exchange, 201, "Success!");
             } catch (InsufficientInputException e) {

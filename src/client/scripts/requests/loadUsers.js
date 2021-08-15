@@ -24,7 +24,7 @@ function listenForEdits() {
 	document.querySelectorAll("#users .edit-button")?.forEach(el => {
 		const user = el.parentElement.parentElement;
 		el.addEventListener("click", () => {
-		    window.location = `http://localhost:8080/pages/my-games?userId=${ user.getAttribute("data-id") }&username=${ user.childNodes[0].nodeValue }`;
+		    window.location = `http://localhost:8080/pages/my-games.html?userId=${ user.getAttribute("data-id") }&username=${ user.childNodes[0].nodeValue }`;
 		});
 	});
 }
@@ -56,7 +56,9 @@ function suspendUser(userID) {
 			alert("User suspended");
 		} else if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 400) {
 			alert("Invalid userID or adminID");
-		}
+		} else if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 403) {
+         	alert("Error: You don't have the permission to perform this command.");
+        }
 	}
 
 	xhr1.send(JSON.stringify({

@@ -1,10 +1,18 @@
 const xhr = new XMLHttpRequest();
+let isCmdHeld;
 newTrial();
 
-window.addEventListener("unload", () => {
-    navigator.sendBeacon("http://localhost:8000/user/logout", JSON.stringify({
-        userID: sessionStorage.getItem("userId")
-    }));
+window.addEventListener("mouseover", () => window.onunload = null);
+window.addEventListener("mouseout", () => window.onunload = logoutOnLeave);
+document.addEventListener("keydown", event => {
+    if (event.key === "Meta" || event.key === "Control") {
+        window.onunload = logoutOnLeave;
+    }
+});
+document.addEventListener("keyup", event => {
+    if (event.key === "Meta" || event.key === "Control") {
+        window.onunload = null;
+    }
 });
 
 function newTrial() {
@@ -23,4 +31,10 @@ function newTrial() {
 	}
 
 	xhr.send();
+}
+
+function logoutOnLeave() {
+    const userID = sessionStorage.getItem("userId");
+    sessionStorage.clear();
+    navigator.sendBeacon("http://localhost:8000/user/logout", JSON.stringify({ userID }));
 }
