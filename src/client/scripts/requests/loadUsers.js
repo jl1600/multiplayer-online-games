@@ -31,7 +31,6 @@ function listenForEdits() {
 
 function listenForSuspensions() {
 	document.querySelectorAll("#users .suspend-button")?.forEach(el => {
-		const userId = el.parentElement.parentElement.getAttribute("data-id");
 		el.addEventListener("click", () => {
 		    suspendUser(el.parentElement.parentElement.getAttribute("data-id"));
 		});
@@ -40,7 +39,6 @@ function listenForSuspensions() {
 
 function listenForAddFriends() {
 	document.querySelectorAll("#users .add-friend-button")?.forEach(el => {
-		const userId = el.parentElement.parentElement.getAttribute("data-id");
 		el.addEventListener("click", () => {
 		    addFriend(el.parentElement.parentElement.getAttribute("data-id"));
 		});
@@ -67,6 +65,7 @@ function suspendUser(userID) {
 		length
 	}));
 }
+
 function addFriend(receiverID) {
 	xhr1.open("POST", "http://localhost:8000/user/send-friend-request");
 
