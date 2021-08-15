@@ -1,5 +1,7 @@
 package system.use_cases.game_matches;
 
+import java.lang.String;
+
 import shared.constants.MatchStatus;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.game.hangman.HangmanGame;
@@ -45,9 +47,7 @@ public class HangmanMatch extends GameMatch {
 
         try {
             addPlayer(userID, username);
-        } catch (DuplicateUserIDException e) {
-            e.printStackTrace();
-        } catch (MaxPlayerReachedException e) {
+        } catch (DuplicateUserIDException | MaxPlayerReachedException e) {
             e.printStackTrace();
         }
 
@@ -69,15 +69,14 @@ public class HangmanMatch extends GameMatch {
             if (playerId.equals(activePlayerId)) {
                 s.append("Active Player! ");
             } else if (!livingPlayers.contains(playerId)) {
-                s.append("Eliminated     ");
+                s.append("Eliminated. ");
             } else {
-                s.append("Waiting...     ");
+                s.append("Waiting... ");
             }
             s.append("score: ");
             s.append(scores.get(playerId));
             s.append(", lives: ");
             s.append(remainingLives.get(playerId));
-            s.append(", hints: ");
             s.append(", hints: ");
             s.append(remainingHints.get(playerId));
             playerStatusMap.put(playerNames.get(playerId), s.toString());
@@ -345,18 +344,23 @@ public class HangmanMatch extends GameMatch {
 
     private String getEndingMessage() {
         int highest = 0;
-        String winner = "";
+        StringBuilder winner = new StringBuilder();
         for (String player : players) {
             int score = scores.get(player);
             score += remainingHints.get(player);
             score += remainingLives.get(player);
             if (score > highest) {
                 highest = score;
-                winner = playerNames.get(player);
+                winner.setLength(0);
+                winner.append(playerNames.get(player));
             } else if (score == highest) {
-                winner = winner + ", " + playerNames.get(player);
+                winner.append(", ");
+                winner.append(playerNames.get(player));
             }
         }
-        return winner + " wins with a total score " + highest + "!";
+        winner.append(" wins with a total score ");
+        winner.append(highest);
+        winner.append("!");
+        return winner.toString();
     }
 }
