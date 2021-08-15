@@ -226,14 +226,17 @@ public class GameManager {
         if(!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
-        games.get(gameID).setGameAccessLevel(gameAccessLevel);
-        try {
-            gateway.updateGame(games.get(gameID));
-            System.out.println(games.get(gameID).getTitle());
-            System.out.println(games.get(gameID).getGameAccessLevel().name());
-        } catch (IOException e) {
-            throw new RuntimeException("Dysfunctional Database.");
+        if (gameAccessLevel != null){
+            games.get(gameID).setGameAccessLevel(gameAccessLevel);
+            try {
+                gateway.updateGame(games.get(gameID));
+                System.out.println(games.get(gameID).getTitle());
+                System.out.println(games.get(gameID).getGameAccessLevel().name());
+            } catch (IOException e) {
+                throw new RuntimeException("Dysfunctional Database.");
+            }
         }
+
     }
 
     public void undoSetGameAccessLevel(String gameID) throws InvalidGameIDException {
