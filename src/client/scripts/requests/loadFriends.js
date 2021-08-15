@@ -7,7 +7,7 @@ function loadPendings() {
 
 	xhr2.onreadystatechange = () => {
 		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 200) {
-			JSON.parse(xhr2.response).forEach(pendingFriend => createRow("friends", pendingFriend));
+			JSON.parse(xhr2.response).forEach(pendingFriend => createRow("friends", pendingFriend, ["Decline", "Accept"]));
 			listenForAcceptances();
 			listenForDeclines();
 			loadFriends();
@@ -22,7 +22,7 @@ function loadFriends() {
 
 	xhr2.onreadystatechange = () => {
 		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 200) {
-			JSON.parse(xhr2.response).forEach(friend => createRow("friends", friend, "Unfriend"));
+			JSON.parse(xhr2.response).forEach(friend => createRow("friends", friend, ["Unfriend"]));
 			listenForRemoveFriends();
 		}
 	}
@@ -31,7 +31,7 @@ function loadFriends() {
 }
 
 function listenForRemoveFriends() {
-	document.querySelectorAll("#friends .remove-button")?.forEach(el => {
+	document.querySelectorAll("#friends .unfriend-button")?.forEach(el => {
 		el.addEventListener("click", () => {
 		    if (confirm("Are you sure you want to remove this friend?")) {
 			    removeFriend(el.parentElement.parentElement.getAttribute("data-id"));

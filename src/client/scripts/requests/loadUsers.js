@@ -8,8 +8,10 @@ function loadUsers() {
 
 	xhr1.onreadystatechange = () => {
 		if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 200) {
-			JSON.parse(xhr1.response).forEach(user => createRow("users", user, userType === "ADMIN" ? "EDIT" : "Add friend"));
-			listenForClicks(userType);
+			JSON.parse(xhr1.response).forEach(user => createRow("users", user, userType === "ADMIN" ? ["SUSPEND", "EDIT"] : ["Add friend"]));
+			listenForEdits();
+			listenForSuspensions();
+			listenForAddFriends();
 		} else if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 400) {
 			alert("Invalid id");
 		}
@@ -18,32 +20,60 @@ function loadUsers() {
 	xhr1.send();
 }
 
-function listenForClicks(userType) {
-	document.querySelectorAll("#users .button")?.forEach(el => {
-		const userId = el.parentElement.parentElement.getAttribute("data-id");
+function listenForEdits() {
+	document.querySelectorAll("#users .edit-button")?.forEach(el => {
+		const user = el.parentElement.parentElement;
 		el.addEventListener("click", () => {
-			switch (userType) {
-				case "ADMIN":
-					window.location = `http://localhost:8080/pages/my-games?userId=${ userId }`;
-				break;
-				case "MEMBER":
-					addFriend(userId);
-				break;
-				case "TRIAL":
-					window.location = "http://localhost:8080";
-				break;
-			}
+		    window.location = `http://localhost:8080/pages/my-games?userId=${ user.getAttribute("data-id") }&username=${ user.childNodes[0].nodeValue }`;
 		});
 	});
 }
 
+function listenForSuspensions() {
+	document.querySelectorAll("#users .suspend-button")?.forEach(el => {
+		const userId = el.parentElement.parentElement.getAttribute("data-id");
+		el.addEventListener("click", () => {
+		    suspendUser(el.parentElement.parentElement.getAttribute("data-id"));
+		});
+	});
+}
+
+function listenForAddFriends() {
+	document.querySelectorAll("#users .add-friend-button")?.forEach(el => {
+		const userId = el.parentElement.parentElement.getAttribute("data-id");
+		el.addEventListener("click", () => {
+		    addFriend(el.parentElement.parentElement.getAttribute("data-id"));
+		});
+	});
+}
+
+function suspendUser(userID) {
+    const length = parseInt(prompt("How many days?"));
+    if (isNaN(length)) return alert("Invalid input. Please enter a whole number");
+
+	xhr1.open("POST", "http://localhost:8000/user/suspend");
+
+	xhr1.onreadystatechange = () => {
+		if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 204) {
+			alert("User suspended");
+		} else if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 400) {
+			alert("Invalid userID or adminID");
+		}
+	}
+
+	xhr1.send(JSON.stringify({
+		adminID: sessionStorage.getItem("userId"),
+		userID,
+		length
+	}));
+}
 function addFriend(receiverID) {
 	xhr1.open("POST", "http://localhost:8000/user/send-friend-request");
 
 	xhr1.onreadystatechange = () => {
-		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 200) {
+		if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 200) {
 			alert("Friend request sent!");
-		} else if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 400) {
+		} else if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 400) {
 			alert("userID is invalid");
 		}
 	}
