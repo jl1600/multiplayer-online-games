@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 
 public abstract class RequestHandler implements HttpHandler {
 
@@ -69,6 +70,20 @@ public abstract class RequestHandler implements HttpHandler {
             return false;
         } else {
             return true;
+        }
+    }
+
+    protected static String getQueryArgFromGET(HttpExchange exchange) throws IOException {
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return null;
+            }
+            return query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return null;
         }
     }
 }

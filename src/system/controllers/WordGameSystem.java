@@ -29,7 +29,7 @@ public class WordGameSystem {
 
         MatchManager mm = new MatchManager();
         GameRequestHandler gameRH = new GameRequestHandler(gm, tm, um, mm);
-        TemplateRequestHandler templateRH = new TemplateRequestHandler(tm, um);
+        TemplateRequestHandler templateRH = new TemplateRequestHandler(tm);
         UserRequestHandler userRH = new UserRequestHandler(um);
 
         server = HttpServer.create(new InetSocketAddress("localhost", 8000), 20);

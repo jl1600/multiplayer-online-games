@@ -5,19 +5,26 @@ package system.entities.template;
  */
 public class HangmanTemplate extends Template {
 
-    private boolean haveHints;
+    private boolean hasHints;
     /**
      * Hangman Template Constructor
      */
     public HangmanTemplate() {
         super();
+        this.hasHints = false;
+        setTitle("Unnamed Hangman Template");
     }
 
-    public void setHaveHints(boolean haveHints) {
-        this.haveHints = haveHints;
+    public HangmanTemplate(HangmanTemplate template){
+        super(template);
+        this.hasHints = template.hasHints();
     }
 
-    public boolean haveHints() {
-        return haveHints;
+    public void setHasHints(boolean haveHints) {
+        this.hasHints = haveHints;
+    }
+
+    public boolean hasHints() {
+        return hasHints;
     }
 }

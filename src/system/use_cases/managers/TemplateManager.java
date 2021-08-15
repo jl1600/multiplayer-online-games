@@ -6,6 +6,7 @@ import system.entities.template.Template;
 import system.gateways.TemplateDataGateway;
 import system.use_cases.editors.TemplateEditor;
 import system.use_cases.factories.TemplateEditorFactory;
+import system.use_cases.factories.TemplateFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -36,15 +37,29 @@ public class TemplateManager {
     /**
      * Create a default template, save it, and returns the template ID.
      * */
-    public void createTemplate(Map<String, String> attrMap, GameGenre type) {
+    public void createTemplate(Map<String, String> attrMap, GameGenre type) throws
+            NoSuchAttributeException, InvalidInputException {
+        TemplateFactory factory = new TemplateFactory();
+        Template temp = factory.getTemplate(type);
+        TemplateEditorFactory editFactory = new TemplateEditorFactory();
+        TemplateEditor editor = editFactory.getTemplateEditor(temp);
 
+        for (String attrName: attrMap.keySet()) {
+            editor.editAttribute(attrName, attrMap.get(attrName));
+        }
+        Template res = editor.getTemplate();
+        res.setID(idManager.getNextId());
     }
 
     /**
      * Returns the default version of a template attribute map.
      * */
     public Map<String, String> getDefaultAttrMap(GameGenre type) {
-
+        TemplateFactory factory = new TemplateFactory();
+        Template temp = factory.getTemplate(type);
+        TemplateEditorFactory editFactory = new TemplateEditorFactory();
+        TemplateEditor editor = editFactory.getTemplateEditor(temp);
+        return editor.getAttributeMap();
     }
 
     public void editTemplate(Map<String, String> attrMap, String templateID) throws

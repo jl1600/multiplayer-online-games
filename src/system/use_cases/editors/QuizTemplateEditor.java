@@ -1,13 +1,9 @@
 package system.use_cases.editors;
 
-import com.sun.istack.internal.NotNull;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import shared.exceptions.use_case_exceptions.NoSuchAttributeException;
 import system.entities.template.QuizTemplate;
 import system.entities.template.Template;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class QuizTemplateEditor extends TemplateEditor {
@@ -24,67 +20,57 @@ public class QuizTemplateEditor extends TemplateEditor {
     }
 
     @Override
-    public void editAttribute(@NotNull String attributeName,@NotNull String value)
+    public void editAttribute(String attributeName, String value)
             throws InvalidInputException, NoSuchAttributeException {
         switch (attributeName)
         {
-            case "Title":
+            case "title":   // String has to match the actual instance variable name.
                 editTitle(value);
                 break;
-            case "Is multiple choice":
+            case "multipleChoice":
                 editIsMultipleChoice(value);
                 break;
-            case "Is choose all that apply":
+            case "chooseAllThatApply":
                 editIsChooseAllThatApply(value);
                 break;
-            case "Has multiple score categories":
+            case "hasMultipleScoreCategories":
                 editHasMultipleScoreCategories(value);
                 break;
-            case "Each category has a custom ending message":
+            case "hasCustomEndingMessage":
                 editHasCustomEndingMessage(value);
+                break;
+            case "hasScoreWeight":
                 break;
             default:
                 throw new NoSuchAttributeException();
         }
     }
 
-    private void editHasCustomEndingMessage(@NotNull String value) throws InvalidInputException {
+    private void editHasCustomEndingMessage(String value) throws InvalidInputException {
         if (!value.equals("true") && !value.equals("false"))
             throw new InvalidInputException();
         template.setHasCustomEndingMessage(Boolean.parseBoolean(value));
     }
 
-    private void editHasMultipleScoreCategories(@NotNull String value) throws InvalidInputException {
+    private void editHasMultipleScoreCategories(String value) throws InvalidInputException {
         if (!value.equals("true") && !value.equals("false"))
             throw new InvalidInputException();
         template.setHasMultipleScoreCategories(Boolean.parseBoolean(value));
     }
 
-    private void editIsChooseAllThatApply(@NotNull  String value) throws InvalidInputException {
+    private void editIsChooseAllThatApply(String value) throws InvalidInputException {
         if (!value.equals("true") && !value.equals("false"))
             throw new InvalidInputException();
         template.setChooseAllThatApply(Boolean.parseBoolean(value));
     }
 
-    private void editTitle(@NotNull String value) {
+    private void editTitle(String value) {
         template.setTitle(value);
     }
 
-    private void editIsMultipleChoice(@NotNull String value) throws InvalidInputException {
+    private void editIsMultipleChoice(String value) throws InvalidInputException {
         if (!value.equals("true") && !value.equals("false"))
             throw new InvalidInputException();
         template.setMultipleChoice(Boolean.parseBoolean(value));
-    }
-
-
-    @Override
-    public Map<String, String> getAttributeMap() {
-        Map<String, String> attributes = new HashMap<>();
-        attributes.put("Title", template.getTitle());
-        attributes.put("Is multiple choice", Boolean.toString(template.isMultipleChoice()));
-        attributes.put("Is choose all that apply", Boolean.toString(template.isChooseAllThatApply()));
-        attributes.put("Has multiple score categories", Boolean.toString(template.hasMultipleScoreCategories()));
-        attributes.put("Each category has a custom ending message", Boolean.toString(template.hasCustomEndingMessage()));
-        return attributes;
     }
 }

@@ -148,7 +148,7 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
         if (Pattern.matches("[0-9]*", designChoice)) {
             int value = Integer.parseInt(designChoice);
             currentGame.setNumLives(value);
-            if (chosenTemplate.haveHints())
+            if (chosenTemplate.hasHints())
                 currentDesignTopic = DesignTopic.NUM_HINTS;
             else {
                 currentGame.setNumHints(0);

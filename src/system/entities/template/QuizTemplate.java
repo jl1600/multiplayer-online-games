@@ -28,6 +28,7 @@ public class QuizTemplate extends Template {
         this.chooseAllThatApply = template.chooseAllThatApply;
         this.hasMultipleScoreCategories = template.hasMultipleScoreCategories;
         this.hasScoreWeight = template.hasScoreWeight;
+        this.setTitle("Unnamed Quiz Template.");
     }
 
     /**
