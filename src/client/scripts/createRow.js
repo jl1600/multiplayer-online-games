@@ -1,7 +1,7 @@
 function createRow(id, userData, buttonText = null) {
 	const row = document.createElement("div");
 	row.classList.add("row");
-	row.setAttribute("data-id", userData.id);
+	row.setAttribute("data-id", userData.userID);
 	row.innerHTML = userData.username;
 
 	if (buttonText) {

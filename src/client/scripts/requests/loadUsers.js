@@ -4,8 +4,7 @@ document.addEventListener("DOMContentLoaded", loadUsers, false);
 
 function loadUsers() {
 	const userType = sessionStorage.getItem("userType");
-	xhr1.open("GET", "http://localhost:8000/user/all-members" +
-		userType === "ADMIN" ? "" : `?userid=${ sessionStorage.getItem("userId") }`);
+	xhr1.open("GET", "http://localhost:8000/user/all-members" + (userType === "ADMIN" ? "" : `?userid=${ sessionStorage.getItem("userId") }`));
 
 	xhr1.onreadystatechange = () => {
 		if (xhr1.readyState === XMLHttpRequest.DONE && xhr1.status === 200) {

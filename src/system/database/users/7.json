@@ -5,7 +5,7 @@
   "role": "MEMBER",
   "onlineStatus": "OFFLINE",
   "gameCreations": [],
-  "friendList": [],
+  "friendList": ["2"],
   "pendingFriendList": [],
   "registerDate": "Aug 14, 2021 12:02:16 AM",
   "lastBanDate": "Aug 14, 2021 12:02:16 AM"

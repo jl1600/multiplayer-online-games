@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.*;
 import shared.DTOs.Responses.GeneralUserInfoResponseBody;
 import shared.DTOs.Responses.LoginResponseBody;
+import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
 import system.use_cases.managers.UserManager;
 
@@ -168,8 +169,9 @@ public class UserRequestHandler extends RequestHandler {
     }
 
     private void handleGetAllMembers(HttpExchange exchange) throws IOException {
-        if (exchange.getRequestURI().getQuery() == null)
+        if (exchange.getRequestURI().getQuery() == null) {
             sendResponse(exchange, 200, gson.toJson(getAllMembers()));
+        }
         else {
             String userID = getQueryArgFromGET(exchange);
             if (userID == null)
@@ -189,7 +191,9 @@ public class UserRequestHandler extends RequestHandler {
             GeneralUserInfoResponseBody user = new GeneralUserInfoResponseBody();
             user.userID = uid;
             try {
-                user.userName = userManager.getUsername(uid);
+                if (userManager.getUserRole(uid)!= UserRole.MEMBER)
+                    continue;
+                user.username = userManager.getUsername(uid);
             } catch (InvalidUserIDException e) {
                 throw new RuntimeException("The user id got from the set of all user ids is invalid.");
             }
@@ -208,7 +212,9 @@ public class UserRequestHandler extends RequestHandler {
             GeneralUserInfoResponseBody user = new GeneralUserInfoResponseBody();
             user.userID = uid;
             try {
-                user.userName = userManager.getUsername(uid);
+                if (userManager.getUserRole(uid)!= UserRole.MEMBER)
+                    continue;
+                user.username = userManager.getUsername(uid);
             } catch (InvalidUserIDException e) {
                 throw new RuntimeException("The user id got from the set of all user ids is invalid.");
             }
@@ -239,7 +245,6 @@ public class UserRequestHandler extends RequestHandler {
 
     private void handleRegister(HttpExchange exchange) throws IOException {
         RegisterRequestBody body = gson.fromJson(getRequestBody(exchange), RegisterRequestBody.class);
-        System.out.println("Trying to register");
         try {
             userManager.createUser(body.username, body.password, body.role);
             sendResponse(exchange, 204, null);
@@ -297,7 +302,7 @@ public class UserRequestHandler extends RequestHandler {
             for (String id : allFriends){
                 GeneralUserInfoResponseBody frb = new GeneralUserInfoResponseBody();
                 frb.userID = id;
-                frb.userName = userManager.getUsername(id);
+                frb.username = userManager.getUsername(id);
                 dataSet.add(frb);
             }
 
@@ -321,7 +326,7 @@ public class UserRequestHandler extends RequestHandler {
             for (String id : allFriends){
                 GeneralUserInfoResponseBody frb = new GeneralUserInfoResponseBody();
                 frb.userID = id;
-                frb.userName = userManager.getUsername(id);
+                frb.username = userManager.getUsername(id);
                 dataSet.add(frb);
             }
         } catch (InvalidUserIDException e) {

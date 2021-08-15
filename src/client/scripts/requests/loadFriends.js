@@ -22,7 +22,7 @@ function loadFriends() {
 
 	xhr2.onreadystatechange = () => {
 		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 200) {
-			JSON.parse(xhr2.response).forEach(friend => createRow("friends", friend, "Remove friend"));
+			JSON.parse(xhr2.response).forEach(friend => createRow("friends", friend, "Unfriend"));
 			listenForRemoveFriends();
 		}
 	}
@@ -33,16 +33,18 @@ function loadFriends() {
 function listenForRemoveFriends() {
 	document.querySelectorAll("#friends .button")?.forEach(el => {
 		el.addEventListener("click", () => {
-			removeFriend(el.parentElement.getAttribute("data-id"));
+		    if (confirm("Are you sure you want to remove this friend?")) {
+			    removeFriend(el.parentElement.getAttribute("data-id"));
+			}
 		});
 	});
 }
 
 function removeFriend(receiverID) {
-	xhr2.open("GET", "http://localhost:8000/user/remove-friend");
+	xhr2.open("POST", "http://localhost:8000/user/remove-friend");
 
 	xhr2.onreadystatechange = () => {
-		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 200) {
+		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 204) {
 			window.location.reload();
 		} else if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 400) {
 			alert("userID is invalid");
@@ -64,10 +66,10 @@ function listenForAcceptances() {
 }
 
 function acceptFriendRequest(receiverID) {
-	xhr2.open("GET", "http://localhost:8000/user/accept-pending-friend");
+	xhr2.open("POST", "http://localhost:8000/user/accept-pending-friend");
 
 	xhr2.onreadystatechange = () => {
-		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 200) {
+		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 204) {
 			window.location.reload();
 		} else if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 400) {
 			alert("userID is invalid");
@@ -89,10 +91,10 @@ function listenForDeclines() {
 }
 
 function declineFriendRequest(receiverID) {
-	xhr2.open("GET", "http://localhost:8000/user/decline-pending-friend");
+	xhr2.open("POST", "http://localhost:8000/user/decline-pending-friend");
 
 	xhr2.onreadystatechange = () => {
-		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 200) {
+		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 204) {
 			window.location.reload();
 		} else if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 400) {
 			alert("userID is invalid");
