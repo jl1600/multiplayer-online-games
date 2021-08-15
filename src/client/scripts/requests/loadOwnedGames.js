@@ -72,7 +72,7 @@ function deleteGame(el) {
 }
 
 function recoverGame(el) {
-	xhr.open("POST", "http://localhost:8000/game/access-level");
+	xhr.open("POST", "http://localhost:8000/game/undo-access-level");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
@@ -86,8 +86,7 @@ function recoverGame(el) {
 
 	xhr.send(JSON.stringify({
 		gameID: el.parentElement.parentElement.parentElement.getAttribute("data-id"),
-		userID: sessionStorage.getItem("userId"),
-		accessLevel: "PRIVATE"
+		userID: sessionStorage.getItem("userId")
 	}));
 }
 
