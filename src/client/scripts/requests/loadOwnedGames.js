@@ -6,6 +6,7 @@ function fetchOwnedGames() {
     if (sessionStorage.getItem("userType") === "ADMIN") {
         document.getElementsByTagName("h1")[0].innerHTML = `${ window.location.href.match(/username=(\w+)/)[1] }'s games`;
         xhr.open("GET", `http://localhost:8000/game/all-owned-games?userid=${ window.location.href.match(/userId=(\d+)/)[1] }`);
+        document.getElementById("create-card").hidden = true;
     } else {
         xhr.open("GET", `http://localhost:8000/game/all-owned-games?userid=${ sessionStorage.getItem("userId") }`);
     }
