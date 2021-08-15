@@ -23,7 +23,12 @@ function signup(username, password, confirmPassword, userType) {
 		}
 	};
 
-	xhr.send(JSON.stringify({username, password, role: userType }));
+	xhr.send(JSON.stringify({
+	    userID: sessionStorage.getItem("userId"),
+	    username,
+	    password,
+	    role: userType
+	}));
 }
 
 function checkPassword() {
