@@ -105,7 +105,7 @@ public class UserRequestHandler extends RequestHandler {
         EditPasswordRequestBody body = gson.fromJson(getRequestBody(exchange), EditPasswordRequestBody.class);
         try {
             userManager.editPassword(body.userID,body.oldPassword,body.newPassword);
-            sendResponse(exchange, 204, null);
+            sendResponse(exchange, 200, null);
         } catch (InvalidUserIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }catch (IncorrectPasswordException e) {

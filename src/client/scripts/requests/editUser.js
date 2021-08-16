@@ -52,10 +52,10 @@ function allowEditPassword() {
 }
 function updatePassword() {
     xhr.open("POST", "http://localhost:8000/user/edit-password");
-	xhr.setRequestHeader("Content-Type", "application/json");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+		    alert("!!!!!1!!!!!");
             document.getElementById("edit-password").hidden = false;
             document.getElementById("save-password").hidden = true;
             document.getElementById("new-password").hidden = true;

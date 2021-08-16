@@ -273,10 +273,9 @@ public class UserManager {
             IncorrectPasswordException, IOException, InvalidUserIDException {
         if (isPasswordIncorrect(userId, oldPassword)) throw new IncorrectPasswordException();
 
-        User user = getUser(userId);
-        user.setPassword(newPassword);
+        getUser(userId).setPassword(newPassword);
 
-        gateway.updateUser(user);
+        gateway.updateUser(getUser(userId));
     }
 
     /**
