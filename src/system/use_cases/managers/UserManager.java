@@ -209,8 +209,6 @@ public class UserManager {
         if (specialMatcher.find()){
             hasSpecialChar = true;
         }
-
-        System.out.println(password + characters + hasNumbers + hasSpecialChar + isLong);
         return characters && hasNumbers && hasSpecialChar && isLong;
     }
 

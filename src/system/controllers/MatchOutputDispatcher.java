@@ -38,11 +38,10 @@ public class MatchOutputDispatcher implements Observer {
     public final Gson gson;
 
     /**
-     *
-     * @param out the outputs
+     * @param out     the output stream
      * @param manager the match manager that contains all matches and can manipulate them
-     * @param matchID the current match id
-     * @param userID the current user id
+     * @param matchID the observed match id
+     * @param userID  the client user id
      */
     public MatchOutputDispatcher(OutputStream out, MatchManager manager, String matchID, String userID) {
         this.matchManager = manager;
@@ -52,13 +51,12 @@ public class MatchOutputDispatcher implements Observer {
         gson = new Gson();
     }
 
-
     /**
-     * Send match output to all players.
+     * Sends the latest match output to the output stream when the observed game match is modified.
      *
-     * @param o the game match that is being observed
-     * @param arg the String ID of the player who caused the change.
-     * */
+     * @param o   the observed object, not used, required by Observer
+     * @param arg input argument, not used, required by Observer
+     */
     @Override
     public void update(Observable o, Object arg) {
         MatchOutput matchOutput = new MatchOutput();
@@ -83,6 +81,7 @@ public class MatchOutputDispatcher implements Observer {
             System.out.println("Can't connect to this player. They may have left the match.");
         }
     }
+
     // Read a websocket text message
     // Sending a websocket text message
     // Formatting the byte array so that it follows the standard for websocket communication
@@ -91,7 +90,7 @@ public class MatchOutputDispatcher implements Observer {
         firstTwo[0] |= (1 << 7);  // FIN, telling the client that this is a whole message
         firstTwo[0] |= 1; // Op code, 0x1, telling that this is a text
         int lenCode;    // this is the length of the message if length < 126
-        byte [] uint16Len = new byte [2];   // A backup for the length in the case it exceeds 125
+        byte[] uint16Len = new byte[2];   // A backup for the length in the case it exceeds 125
 
         if (message.length() < 126) {
             lenCode = message.length();

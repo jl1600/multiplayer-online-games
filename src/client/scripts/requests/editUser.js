@@ -6,13 +6,11 @@ document.addEventListener("DOMContentLoaded", fillEmail(), false);
 
 function fillUsername() {
     xhr.open("GET", "http://localhost:8000/user/username?userid=" + sessionStorage.getItem("userId"));
-
     	xhr.onreadystatechange = () => {
     		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
     		    document.getElementById("username").value = JSON.parse(xhr.response).username;
     		}
     	}
-
     	xhr.send();
 }
 
@@ -20,7 +18,7 @@ function fillEmail() {
     xhr2.open("GET", "http://localhost:8000/user/email?userid=" + sessionStorage.getItem("userId"));
 
     	xhr2.onreadystatechange = () => {
-    		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+    		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 200) {
     		    document.getElementById("email").value = JSON.parse(xhr2.response).email;
     		}
     	}
@@ -90,11 +88,23 @@ function allowEditPassword() {
     document.getElementById("save-password").hidden = false;
     document.getElementById("old-password").value = "";
     document.getElementById("old-password").readOnly = false;
+    document.getElementById("old-password").required = true;
+
     document.getElementById("old-password").focus();
     document.getElementById("new-password").hidden = false;
     document.getElementById("confirm-password").hidden = false;
+
+    if (document.getElementById("password-strength").style.display === "none") {
+        document.getElementById("password-strength").style.display = "block";
+     }
+
+     document.getElementById("new-password").addEventListener("input", () => {
+         passwordStrengthChecker(document.getElementById("new-password").value)
+     });
+
 }
 function updatePassword() {
+    if (!checkPassword()) return false;
     xhr.open("POST", "http://localhost:8000/user/edit-password");
 
 	xhr.onreadystatechange = () => {
@@ -108,6 +118,7 @@ function updatePassword() {
 
             document.getElementById("old-password").value = "xxxxxxxx";
             document.getElementById("old-password").readOnly = true;
+            document.getElementById("password-strength").style.display = "none"
             alert("Password edit success.");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
             alert("Invalid userID");
@@ -125,3 +136,63 @@ function updatePassword() {
 	}));
 }
 
+function checkPassword() {
+	if (document.getElementById("new-password").value !== document.getElementById("confirm-password").value) {
+		document.getElementById("errorMessage").innerHTML = "Passwords don't match!";
+		return false;
+	} else {
+		document.getElementById("errorMessage").innerHTML = "";
+		return true;
+	}
+}
+
+function passwordStrengthChecker(password){
+    var charactersBool = false;
+    var numberBool = false;
+    var specialCharacterBool = false;
+    var lengthBool = false;
+
+    if (password.match(/([a-z].*[A-Z])/) || password.match(/([A-Z].*[a-z])/)){
+        addCheck("characters");
+        charactersBool = true;
+    } else {
+        removeCheck("characters");
+        charactersBool = false;
+    }
+
+    if (password.match(/([0-9])/)){
+        addCheck("numbers");
+        numberBool = true;
+    } else {
+        removeCheck("numbers");
+        numberBool = false;
+    }
+
+    if (password.match(/[!@#$%^&*()_~?,.<>/;:]/)){
+        addCheck("special");
+        specialCharacterBool = true;
+    } else{
+        removeCheck("special");
+        specialCharacterBool = false;
+    }
+
+    if (password.length >= 6){
+        addCheck("length");
+        lengthBool = true;
+    } else{
+        removeCheck("length");
+        lengthBool = false;
+    }
+
+    return [charactersBool, numberBool, specialCharacterBool, lengthBool].every(Boolean);
+}
+
+function addCheck(value){
+    document.querySelector("." + value + " i").classList.remove("fa-times");
+    document.querySelector("." + value + " i").classList.add("fa-check");
+}
+
+function removeCheck(value){
+    document.querySelector("." + value + " i").classList.add("fa-times");
+    document.querySelector("." + value + " i").classList.remove("fa-check");
+}
