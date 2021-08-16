@@ -1,6 +1,8 @@
 const xhr = new XMLHttpRequest();
+const xhr2 = new XMLHttpRequest();
+document.addEventListener("DOMContentLoaded", fillUsername(), false);
+document.addEventListener("DOMContentLoaded", fillEmail(), false);
 
-document.addEventListener("DOMContentLoaded", fillUsername, false);
 
 function fillUsername() {
     xhr.open("GET", "http://localhost:8000/user/username?userid=" + sessionStorage.getItem("userId"));
@@ -8,7 +10,6 @@ function fillUsername() {
     	xhr.onreadystatechange = () => {
     		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
     		    document.getElementById("username").value = JSON.parse(xhr.response).username;
-    		    document.getElementById("email").value = JSON.parse(xhr.response).email;
     		}
     	}
 
@@ -16,15 +17,15 @@ function fillUsername() {
 }
 
 function fillEmail() {
-    xhr.open("GET", "http://localhost:8000/user/username?userid=" + sessionStorage.getItem("userId"));
+    xhr2.open("GET", "http://localhost:8000/user/email?userid=" + sessionStorage.getItem("userId"));
 
-    	xhr.onreadystatechange = () => {
+    	xhr2.onreadystatechange = () => {
     		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-    		    document.getElementById("email").value = JSON.parse(xhr.response).username;
+    		    document.getElementById("email").value = JSON.parse(xhr2.response).email;
     		}
     	}
 
-    	xhr.send();
+    	xhr2.send();
 }
 
 function allowEditUsername() {
@@ -79,8 +80,8 @@ function updateEmail(){
 	}
 
 	xhr.send(JSON.stringify({
-	    userID: sessionStorage.getItem("userId"),
-	    newUsername: document.getElementById("username").value
+	    userId: sessionStorage.getItem("userId"),
+	    newEmail: document.getElementById("email").value
 	}));
 }
 

@@ -53,11 +53,11 @@ public class UserManager {
         return userIds.get(username);
     }
 
-    public String getEmail(String username) throws InvalidUsernameException, InvalidUserIDException {
-        if (!userIds.containsKey(username))
+    public String getEmail(String userID) throws InvalidUsernameException, InvalidUserIDException {
+        if (!users.containsKey(userID))
             throw new InvalidUsernameException();
 
-        return getUser(userIds.get(username)).getEmail();
+        return getUser(userID).getEmail();
     }
 
     private boolean isPasswordIncorrect(String userId, String password) throws InvalidUserIDException {

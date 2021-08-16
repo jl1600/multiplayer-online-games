@@ -400,6 +400,7 @@ public class UserRequestHandler extends RequestHandler {
 
     private void handleGetEmail(HttpExchange exchange) throws IOException {
         String userID;
+        GeneralUserInfoResponseBody body = new GeneralUserInfoResponseBody();
         try {
             String query = exchange.getRequestURI().getQuery();
             // userid=57, This is the query BTW
@@ -413,7 +414,9 @@ public class UserRequestHandler extends RequestHandler {
             return;
         }
         try {
-            sendResponse(exchange, 200, "{\"email\":\"" + userManager.getEmail(userID)+"\"}");
+            body.userID = userID;
+            body.email = userManager.getEmail(userID);
+            sendResponse(exchange, 200, gson.toJson(body));
         } catch (InvalidUserIDException | InvalidUsernameException e) {
             e.printStackTrace();
         }
