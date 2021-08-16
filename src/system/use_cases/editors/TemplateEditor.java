@@ -9,6 +9,9 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+/**
+ * Abstract TemplateEditor Class
+ */
 public abstract class TemplateEditor {
 
     /**

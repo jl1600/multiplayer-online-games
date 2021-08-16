@@ -17,6 +17,9 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * QuizGameInteractiveBuilder Class
+ */
 public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
     int numQuestions;
     int numAnswerEachQ;
@@ -32,12 +35,20 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
     String currentDesignQuestion;
     Map<DesignSubject, String> designQuestions;
 
+    /**
+     * Design subjects that the user can choose value of
+     */
     public enum DesignSubject {
         TITLE, QUESTION_NUM, ANSWER_NUM, CATEGORIES_NUM, CATEGORY_NAME, CATEGORY_END_MESSAGE,
         MAX_ATTEMPTS, QUIZ_QUESTION, QUIZ_ANSWER, CORRECT_ANSWER_INDEX, CORRECT_ANSWERS, CATEGORY_SCORE, IS_PUBLIC,
         CONFIRMATION, NULL
     }
 
+    /**
+     * Constructor of QuizGameInteractiveBuilder
+     * @param creatorID the creator of this game
+     * @param template the template this game is using
+     */
     public QuizGameInteractiveBuilder(String creatorID, QuizTemplate template) {
         super(creatorID);
         currentGame = new QuizGame("", creatorID);
@@ -58,11 +69,20 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
         numScoreCategories = 1;
     }
 
+    /**
+     * handle design choice appropriately
+     * @param designChoice A String that represents the user input for the design of the creation.
+     * @throws InvalidInputException when parameters are illegal and passed a null value
+     */
     @Override
     public void makeDesignChoice(String designChoice) throws InvalidInputException {
         currentDesignQuestion = update(designChoice);
     }
 
+    /**
+     *
+     * @return the current design question
+     */
     @Override
     public String getDesignQuestion() {
         return currentDesignQuestion;
@@ -334,6 +354,12 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
     }
 
 
+    /**
+     *
+     * @param id the gameID to be assigned to the game
+     * @return the current built game
+     * @throws InsufficientInputException if there isn't enough inputs given to fulfills the least requirement to build yet
+     */
     @Override
     public QuizGame build(String id) throws InsufficientInputException {
         if (!isReadyToBuild()) {

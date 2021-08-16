@@ -4,11 +4,21 @@ import shared.exceptions.use_case_exceptions.InsufficientInputException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.Game;
 
+/**
+ * Abstract GameInteractiveBuilder Class
+ */
 public abstract class GameInteractiveBuilder {
 
     private final String creatorID;
+    /**
+     * is this game ready to be build
+     */
     protected boolean readyToBuild;
 
+    /**
+     * Constructor of GameInteractiveBuilder
+     * @param creatorName the id of the creator user
+     */
     public GameInteractiveBuilder(String creatorName) {
         this.creatorID = creatorName;
     }

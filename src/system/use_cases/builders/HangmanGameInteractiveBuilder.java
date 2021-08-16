@@ -15,6 +15,9 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+/**
+ * HangmanGameInteractiveBuilder Class
+ */
 public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
 
     private enum DesignTopic {
@@ -28,6 +31,11 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
 
     private int currentPuzzleIndex;
 
+    /**
+     * Constructor of HangmanGameInteractiveBuilder
+     * @param creatorId the id of the creator user
+     * @param template the template this game will use
+     */
     public HangmanGameInteractiveBuilder(String creatorId, HangmanTemplate template) {
         super(creatorId);
         chosenTemplate = template;
@@ -48,12 +56,20 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
 
     }
 
+    /**
+     * @return the current design question
+     */
     @Override
     public String getDesignQuestion() {
         return designQuestions.get(currentDesignTopic);
     }
 
 
+    /**
+     * handle design choice appropriately
+     * @param designChoice A String that represents the user input for the design of the creation.
+     * @throws InvalidInputException when parameters are illegal and passed a null value
+     */
     @Override
     public void makeDesignChoice(String designChoice) throws InvalidInputException {
         switch (currentDesignTopic) {
@@ -168,6 +184,12 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
         }
     }
 
+    /**
+     * build this game
+     * @param id the gameID to be assigned to the game
+     * @return the current built game
+     * @throws InsufficientInputException if there isn't enough inputs given to fulfills the least requirement to build yet
+     */
     @Override
     public HangmanGame build(String id) throws InsufficientInputException {
 

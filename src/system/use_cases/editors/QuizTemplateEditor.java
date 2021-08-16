@@ -5,20 +5,37 @@ import shared.exceptions.use_case_exceptions.NoSuchAttributeException;
 import system.entities.template.QuizTemplate;
 import system.entities.template.Template;
 
-
+/**
+ * QuizTemplateEditor Class
+ */
 public class QuizTemplateEditor extends TemplateEditor {
 
     QuizTemplate template;
 
+    /**
+     * Constructor of QuizTemplateEditor
+     * @param template the template to be edited
+     */
     public QuizTemplateEditor(QuizTemplate template) {
         this.template = new QuizTemplate(template);
     }
 
+    /**
+     *
+     * @return get the current template
+     */
     @Override
     public Template getTemplate() {
         return this.template;
     }
 
+    /**
+     * edit template's attribute appropriately
+     * @param attributeName The name of the attribute
+     * @param value The string representation of the value
+     * @throws InvalidInputException when parameters are illegal and passed a null value
+     * @throws NoSuchAttributeException when there does not exist a case to handle this attribute name
+     */
     @Override
     public void editAttribute(String attributeName, String value)
             throws InvalidInputException, NoSuchAttributeException {

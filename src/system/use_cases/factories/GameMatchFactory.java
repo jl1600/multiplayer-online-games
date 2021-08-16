@@ -10,7 +10,20 @@ import system.use_cases.game_matches.QuizGameMatch;
 import system.entities.template.QuizTemplate;
 import system.entities.template.Template;
 
+/**
+ * GameMatchFactory Class
+ */
 public class GameMatchFactory {
+
+    /**
+     * choose which gameMatch to get based on parameters
+     * @param matchID the match's id
+     * @param userID the host user's id
+     * @param username the host user name
+     * @param game the game this match uses
+     * @param template the template this match uses
+     * @return appropriate game match based on given template and matches
+     */
     public GameMatch getGameMatch(String matchID, String userID, String username, Game game, Template template) {
         if (template instanceof QuizTemplate && game instanceof QuizGame) {
             return new QuizGameMatch(matchID, userID, username, (QuizGame) game, (QuizTemplate) template);
