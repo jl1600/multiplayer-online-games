@@ -311,22 +311,13 @@ public class GameRequestHandler extends RequestHandler {
     }
 
     private void handleGetAvailableGamesByUserID(HttpExchange exchange) throws IOException {
-        String userID;
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return;
-            }
-            userID = query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
+        String ownerID = getQueryArgFromGET(exchange);
+        if (ownerID == null)
             return;
-        }
-
         try{
-            sendResponse(exchange, 200, getAvailableGameDataByUserID(userID));
+            sendResponse(exchange, 200, getAvailableGameDataByUserID(ownerID));
         } catch (InvalidUserIDException e) {
+            System.out.println("inv");
             sendResponse(exchange, 400, "Invalid User ID.");
             return;
         }

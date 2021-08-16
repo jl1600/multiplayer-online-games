@@ -3,7 +3,7 @@ if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 document.addEventListener("DOMContentLoaded", fetchAllGames, false);
 
 function fetchAllGames() {
-	xhr.open("GET", "http://localhost:8000/game/available-games");
+	xhr.open("GET", "http://localhost:8000/game/available-games?userid=" + sessionStorage.getItem("userId"),);
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
@@ -12,7 +12,9 @@ function fetchAllGames() {
 		}
 	}
 
-	xhr.send();
+    xhr.send(JSON.stringify({
+        userID: sessionStorage.getItem("userId"),
+    }));
 }
 
 function listenForClicks() {

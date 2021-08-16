@@ -332,8 +332,9 @@ public class GameManager {
         Set<String> ownedNotDeletedGameIDs = new HashSet<>();
         for (String id: games.keySet()) {
             //if owner id match and game is not deleted
-            if ( games.get(id).getOwnerId() == userID) {
-                if (games.get(id).getGameAccessLevel() != GameAccessLevel.DELETED){
+            String ownerID = games.get(id).getOwnerId();
+            if ( ownerID.equals(userID)) {
+                if (!games.get(id).getGameAccessLevel().equals(GameAccessLevel.DELETED)){
                     ownedNotDeletedGameIDs.add(id);
                 }
             }
@@ -346,9 +347,11 @@ public class GameManager {
 
         for (String id: games.keySet()) {
             //if owner id match and game is FRIEND only
-            if ( games.get(id).getOwnerId() == userID &&
-                    (games.get(id).getGameAccessLevel() == GameAccessLevel.FRIEND)) {
-                friendOnlyGameIDs.add(id);
+            String ownerID = games.get(id).getOwnerId();
+            if ( ownerID.equals(userID)) {
+                if (games.get(id).getGameAccessLevel().equals(GameAccessLevel.FRIEND)){
+                    friendOnlyGameIDs.add(id);
+                }
             }
         }
 
