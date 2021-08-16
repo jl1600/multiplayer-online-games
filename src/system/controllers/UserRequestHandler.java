@@ -78,6 +78,9 @@ public class UserRequestHandler extends RequestHandler {
             case "cancel-friend-request":
                 handleCancelFriendRequest(exchange);
                 break;
+            case "forgot-password":
+                handleForgotPassword(exchange);
+                break;
             case "decline-pending-friend":
                 handleDeclinePendingFriend(exchange);
                 break;
@@ -233,6 +236,21 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
+    private void handleForgotPassword(HttpExchange exchange) throws IOException {
+        PasswordResetRequestBody body = gson.fromJson(getRequestBody(exchange), PasswordResetRequestBody.class);
+        EmailComposer email = new EmailComposer();
+        String reciever = "";
+        try {
+          String generatedPass = userManager.forgotPassword(body.userID, body.email);
+          email.sendResetPasswordEmail(reciever, generatedPass);
+          sendResponse(exchange, 200, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        } catch (InvalidEmailException e){
+            sendResponse(exchange, 400, "Invalid email.");
+        }
+    }
+
     private void handleDeleteUser(HttpExchange exchange) throws IOException {
         DeleteUserRequestBody body = gson.fromJson(getRequestBody(exchange), DeleteUserRequestBody.class);
         try {
@@ -246,12 +264,14 @@ public class UserRequestHandler extends RequestHandler {
     private void handleRegister(HttpExchange exchange) throws IOException {
         RegisterRequestBody body = gson.fromJson(getRequestBody(exchange), RegisterRequestBody.class);
         try {
-            userManager.createUser(body.username, body.password, body.role);
+            userManager.createUser(body.username, body.password, body.email, body.role);
             sendResponse(exchange, 204, null);
         } catch (DuplicateUsernameException e) {
             sendResponse(exchange, 403, "Duplicate username.");
         } catch (WeakPasswordException e){
-            sendResponse(exchange, 400, "Password isn't strong enough.");
+            sendResponse(exchange, 412, "Password isn't strong enough.");
+        } catch (InvalidEmailException e) {
+            sendResponse(exchange, 400, "Invalid email.");
         }
     }
 

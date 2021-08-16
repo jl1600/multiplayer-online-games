@@ -15,6 +15,7 @@ public class User {
     private final String userId;
     private String username;
     private String password;
+    private String email;
     private UserRole role;
     private OnlineStatus onlineStatus;
     private final Set<String> gameCreations;
@@ -30,10 +31,11 @@ public class User {
      * @param password the password user use to prove their identity
      * @param role the user role that determines the appropriate action to take and rules to follow for this user
      */
-    public User(String userId, String username, String password, UserRole role, Date registerDate) {
+    public User(String userId, String username, String password, String email, UserRole role, Date registerDate) {
         this.userId = userId;
         this.username = username;
         this.password = password;
+        this.email = email;
         this.role = role;
         this.onlineStatus = OnlineStatus.OFFLINE;
         this.gameCreations = new HashSet<>();
@@ -129,6 +131,10 @@ public class User {
     public String getPassword() {
         return password;
     }
+
+    public String getEmail() { return email;}
+
+    public void setEmail(String email) {this.email = email;}
 
     public void removeGameID(String gameID) {
         gameCreations.remove(gameID);

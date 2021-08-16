@@ -25,3 +25,9 @@ function login(username, password) {
 
 	xhr.send(JSON.stringify({ username, password }));
 }
+
+
+function redirect(){
+    console.log("redirecting to reset.html")
+    window.location = "http://localhost:8080/pages/reset.html"
+}

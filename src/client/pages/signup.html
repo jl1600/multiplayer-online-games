@@ -12,11 +12,12 @@
 	<body>
 		<iframe id="header" src="../components/header.html" width="100%"></iframe>
 
-		<form onsubmit="signup(this.username.value, this.password.value, this.confirmPassword.value, this.userType.value); return false">
+		<form onsubmit="signup(this.username.value, this.password.value, this.confirmPassword.value, this.email.value, this.userType.value); return false">
 			<h1>Sign up</h1>
 
 			<input type="text" name="username" placeholder="Username" required>
 			<input id="password" type="password" name="password" placeholder="Password" required>
+			<input id="text" type="email" name="email" placeholder="email" required>
 			<input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm password" required onfocusout="checkPassword()">
 			<div id="errorMessage"></div>
 

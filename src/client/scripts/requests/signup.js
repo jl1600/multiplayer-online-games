@@ -9,9 +9,10 @@ function checkPassword() {
 		return true;
 	}
 }
-function signup(username, password, confirmPassword, userType) {
+function signup(username, password, confirmPassword, email, userType) {
 	if (!username || !password) return false;
 	if (!checkPassword(password, confirmPassword)) return false;
+	if (!checkValidEmail(email)) return false;
 
 	xhr.open("POST", "http://localhost:8000/user/register");
 
@@ -20,15 +21,18 @@ function signup(username, password, confirmPassword, userType) {
 			window.location = "http://localhost:8080/pages/login.html";
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
 		    alert("Username is taken");
-		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 412) {
 		    alert("Password is not strong enough")
-		}
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+            alert("Email is invalid")
+         }
 	};
 
 	xhr.send(JSON.stringify({
 	    userID: sessionStorage.getItem("userId"),
 	    username,
 	    password,
+	    email,
 	    role: userType
 	}));
 }
@@ -98,4 +102,9 @@ function addCheck(value){
 function removeCheck(value){
     document.querySelector("." + value + " i").classList.add("fa-times");
     document.querySelector("." + value + " i").classList.remove("fa-check");
+}
+
+function checkValidEmail(email){
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
 }

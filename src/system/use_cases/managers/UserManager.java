@@ -1,6 +1,6 @@
 package system.use_cases.managers;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import java.util.*;
 import shared.constants.OnlineStatus;
 import shared.constants.UserRole;
 import shared.exceptions.entities_exception.IDAlreadySetException;
@@ -10,7 +10,6 @@ import system.entities.User;
 import system.gateways.UserDataGateway;
 
 import java.io.IOException;
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,11 +19,13 @@ public class UserManager {
     private final IdManager idManager;
     private final HashMap<String, String> userIds; // username to userId
     private final UserDataGateway gateway;
+    private final HashMap<String, String> tempPasswords; //  userId to temporary passwords
 
     public UserManager(UserDataGateway gateway) throws IOException, InvalidUserIDException {
         users = new HashMap<>();
         userIds = new HashMap<>();
         this.gateway = gateway;
+        tempPasswords = new HashMap<>();
 
         Date currentTime = Calendar.getInstance().getTime();
 
@@ -92,19 +93,21 @@ public class UserManager {
      *             Trial users should be created using this.createTrialUser
      * @throws DuplicateUsernameException if the username is already taken
      */
-    public void createUser(String username, String password, UserRole role)
-            throws DuplicateUsernameException, UnaccountedUserRoleException, WeakPasswordException {
+    public void createUser(String username, String password, String email, UserRole role)
+            throws DuplicateUsernameException, UnaccountedUserRoleException, WeakPasswordException, InvalidEmailException {
         if (role.equals(UserRole.TRIAL))
             throw new UnaccountedUserRoleException();
         if (userIds.containsKey(username))
             throw new DuplicateUsernameException();
         if (!checkPasswordStrength(password))
             throw new WeakPasswordException();
+        if (!isValidEmail(email))
+            throw new InvalidEmailException();
 
         String userId = idManager.getNextId();
         Date currentTime = Calendar.getInstance().getTime();
 
-        User user = new User(userId, username, password, role, currentTime);
+        User user = new User(userId, username, password, email, role, currentTime);
         userIds.put(username, userId);
         users.put(userId, user);
         System.out.println("Trying to add the user to gateway");
@@ -115,6 +118,49 @@ public class UserManager {
         }
     }
 
+    public String forgotPassword(String userId, String email) throws InvalidEmailException, InvalidUserIDException {
+        if (isValidEmail(email))
+            throw new InvalidEmailException();
+        if (!users.containsKey(userId))
+            throw new InvalidUserIDException();
+        String tempGeneratedPass = generateRandomPassword();
+
+        tempPasswords.put(userId, tempGeneratedPass);
+        return tempGeneratedPass;
+    }
+
+    public boolean isValidEmail(String email){
+        Pattern email_regex = Pattern.compile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
+        final Matcher matcher = email_regex.matcher(email);
+        return matcher.matches();
+    }
+
+    private String generateRandomPassword(){
+        String alphabetUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String alphabetLower = "abcdefghijklmnopqrstuvwxyz";
+        String numbers = "0123456789";
+        String specialChar = "$&+,:;=?@#|";
+        StringBuilder randomPassword = new StringBuilder();
+        for(int i = 0; i < 10; i++) {
+            if (i == 0){
+                int randomUpper = (int)(Math.random() * 26);
+                randomPassword.append(alphabetUpper.charAt(randomUpper));
+            } else if (i == 1){
+                int randomLower = (int)(Math.random() * 26);
+                randomPassword.append(alphabetLower.charAt(randomLower));
+            } else if (i == 2) {
+                int randomNumber = (int)(Math.random() * 9);
+                randomPassword.append(numbers.charAt(randomNumber));
+            } else if (i == 3) {
+                int randomSpecial = (int)(Math.random() * 11);
+                randomPassword.append(specialChar.charAt(randomSpecial));
+            } else{
+                int randomLower = (int)(Math.random() * 26);
+                randomPassword.append(alphabetLower.charAt(randomLower));
+            }
+        }
+        return randomPassword.toString();
+    }
 
     private boolean checkPasswordStrength(String password){
         boolean characters = false;
@@ -153,7 +199,7 @@ public class UserManager {
 
         Date currentTime = Calendar.getInstance().getTime();
 
-        User user = new User(userId, username, null, UserRole.TRIAL, currentTime);
+        User user = new User(userId, username, null, null, UserRole.TRIAL, currentTime);
 
         userIds.put(username, userId);
         users.put(userId, user);
@@ -184,7 +230,7 @@ public class UserManager {
 
         String userId = getUserId(username);
         try {
-            if (isPasswordIncorrect(userId, password)) throw new IncorrectPasswordException();
+            if (isPasswordIncorrect(userId, password) && isTempPasswordLogin(userId, password)) throw new IncorrectPasswordException();
             if (isBanned(userId)) throw new BannedUserException();
             if (getUserRole(userId) == UserRole.TEMP){
                 if (isExpiredUser(userId)){
@@ -193,11 +239,24 @@ public class UserManager {
             }
             getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
             gateway.updateUser(getUser(userId));
+            removeTempPass(userId);
         } catch (InvalidUserIDException e) {
             throw new RuntimeException("System failure: The ID associated with this username is invalid.");
         }
-
         return userId;
+    }
+
+    private boolean isTempPasswordLogin(String userId, String password){
+        if (tempPasswords.containsKey(userId)) {
+            return tempPasswords.get(userId).equals(password);
+        }
+        return false;
+    }
+
+    private void removeTempPass(String userId){
+        if (tempPasswords.containsKey(userId)){
+            tempPasswords.remove(userId);
+        }
     }
 
     private boolean isBanned(String userId) throws InvalidUserIDException {
@@ -207,7 +266,6 @@ public class UserManager {
             //if the last ban date hasn't arrived yet
             //online status will be set in login()
             return getUser(userId).getLastBanDate().after(currentTime);
-
         }
         return false;
     }
