@@ -130,8 +130,8 @@ public class UserManager {
     }
 
     public boolean isValidEmail(String email){
-        Pattern email_regex = Pattern.compile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
-        final Matcher matcher = email_regex.matcher(email);
+        Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$");
+        final Matcher matcher = emailPattern.matcher(email);
         return matcher.matches();
     }
 
@@ -239,7 +239,6 @@ public class UserManager {
             }
             getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
             gateway.updateUser(getUser(userId));
-            removeTempPass(userId);
         } catch (InvalidUserIDException e) {
             throw new RuntimeException("System failure: The ID associated with this username is invalid.");
         }
@@ -305,6 +304,7 @@ public class UserManager {
             String username = users.get(userId).getUsername();
             users.remove(userId);
             userIds.remove(username);
+            removeTempPass(userId);
         } else {
             gateway.updateUser(getUser(userId));
         }
