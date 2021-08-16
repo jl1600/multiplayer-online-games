@@ -132,7 +132,7 @@ public class UserManager {
             hasNumbers = true;
         }
 
-        Pattern specialRegex = Pattern.compile("[$&+,:;=?@#|]");
+        Pattern specialRegex = Pattern.compile("[$&+,:;=?@#|!]");
         Matcher specialMatcher = specialRegex.matcher(password);
         if (specialMatcher.find()){
             hasSpecialChar = true;

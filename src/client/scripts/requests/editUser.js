@@ -20,8 +20,9 @@ function allowEditUsername() {
     document.getElementById("edit-username").hidden = true;
     document.getElementById("save-username").hidden = false;
 }
-function updateUsername(username) {
+function updateUsername() {
 	xhr.open("POST", "http://localhost:8000/edit-username");
+	alert(document.getElementById("username").value);
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
@@ -37,7 +38,7 @@ function updateUsername(username) {
 
 	xhr.send(JSON.stringify({
 	    userID: sessionStorage.getItem("userId"),
-	    newUsername
+	    newUsername: document.getElementById("username").value
 	}));
 }
 
