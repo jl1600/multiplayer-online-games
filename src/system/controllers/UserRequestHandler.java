@@ -402,7 +402,6 @@ public class UserRequestHandler extends RequestHandler {
         String userID;
         try {
             String query = exchange.getRequestURI().getQuery();
-            // userid=57, This is the query BTW
             if (query == null) {
                 sendResponse(exchange, 400, "Missing Query.");
                 return;
