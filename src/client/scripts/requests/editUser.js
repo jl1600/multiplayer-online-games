@@ -33,12 +33,7 @@ function allowEditUsername() {
     document.getElementById("edit-username").hidden = true;
     document.getElementById("save-username").hidden = false;
 }
-function allowEditEmail() {
-    document.getElementById("email").readOnly = false;
-    document.getElementById("email").focus();
-    document.getElementById("edit-email").hidden = true;
-    document.getElementById("save-email").hidden = false;
-}
+
 function updateUsername() {
 	xhr.open("POST", "http://localhost:8000/user/edit-username");
 
@@ -74,11 +69,13 @@ function updateEmail(){
             document.getElementById("edit-email").hidden = false;
             document.getElementById("save-email").hidden = true;
             document.getElementById("email").readOnly = true;
-		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
-		    alert("Invalid email");
-		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
-		    alert("Duplicate Email");
-		}
+		}else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+         	alert("Invalid userID");
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
+         	alert("Duplicate email");
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 412) {
+            alert("Invalid email");
+        }
 	}
 
 	xhr.send(JSON.stringify({
@@ -86,28 +83,7 @@ function updateEmail(){
 	    newUsername: document.getElementById("username").value
 	}));
 }
-function updateEmail() {
-	xhr.open("POST", "http://localhost:8000/user/edit-email");
 
-	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
-            document.getElementById("edit-email").hidden = false;
-            document.getElementById("save-email").hidden = true;
-            document.getElementById("email").readOnly = true;
-		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
-		    alert("Invalid userID");
-		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
-		    alert("Duplicate email");
-		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 412) {
-            alert("Invalid email");
-        }
-	}
-
-	xhr.send(JSON.stringify({
-	    userID: sessionStorage.getItem("userId"),
-	    newEmail: document.getElementById("email").value
-	}));
-}
 function allowEditPassword() {
     document.getElementById("edit-password").hidden = true;
     document.getElementById("save-password").hidden = false;
