@@ -17,15 +17,17 @@
 			<div id="form">
 				<div id="template-genre">Select a genre:
 					<label>
-						<input type="radio" name="templateGenre" value="QUIZ" checked />Quiz
+						<input type="radio" name="templateGenre" value="QUIZ" onchange="onRadioButtonChange()" checked />Quiz
 					</label>
 					<label>
-						<input type="radio" name="templateGenre" value="HANGMAN"/>Hangman
+						<input type="radio" name="templateGenre" value="HANGMAN" onchange="onRadioButtonChange()" />Hangman
 					</label>
 				</div>
 				<label>
 					Title: <input required />
 				</label>
+				<div id="checkboxes">
+				</div>
 				<button type="button" onclick="createTemplate()">Save</button>
 			</div>
 		</main>

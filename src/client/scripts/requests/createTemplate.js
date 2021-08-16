@@ -3,7 +3,7 @@ if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 getDefaultAttributes();
 
 function getDefaultAttributes() {
-    const genre = document.querySelector("input[name='templateGenre']:checked").value;
+    var genre = document.querySelector("input[name='templateGenre']:checked").value;
     xhr.open("GET", "http://localhost:8000/template/default-attr-map?genre=" + genre);
 
     xhr.onreadystatechange = () => {
@@ -15,6 +15,11 @@ function getDefaultAttributes() {
     }
 
     xhr.send();
+}
+
+function onRadioButtonChange() {
+    document.getElementById("checkboxes").innerHTML = '';
+    getDefaultAttributes();
 }
 
 function createTemplate() {
@@ -37,7 +42,7 @@ function createTemplate() {
 }
 
 function promptAttributes(map) {
-    document.getElementsByTagName("input")[0].value = map.title;
+    document.getElementsByTagName("input")[2].value = map.title;
     delete map.title;
 
     for (const [key, value] of Object.entries(map)) {
@@ -58,7 +63,7 @@ function addOption(label, checked) {
 
     labelEl.prepend(input);
 
-    document.getElementById("form").insertBefore(labelEl, document.getElementsByTagName("button")[0]);
+    document.getElementById("checkboxes").appendChild(labelEl);
 }
 
 function restrictOptions() {
