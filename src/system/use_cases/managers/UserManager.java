@@ -237,7 +237,7 @@ public class UserManager {
 
         String userId = getUserId(username);
         try {
-            if (isPasswordIncorrect(userId, password) && isTempPasswordLogin(userId, password)) throw new IncorrectPasswordException();
+            if (isPasswordIncorrect(userId, password) && hasTempPassword(userId, password)) throw new IncorrectPasswordException();
             if (isBanned(userId)) throw new BannedUserException();
             if (getUserRole(userId) == UserRole.TEMP){
                 if (isExpiredUser(userId)){
@@ -252,7 +252,7 @@ public class UserManager {
         return userId;
     }
 
-    private boolean isTempPasswordLogin(String userId, String password){
+    private boolean hasTempPassword(String userId, String password){
         if (tempPasswords.containsKey(userId)) {
             return tempPasswords.get(userId).equals(password);
         }
@@ -336,8 +336,12 @@ public class UserManager {
      */
     public void editPassword(String userId, String oldPassword, String newPassword) throws
             IncorrectPasswordException, IOException, InvalidUserIDException, WeakPasswordException {
-        if (isPasswordIncorrect(userId, oldPassword) && isTempPasswordLogin(userId, oldPassword))
-            throw new IncorrectPasswordException();
+        if (isPasswordIncorrect(userId, oldPassword)){
+            if (!hasTempPassword(userId,oldPassword)){
+                throw new IncorrectPasswordException();
+            }
+        }
+
         if (!checkPasswordStrength(newPassword)){
            throw new WeakPasswordException();
         }
