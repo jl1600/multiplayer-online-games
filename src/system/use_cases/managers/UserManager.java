@@ -53,6 +53,13 @@ public class UserManager {
         return userIds.get(username);
     }
 
+    public String getEmail(String username) throws InvalidUsernameException, InvalidUserIDException {
+        if (!userIds.containsKey(username))
+            throw new InvalidUsernameException();
+
+        return getUser(userIds.get(username)).getEmail();
+    }
+
     private boolean isPasswordIncorrect(String userId, String password) throws InvalidUserIDException {
         if (!users.containsKey(userId)) throw new InvalidUserIDException();
 
@@ -362,6 +369,17 @@ public class UserManager {
         userIds.put(newUsername, userId);
         user.setUsername(newUsername);
 
+        gateway.updateUser(user);
+    }
+
+
+    public void editEmail(String userId, String newEmail) throws IOException, InvalidUserIDException {
+        if (!users.containsKey(userId))
+            throw new InvalidUserIDException();
+
+
+        User user = getUser(userId);
+        user.setEmail(newEmail);
         gateway.updateUser(user);
     }
 

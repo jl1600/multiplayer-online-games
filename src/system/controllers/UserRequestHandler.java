@@ -38,6 +38,9 @@ public class UserRequestHandler extends RequestHandler {
             case "userid":
                 handleGetUserID(exchange);
                 break;
+            case "email":
+                handleGetEmail(exchange);
+                break;
             case "friends":
                 handleGetFriends(exchange);
                 break;
@@ -93,6 +96,8 @@ public class UserRequestHandler extends RequestHandler {
             case "edit-username":
                 handleEditUsername(exchange);
                 break;
+            case "edit-email":
+                handleEditEmail(exchange);
             case "edit-password":
                 handleEditPassword(exchange);
                 break;
@@ -103,6 +108,7 @@ public class UserRequestHandler extends RequestHandler {
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
+
 
     private void handleEditPassword(HttpExchange exchange) throws IOException {
         EditPasswordRequestBody body = gson.fromJson(getRequestBody(exchange), EditPasswordRequestBody.class);
@@ -129,6 +135,17 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 403, "Duplicate username.");
         }
     }
+
+    private void handleEditEmail(HttpExchange exchange) throws IOException {
+        EditEmailRequestBody body = gson.fromJson(getRequestBody(exchange), EditEmailRequestBody.class);
+        try {
+            userManager.editEmail(body.userId, body.newEmail);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
 
     private void handleRemoveFriend(HttpExchange exchange) throws IOException {
         FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
@@ -381,10 +398,32 @@ public class UserRequestHandler extends RequestHandler {
 
     }
 
+    private void handleGetEmail(HttpExchange exchange) throws IOException {
+        String userID;
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            // userid=57, This is the query BTW
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            userID = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
+        }
+        try {
+            sendResponse(exchange, 200, "{\"email\":\"" + userManager.getEmail(userID)+"\"}");
+        } catch (InvalidUserIDException | InvalidUsernameException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void handleGetUsername(HttpExchange exchange) throws IOException {
         String userID;
         try {
             String query = exchange.getRequestURI().getQuery();
+            // userid=57, This is the query BTW
             if (query == null) {
                 sendResponse(exchange, 400, "Missing Query.");
                 return;

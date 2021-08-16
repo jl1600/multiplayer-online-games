@@ -15,6 +15,18 @@ function fillUsername() {
     	xhr.send();
 }
 
+function fillEmail() {
+    xhr.open("GET", "http://localhost:8000/user/username?userid=" + sessionStorage.getItem("userId"));
+
+    	xhr.onreadystatechange = () => {
+    		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+    		    document.getElementById("email").value = JSON.parse(xhr.response).username;
+    		}
+    	}
+
+    	xhr.send();
+}
+
 function allowEditUsername() {
     document.getElementById("username").readOnly = false;
     document.getElementById("username").focus();
@@ -39,6 +51,33 @@ function updateUsername() {
 		    alert("Invalid userID");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
 		    alert("Duplicate username");
+		}
+	}
+
+	xhr.send(JSON.stringify({
+	    userID: sessionStorage.getItem("userId"),
+	    newUsername: document.getElementById("username").value
+	}));
+}
+
+function allowEditEmail(){
+    document.getElementById("email").readOnly = false;
+    document.getElementById("email").focus();
+    document.getElementById("edit-email").hidden = true;
+    document.getElementById("save-email").hidden = false;
+}
+
+function updateEmail(){
+    xhr.open("POST", "http://localhost:8000/user/edit-email");
+	xhr.onreadystatechange = () => {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
+            document.getElementById("edit-email").hidden = false;
+            document.getElementById("save-email").hidden = true;
+            document.getElementById("email").readOnly = true;
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+		    alert("Invalid email");
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
+		    alert("Duplicate Email");
 		}
 	}
 
