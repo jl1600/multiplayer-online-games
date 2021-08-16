@@ -96,12 +96,17 @@ function allowEditPassword() {
 
     if (document.getElementById("password-strength").style.display === "none") {
         document.getElementById("password-strength").style.display = "block";
-      } else {
+     } else {
         document.getElementById("password-strength").style.display = "none";
-      }
+     }
+
+     document.getElementById("new-password").addEventListener("input", () => {
+         passwordStrengthChecker(document.getElementById("new-password").value)
+     });
 
 }
 function updatePassword() {
+    if (!checkPassword()) return false;
     xhr.open("POST", "http://localhost:8000/user/edit-password");
 
 	xhr.onreadystatechange = () => {
@@ -132,3 +137,63 @@ function updatePassword() {
 	}));
 }
 
+function checkPassword() {
+	if (document.getElementById("new-password").value !== document.getElementById("confirm-password").value) {
+		document.getElementById("errorMessage").innerHTML = "Passwords don't match!";
+		return false;
+	} else {
+		document.getElementById("errorMessage").innerHTML = "";
+		return true;
+	}
+}
+
+function passwordStrengthChecker(password){
+    var charactersBool = false;
+    var numberBool = false;
+    var specialCharacterBool = false;
+    var lengthBool = false;
+
+    if (password.match(/([a-z].*[A-Z])/) || password.match(/([A-Z].*[a-z])/)){
+        addCheck("characters");
+        charactersBool = true;
+    } else {
+        removeCheck("characters");
+        charactersBool = false;
+    }
+
+    if (password.match(/([0-9])/)){
+        addCheck("numbers");
+        numberBool = true;
+    } else {
+        removeCheck("numbers");
+        numberBool = false;
+    }
+
+    if (password.match(/[!@#$%^&*()_~?,.<>/;:]/)){
+        addCheck("special");
+        specialCharacterBool = true;
+    } else{
+        removeCheck("special");
+        specialCharacterBool = false;
+    }
+
+    if (password.length >= 6){
+        addCheck("length");
+        lengthBool = true;
+    } else{
+        removeCheck("length");
+        lengthBool = false;
+    }
+
+    return [charactersBool, numberBool, specialCharacterBool, lengthBool].every(Boolean);
+}
+
+function addCheck(value){
+    document.querySelector("." + value + " i").classList.remove("fa-times");
+    document.querySelector("." + value + " i").classList.add("fa-check");
+}
+
+function removeCheck(value){
+    document.querySelector("." + value + " i").classList.add("fa-times");
+    document.querySelector("." + value + " i").classList.remove("fa-check");
+}

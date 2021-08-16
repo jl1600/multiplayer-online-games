@@ -30,17 +30,19 @@
 			</label>
 			<label>
 				Password:
-				<input id="old-password" type="password" name="oldPassword" value="xxxxxxxx" placeholder="Password" readonly />
+				<input id="old-password" type="password" name="oldPassword" value="xxxxxxxx" placeholder="Password" readonly/>
 				<button id="save-password" onclick="updatePassword()" type="button" hidden style="margin-left: 30px">Save</button>
 				<input id="new-password" type="password" name="newPassword" placeholder="New password" hidden style="margin-left: 100px" />
 				<input id="confirm-password" type="password" name="confirmPassword" placeholder="Confirm password" hidden style="margin-left: 100px" />
 				<button id="edit-password" onclick="allowEditPassword()" type="button" style="margin-left: 10px">Edit</button>
+				<div id="errorMessage"></div>
 				<ul id="password-strength" style="display:none">
 					<li style="list-style-type:none"><span class="characters"> <i class="fa fa-times" aria-hidden="true"></i> Upper and Lower Case Characters </span></li>
 					<li style="list-style-type:none"><span class="numbers"> <i class="fa fa-times" aria-hidden="true"></i> Numbers </span> </li>
 					<li style="list-style-type:none"><span class="special"> <i class="fa fa-times" aria-hidden="true"></i> Special Characters </span> </li>
 					<li style="list-style-type:none"><span class="length"> <i class="fa fa-times" aria-hidden="true"></i> Length of at least 6 Characters </span> </li>
 				</ul>
+
 			</label>
 
 			<div style="display: flex; justify-content: space-evenly; width: 100%;">
