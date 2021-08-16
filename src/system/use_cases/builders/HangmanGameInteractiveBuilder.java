@@ -1,6 +1,7 @@
 package system.use_cases.builders;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import shared.constants.GameAccessLevel;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
@@ -10,15 +11,11 @@ import system.entities.template.HangmanTemplate;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.HashMap;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
-
-    int numPuzzles = 0;
-    int numLives = 0;
-    int numHints = 0;
 
     private enum DesignTopic {
         TITLE, NUM_PUZZLES, NUM_LIVES, NUM_HINTS, PUZZLE_ANSWER, PUZZLE_PROMPT, PUBLIC, CONFIRMATION
@@ -41,8 +38,10 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
         currentDesignTopic = DesignTopic.TITLE;
         Gson gson = new Gson();
         try {
-            JsonReader reader = new JsonReader(new FileReader("hangman_design_questions.JSON"));
-            designQuestions = gson.fromJson(reader, HashMap.class);
+            JsonReader reader = new JsonReader(new FileReader(
+                    "src/system/configuration_files/hangman_design_questions.json"));
+            Type type = new TypeToken<Map<DesignTopic, String>>(){}.getType();
+            designQuestions = gson.fromJson(reader, type);
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Fatal: Can't find the configuration file for hangman design questions.");
         }
@@ -86,7 +85,7 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
     }
 
     private void handleTitle(String designChoice) {
-        if (designChoice.equals("")) {
+        if (designChoice.equals("no")) {
             currentGame.setTitle("Unnamed Hangman Game");
         } else {
             currentGame.setTitle(designChoice);
