@@ -50,7 +50,7 @@ function promptAttributes(map) {
     }
 
     restrictOptions();
-    document.getElementById("isMultipleChoice").onclick = restrictOptions;
+    document.getElementById("multipleChoice").onclick = restrictOptions;
 }
 
 function addOption(label, checked) {
@@ -67,13 +67,13 @@ function addOption(label, checked) {
 }
 
 function restrictOptions() {
-    if (!document.getElementById("isMultipleChoice").checked) {
-        document.querySelectorAll("input[type='checkbox']:not(#isMultipleChoice)").forEach(el => {
+    if (!document.getElementById("multipleChoice").checked) {
+        document.querySelectorAll("input[type='checkbox']:not(#multipleChoice)").forEach(el => {
             el.checked = false;
             el.disabled = true;
         });
     } else {
-        document.querySelectorAll("input[type='checkbox']:not(#isMultipleChoice)").forEach(el => el.disabled = false);
+        document.querySelectorAll("input[type='checkbox']:not(#multipleChoice)").forEach(el => el.disabled = false);
     }
 }
 
