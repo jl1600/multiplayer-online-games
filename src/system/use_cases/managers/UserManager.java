@@ -228,7 +228,7 @@ public class UserManager {
         //add 30 days in millisec gives the expiration date
         // if current date > expiration date
         //return true (expired)
-        return currentTime.getTime() > getUser(userId).getRegisterDate().getTime() + TimeUnit.DAYS.toMillis(30);
+        return currentTime.getTime() > getUser(userId).getRegisterDate().getTime() + TimeUnit.MINUTES.toMillis(5);
     }
 
     /**
