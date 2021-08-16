@@ -6,13 +6,11 @@ document.addEventListener("DOMContentLoaded", fillEmail(), false);
 
 function fillUsername() {
     xhr.open("GET", "http://localhost:8000/user/username?userid=" + sessionStorage.getItem("userId"));
-
     	xhr.onreadystatechange = () => {
     		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
     		    document.getElementById("username").value = JSON.parse(xhr.response).username;
     		}
     	}
-
     	xhr.send();
 }
 
@@ -20,7 +18,7 @@ function fillEmail() {
     xhr2.open("GET", "http://localhost:8000/user/email?userid=" + sessionStorage.getItem("userId"));
 
     	xhr2.onreadystatechange = () => {
-    		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+    		if (xhr2.readyState === XMLHttpRequest.DONE && xhr2.status === 200) {
     		    document.getElementById("email").value = JSON.parse(xhr2.response).email;
     		}
     	}
