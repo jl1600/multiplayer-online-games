@@ -6,10 +6,10 @@ function reset(username, email) {
 	xhr.onreadystatechange = () => {
     		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
     			window.location = "http://localhost:8080/pages/login.html";
-    		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
-    		    alert("Invalid user ID")
-    		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 412) {
-                alert("Email is invalid")
+    		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
+    		    alert("Expected an email")
+    		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
+                alert("Invalid username or Email")
              }
     	};
 
