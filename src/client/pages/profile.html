@@ -21,6 +21,12 @@
 				<button id="save-username" onclick="updateUsername()" type="button" hidden>Save</button>
 			</label>
 			<label>
+				Email:
+				<input id="email" type="text" name="email" value="" readonly />
+				<button id="edit-email" onclick="allowEditEmail()" type="button">Edit</button>
+				<button id="save-email" onclick="updateEmail()" type="button" hidden>Save</button>
+			</label>
+			<label>
 				Password:
 				<input id="old-password" type="password" name="oldPassword" value="xxxxxxxx" placeholder="Password" readonly />
 				<button id="save-password" onclick="updatePassword()" type="button" hidden style="margin-left: 30px">Save</button>
