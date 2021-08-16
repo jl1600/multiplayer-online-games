@@ -247,7 +247,7 @@ public class UserRequestHandler extends RequestHandler {
         } catch (InvalidUserIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         } catch (InvalidEmailException e){
-            sendResponse(exchange, 400, "Invalid email.");
+            sendResponse(exchange, 412, "Invalid email.");
         }
     }
 

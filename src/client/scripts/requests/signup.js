@@ -19,7 +19,7 @@ function signup(username, password, confirmPassword, email, userType) {
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
 			window.location = "http://localhost:8080/pages/login.html";
-		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
 		    alert("Username is taken");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 412) {
 		    alert("Password is not strong enough")
