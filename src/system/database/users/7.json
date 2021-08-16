@@ -3,7 +3,7 @@
   "username": "zachary",
   "password": "password",
   "role": "MEMBER",
-  "onlineStatus": "ONLINE",
+  "onlineStatus": "OFFLINE",
   "gameCreations": [
     "8"
   ],
