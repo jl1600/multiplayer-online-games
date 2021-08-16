@@ -59,7 +59,9 @@ function updateEmail() {
 		    alert("Invalid userID");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
 		    alert("Duplicate email");
-		}
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
+            alert("Invalid email");
+        }
 	}
 
 	xhr.send(JSON.stringify({
@@ -95,6 +97,8 @@ function updatePassword() {
             alert("Invalid userID");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
             alert("Incorrect old password");
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 412) {
+            alert("Password isn't strong enough");
         }
 	}
 
@@ -104,3 +108,4 @@ function updatePassword() {
 	    newPassword: document.getElementById("new-password").value
 	}));
 }
+
