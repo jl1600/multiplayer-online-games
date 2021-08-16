@@ -50,7 +50,7 @@ function allowEditPassword() {
     document.getElementById("new-password").hidden = false;
     document.getElementById("confirm-password").hidden = false;
 }
-function updatePassword(oldPassword, newPassword) {
+function updatePassword() {
     xhr.open("POST", "http://localhost:8000/user/edit-password");
 	xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -72,7 +72,7 @@ function updatePassword(oldPassword, newPassword) {
 
 	xhr.send(JSON.stringify({
 	    userID: sessionStorage.getItem("userId"),
-	    oldPassword,
-	    newPassword
+	    oldPassword: document.getElementById("old-password").value,
+	    newPassword: document.getElementById("new-password").value
 	}));
 }
