@@ -93,6 +93,13 @@ function allowEditPassword() {
     document.getElementById("old-password").focus();
     document.getElementById("new-password").hidden = false;
     document.getElementById("confirm-password").hidden = false;
+
+    if (document.getElementById("password-strength").style.display === "none") {
+        document.getElementById("password-strength").style.display = "block";
+      } else {
+        document.getElementById("password-strength").style.display = "none";
+      }
+
 }
 function updatePassword() {
     xhr.open("POST", "http://localhost:8000/user/edit-password");
