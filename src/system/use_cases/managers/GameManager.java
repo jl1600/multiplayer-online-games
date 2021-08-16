@@ -332,9 +332,10 @@ public class GameManager {
         Set<String> ownedNotDeletedGameIDs = new HashSet<>();
         for (String id: games.keySet()) {
             //if owner id match and game is not deleted
-            if ( games.get(id).getOwnerId() == userID &&
-                    !(games.get(id).getGameAccessLevel() == GameAccessLevel.DELETED)) {
-                ownedNotDeletedGameIDs.add(id);
+            if ( games.get(id).getOwnerId() == userID) {
+                if (games.get(id).getGameAccessLevel() != GameAccessLevel.DELETED){
+                    ownedNotDeletedGameIDs.add(id);
+                }
             }
         }
         return ownedNotDeletedGameIDs;

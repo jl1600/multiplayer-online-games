@@ -3,7 +3,7 @@ if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 document.addEventListener("DOMContentLoaded", fetchAllGames, false);
 
 function fetchAllGames() {
-	xhr.open("GET", "http://localhost:8000/game/all-public-games");
+	xhr.open("GET", "http://localhost:8000/game/available-games");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
