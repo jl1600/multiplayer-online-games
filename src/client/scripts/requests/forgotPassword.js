@@ -1,14 +1,13 @@
 if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 
 function forgotPass() {
-    let username = document.getElementById("username").value;
-    let email = document.getElementById("email").value;
-    console.log(username, email)
-	xhr.open("POST", "http://localhost:8080/user/forgot-password");
-	console.log("here", JSON.parse(xhr.response), username, email);
-	xhr.onreadystatechange = () => {
-        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
-    	    console.log("trying to reset");
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+
+	xhr.open("POST", "http://localhost:8000/user/forgot-password");
+
+	xhr.onreadystatechange = () => {        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
+            alert("An \"email\" was sent to you, check your \"inbox\"");
     	} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
             alert("Invalid username or Email");
         }
