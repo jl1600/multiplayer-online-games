@@ -21,8 +21,7 @@ function allowEditUsername() {
     document.getElementById("save-username").hidden = false;
 }
 function updateUsername() {
-	xhr.open("POST", "http://localhost:8000/edit-username");
-	alert(document.getElementById("username").value);
+	xhr.open("POST", "http://localhost:8000/user/edit-username");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
@@ -52,7 +51,7 @@ function allowEditPassword() {
     document.getElementById("confirm-password").hidden = false;
 }
 function updatePassword(oldPassword, newPassword) {
-    xhr.open("POST", "http://localhost:8000/edit-password");
+    xhr.open("POST", "http://localhost:8000/user/edit-password");
 	xhr.setRequestHeader("Content-Type", "application/json");
 
 	xhr.onreadystatechange = () => {
