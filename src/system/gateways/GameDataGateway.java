@@ -42,7 +42,6 @@ public interface GameDataGateway {
      */
     Set<Game> getAllGames() throws IOException;
 
-
     /**
      * Get the count of Game objects ever created by the program.
      * <p>

@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 public class HangmanMatch extends GameMatch {
 
+    private final static int PLAYER_LIMIT = 4; //maximum allowed players
     private HangmanGame game;
     private HangmanTemplate template;
 
@@ -33,7 +34,7 @@ public class HangmanMatch extends GameMatch {
     private enum MoveType {HINT, INVALID, USED, NORMAL}
 
     public HangmanMatch(String matchID, String userID, String username, HangmanGame game, HangmanTemplate template) {
-        super(matchID, userID, username, 4);
+        super(matchID, userID, username, PLAYER_LIMIT);
         this.template = template;
         this.game = game;
         this.guesses = new ArrayList<>();
@@ -56,6 +57,9 @@ public class HangmanMatch extends GameMatch {
         output = this.simpleOutput();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getTextContent() {
         if (getStatus() == MatchStatus.PREPARING) {
@@ -64,6 +68,9 @@ public class HangmanMatch extends GameMatch {
         return this.output;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, String> getAllPlayerStats() {
         Map<String, String> playerStatusMap = new HashMap<>();
@@ -88,16 +95,25 @@ public class HangmanMatch extends GameMatch {
         return playerStatusMap;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getPlayerCount() {
         return players.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getGameId() {
         return game.getID();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startMatch() {
         if (getStatus() == MatchStatus.PREPARING) {
@@ -110,6 +126,9 @@ public class HangmanMatch extends GameMatch {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addPlayer(String playerID, String playerName) throws DuplicateUserIDException, MaxPlayerReachedException {
         if (players.contains(playerID)) {

@@ -7,13 +7,16 @@ import system.entities.game.Game;
 public abstract class GameInteractiveBuilder {
 
     private final String creatorID;
-
     protected boolean readyToBuild;
 
+    public GameInteractiveBuilder(String creatorName) {
+        this.creatorID = creatorName;
+    }
+
     /**
-     * Returns whether the builder has collected enough input to build the object.
-     *
-     * */
+     * Checks whether the game object being built is fully specified
+     * @return true if the object is fully formed, otherwise false
+     */
     public boolean isReadyToBuild() {
         return readyToBuild;
     }
@@ -28,20 +31,23 @@ public abstract class GameInteractiveBuilder {
     /**
      * Returns a human-readable string that describe the input this interactive builder is looking for
      * in order to build the object.
-     * */
+     * @return the current design question string
+     */
     public abstract String getDesignQuestion();
-    public GameInteractiveBuilder(String creatorName) {
-        this.creatorID = creatorName;
-    }
 
+    /**
+     * Returns the userID of the game creator.
+     * @return the userID of the game creator
+     */
     public String getCreatorID(){
         return creatorID;
     }
 
     /**
-     * Returns the Game object that this builder has been building.
-     *
-     * @param id The id to be assigned to the newly created Game object.
-     * */
+     * Returns the Game object this builder has been building.
+     * @param id the gameID to be assigned to the game
+     * @return the game object
+     * @throws InsufficientInputException if the game is not fully formed
+     */
     public abstract Game build(String id) throws InsufficientInputException;
 }

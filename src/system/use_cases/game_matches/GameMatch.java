@@ -25,89 +25,115 @@ public abstract class GameMatch extends Observable {
         this.hostName = username;
     }
 
-
     protected void setPlayerLimit(int value) {
         playerLimit = value;
     }
 
+    /**
+     * Return the maximum allowed numer of players.
+     * @return the maximum allowed number of players
+     */
     public int getPlayerLimit() {
         return playerLimit;
     }
 
+    /**
+     * Return the userID of the match host.
+     * @return the userID of the match host.
+     */
     public String getHostName() {
         return this.hostName;
     }
 
+    /**
+     * Returns the matchID.
+     * @return the matchID
+     */
     public String getID() {
         return id;
     }
 
     /**
      * Returns the current text content of this word game match. The content may be different depending on the player.
-     *
      * @return The human-readable string that represents the state of this game.
-     * @throws InvalidUserIDException When the match doesn't contain such a player.
-     * */
+     */
     public abstract String getTextContent();
 
     /**
-     * Returns the string representation of the stats of a player.
-     *
-     * @throws InvalidUserIDException When the match doesn't contain such a player.
-     * */
+     * Returns the string representation of the status of a player.
+     * @return a map of player's username to their current display status
+     */
     public abstract Map<String, String> getAllPlayerStats();
 
     /**
-     * Returns te current number of players in this match.
-     * */
+     * Returns the current number of players in this match.
+     * @return the current number of players
+     */
     public abstract int getPlayerCount();
 
     /**
      * Returns the ID of the game of this match.
-     * */
+     * @return the gameID of the game of this match
+     */
     public abstract String getGameId();
 
     /**
      * Returns the ID of the player who started this match.
-     * */
+     * @return the userId of the host
+     */
     public String getHostID() {
         return hostID;
     }
 
+    /**
+     * Returns the current match status.
+     * @return the current match status
+     */
     public MatchStatus getStatus() {
         return status;
     }
 
     /**
-     * Turn the match status from PREPARING to ONGOING.
-     * If The status is not PREPARING, do nothing.
-     * */
+     * Change match satus from preparing to ongoing.
+     * <p>
+     * If the status is not preparing, do nothing.
+     */
     public abstract void startMatch();
 
+    /**
+     * Change the match status to the input
+     *
+     * @param status the new status
+     */
     public void setStatus(MatchStatus status) {
         this.status = status;
     }
 
     /**
-     * Add a new player to the match.
+     * Adds a new player to the match.
      *
-     * @param playerID The unique string identifier of the player.
-     * */
+     * @param playerID   the player's userID
+     * @param playerName the player's username
+     * @throws DuplicateUserIDException  if the input userID is already in the game.
+     * @throws MaxPlayerReachedException if the game is full.
+     */
     public abstract void addPlayer(String playerID, String playerName) throws DuplicateUserIDException, MaxPlayerReachedException;
 
     /**
-     * Remove a player to the match.
+     * Remove a player from the match.
      *
      * @param playerID The unique string identifier of the player.
-     * */
+     * @throws InvalidUserIDException if the input playerID is not found in the match.
+     */
     public abstract void removePlayer(String playerID) throws InvalidUserIDException;
 
     /**
      * Play a game move. Do nothing if the match status is finished.
      *
      * @param playerID The unique string identifier of the player.
-     * @param move The string representing the player input
-     *
-     * */
+     * @param move     The string representing the player input
+     * @throws InvalidUserIDException if the input player's userID is not found
+     * @throws InvalidInputException  if the input move is not recognized.
+     */
     public abstract void playMove(String playerID, String move) throws InvalidUserIDException, InvalidInputException;
 }

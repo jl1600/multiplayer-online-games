@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class QuizGameMatch extends GameMatch {
 
+    private final static int PLAYER_LIMIT = 10; //maximum allowed players
     private final Map<String, PlayerStat> playerStats;
     private final QuizGame game;
     private final QuizTemplate template;
@@ -79,7 +80,7 @@ public class QuizGameMatch extends GameMatch {
 
 
     public QuizGameMatch(String matchID, String userID, String username, QuizGame game, QuizTemplate template){
-        super(matchID, userID, username, 10); // temporary player limit
+        super(matchID, userID, username, PLAYER_LIMIT); // temporary player limit
         this.game = game;
         this.template = template;
         this.playerStats = new HashMap<>();
