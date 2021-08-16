@@ -29,5 +29,5 @@ function login(username, password) {
 
 function redirect(){
     console.log("redirecting to reset.html")
-    window.location = "http://localhost:8080/pages/reset.html"
+    window.location = "http://localhost:8080/pages/forgot-password.html"
 }
