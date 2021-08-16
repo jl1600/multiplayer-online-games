@@ -37,6 +37,7 @@ function createTemplate() {
     const attrMap = getAttrMap();
 
 	xhr.send(JSON.stringify({
+	    genre: document.querySelector("input[name='templateGenre']:checked").value,
 		attrMap
 	}));
 }
@@ -78,10 +79,11 @@ function restrictOptions() {
 }
 
 function getAttrMap() {
-    const inputs = Array.from(document.getElementsByTagName("input"));
+    var node = document.getElementById('checkboxes');
+    const inputs = Array.from(node.getElementsByTagName("input"));
 
     let attrMap = {
-       title: inputs.shift().value
+       title: document.getElementsByTagName("input")[2].value
     };
 
     for (const el of inputs) {
