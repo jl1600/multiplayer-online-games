@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * FriendRequestBody Class
  * Content used to perform send friend request
  */
 public class FriendRequestBody {

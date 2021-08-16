@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * LogoutRequestBody Class
  * Content used to perform logout request
  */
 public class LogoutRequestBody {

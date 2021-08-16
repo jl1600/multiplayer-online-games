@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * LoginRequestBody Class
  * Content used to perform login request
  */
 public class LoginRequestBody {

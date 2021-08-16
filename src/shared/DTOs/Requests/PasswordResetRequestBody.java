@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * PasswordResetRequestBody Class
  * Content used to perform password reset request
  */
 public class PasswordResetRequestBody {

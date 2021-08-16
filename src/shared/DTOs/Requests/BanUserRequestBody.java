@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * BanUserRequestBody Class
  * Content required to perforn ban user request
  */
 public class BanUserRequestBody {

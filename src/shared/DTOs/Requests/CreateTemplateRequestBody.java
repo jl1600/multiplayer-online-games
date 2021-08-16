@@ -4,6 +4,7 @@ import shared.constants.GameGenre;
 
 import java.util.Map;
 /**
+ * CreateTemplateRequestBody Class
  * Content required to perform create template request
  */
 public class CreateTemplateRequestBody {

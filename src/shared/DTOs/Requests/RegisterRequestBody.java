@@ -3,6 +3,7 @@ package shared.DTOs.Requests;
 import shared.constants.UserRole;
 
 /**
+ * RegisterRequestBody Class
  * Content used to perform register request
  */
 public class RegisterRequestBody {

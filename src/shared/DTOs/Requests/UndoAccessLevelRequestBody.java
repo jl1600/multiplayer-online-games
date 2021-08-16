@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * UndoAccessLevelRequestBody Class
  * The content used to perform revert access level request
  */
 public class UndoAccessLevelRequestBody {

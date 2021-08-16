@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * EditPasswordRequestBody Class
  * Content used to perform edit password request
  */
 public class EditPasswordRequestBody {

@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * EditEmailRequestBody Class
  * Content to perform edit email request
  */
 public class EditEmailRequestBody {

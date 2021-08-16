@@ -1,5 +1,6 @@
 package shared.DTOs.Requests;
 /**
+ * CreateGameBuilderRequestBody Class
  * Content required to perform create game builder
  */
 public class CreateGameBuilderRequestBody {

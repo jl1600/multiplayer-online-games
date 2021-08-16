@@ -1,5 +1,6 @@
 package shared.DTOs.Requests;
 /**
+ * DesignChoiceRequestBody Class
  * Content required to perform design choice request
  */
 public class DesignChoiceRequestBody {

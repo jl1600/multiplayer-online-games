@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * EditUsernameRequestBody Class
  * content to perform edit user request
  */
 public class EditUsernameRequestBody {

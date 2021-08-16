@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * CancelBuilderRequestBody Class
  * Content required to perform cancel builder request
  */
 public class CancelBuilderRequestBody {

@@ -3,6 +3,7 @@ package shared.DTOs.Requests;
 import java.util.Map;
 
 /**
+ * EditTemplateRequestBody Class
  * the content used to perform edit template request
  */
 public class EditTemplateRequestBody {

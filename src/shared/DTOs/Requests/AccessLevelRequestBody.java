@@ -3,6 +3,7 @@ package shared.DTOs.Requests;
 import shared.constants.GameAccessLevel;
 
 /**
+ * AccessLevelRequestBody Class
  * Contents needed to perform access level requests
  */
 public class AccessLevelRequestBody {

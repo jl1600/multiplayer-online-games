@@ -1,6 +1,7 @@
 package shared.DTOs.Requests;
 
 /**
+ * AvailableGameRequestBody Class
  * Content required to perform available game request
  */
 public class AvailableGameRequestBody {
