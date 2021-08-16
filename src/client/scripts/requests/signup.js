@@ -1,17 +1,8 @@
 if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 
-function checkPassword() {
-	if (document.getElementById("password").value !== document.getElementById("confirmPassword").value) {
-		document.getElementById("errorMessage").innerHTML = "Passwords don't match!";
-		return false;
-	} else {
-		document.getElementById("errorMessage").innerHTML = "";
-		return true;
-	}
-}
 function signup(username, password, confirmPassword, email, userType) {
 	if (!username || !password) return false;
-	if (!checkPassword(password, confirmPassword)) return false;
+	if (!checkPassword()) return false;
 	if (!checkValidEmail(email)) return false;
 
 	xhr.open("POST", "http://localhost:8000/user/register");
