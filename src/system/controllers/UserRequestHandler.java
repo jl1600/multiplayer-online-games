@@ -113,6 +113,8 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 400, "Invalid user ID.");
         }catch (IncorrectPasswordException e) {
             sendResponse(exchange, 403, "Incorrect password.");
+        }catch (WeakPasswordException e) {
+            sendResponse(exchange, 412, "Password isn't strong enough.");
         }
     }
 

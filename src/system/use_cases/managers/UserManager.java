@@ -328,8 +328,12 @@ public class UserManager {
      * @throws IOException if the database is not found
      */
     public void editPassword(String userId, String oldPassword, String newPassword) throws
-            IncorrectPasswordException, IOException, InvalidUserIDException {
-        if (isPasswordIncorrect(userId, oldPassword)) throw new IncorrectPasswordException();
+            IncorrectPasswordException, IOException, InvalidUserIDException, WeakPasswordException {
+        if (isPasswordIncorrect(userId, oldPassword) && isTempPasswordLogin(userId, oldPassword))
+            throw new IncorrectPasswordException();
+        if (!checkPasswordStrength(newPassword)){
+           throw new WeakPasswordException();
+        }
 
         getUser(userId).setPassword(newPassword);
 
