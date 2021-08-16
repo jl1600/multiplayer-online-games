@@ -4,6 +4,8 @@ import com.sun.net.httpserver.HttpServer;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.gateways.*;
 import system.use_cases.managers.*;
+import system.utilities.EmailService;
+import system.utilities.PseudoEmailComposer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -31,13 +33,15 @@ public class WordGameSystem {
         TemplateManager tm = new TemplateManager(templateDataGateway);
 
         UserDataGateway userGateway = new UserDataMapper();
-
         UserManager um = new UserManager(userGateway);
 
         MatchManager mm = new MatchManager();
+
         GameRequestHandler gameRH = new GameRequestHandler(gm, tm, um, mm);
         TemplateRequestHandler templateRH = new TemplateRequestHandler(tm);
-        UserRequestHandler userRH = new UserRequestHandler(um);
+
+        EmailService eService = new PseudoEmailComposer();
+        UserRequestHandler userRH = new UserRequestHandler(um, eService);
 
         server = HttpServer.create(new InetSocketAddress("localhost", 8000), 20);
 

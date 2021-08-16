@@ -3,5 +3,5 @@ package shared.exceptions.use_case_exceptions;
 /**
  * InvalidEmailException Class
  */
-public class InvalidEmailException extends Throwable {
+public class InvalidEmailException extends Exception {
 }

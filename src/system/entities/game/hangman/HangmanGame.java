@@ -104,7 +104,7 @@ public class HangmanGame extends Game {
 
     /**
      * @param numLives number of lives
-     * @throws InsufficientInputException when numLives is illegal and less than 1
+     * @throws InvalidInputException when numLives is illegal and less than 1
      */
     public void setNumLives(int numLives) throws InvalidInputException {
         if (numLives < 1) {
@@ -122,7 +122,7 @@ public class HangmanGame extends Game {
 
     /**
      * @param numHints number of hints
-     * @throws InsufficientInputException when numHints is illegal and less than 0
+     * @throws InvalidInputException when numHints is illegal and less than 0
      */
     public void setNumHints(int numHints) throws InvalidInputException {
         if (numHints < 0) {
@@ -149,9 +149,7 @@ public class HangmanGame extends Game {
         if (index >= this.puzzles.size()) {
             throw new InvalidInputException();
         }
-        List<String> result = new ArrayList<>();
-        result.addAll(this.puzzles.get(index));
-        return result;
+        return new ArrayList<>(this.puzzles.get(index));
     }
 
     public String getAnswer(int puzzleIndex) {

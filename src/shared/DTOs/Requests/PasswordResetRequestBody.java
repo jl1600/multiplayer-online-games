@@ -8,7 +8,7 @@ public class PasswordResetRequestBody {
     /**
      * the submitted userID
      */
-    public String userID;
+    public String username;
     /**
      * the submitted email
      */

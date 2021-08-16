@@ -15,11 +15,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class UserManager {
-    private final HashMap<String, User> users;     // userId to User entity
+    private final Map<String, User> users;     // userId to User entity
+    private final Map<String, String> userIds; // username to userId
+    private final Map<String, Map<String, Date>> tempPasswords; //  userId to temporary passwords
+
     private final IdManager idManager;
-    private final HashMap<String, String> userIds; // username to userId
     private final UserDataGateway gateway;
-    private final HashMap<String, String> tempPasswords; //  userId to temporary passwords
 
     public UserManager(UserDataGateway gateway) throws IOException, InvalidUserIDException {
         users = new HashMap<>();
@@ -125,15 +126,33 @@ public class UserManager {
         }
     }
 
-    public String forgotPassword(String userId, String email) throws InvalidEmailException, InvalidUserIDException {
-        if (isValidEmail(email))
-            throw new InvalidEmailException();
-        if (!users.containsKey(userId))
-            throw new InvalidUserIDException();
-        String tempGeneratedPass = generateRandomPassword();
+    /**
+     * Create a temporary password that lasts 24 hours and returns it.
+     *
+     * @param username The username of the user who is requesting the temporary password.
+     * @param email The email corresponding to the user.
+     * @return The temporary password.
+     *
+     * @throws InvalidUsernameException When the username is invalid.
+     * @throws InvalidEmailException When the email doesn't match.
+     * */
 
-        tempPasswords.put(userId, tempGeneratedPass);
-        return tempGeneratedPass;
+    public String createTempPassword(String username, String email) throws InvalidUsernameException, InvalidEmailException {
+        if (!userIds.containsKey(username))
+            throw new InvalidUsernameException();
+
+        String uid = userIds.get(username);
+
+        if (!users.get(uid).getEmail().equals(email))
+            throw new InvalidEmailException();
+
+        String tempPassword = generateRandomPassword();
+        Calendar expireDate = Calendar.getInstance();
+        expireDate.add(Calendar.HOUR, 24);
+        Map<String, Date> passAndDate = new HashMap<>();
+        passAndDate.put(tempPassword, expireDate.getTime());
+        tempPasswords.put(uid, passAndDate);
+        return tempPassword;
     }
 
     public boolean isValidEmail(String email){
@@ -230,14 +249,15 @@ public class UserManager {
      */
     public String login(String username, String password)
             throws InvalidUsernameException, BannedUserException, IncorrectPasswordException,
-             ExpiredUserException, IOException {
+             ExpiredUserException {
 
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
 
         String userId = getUserId(username);
         try {
-            if (isPasswordIncorrect(userId, password) && hasTempPassword(userId, password)) throw new IncorrectPasswordException();
+            if (isPasswordIncorrect(userId, password) && isTempPasswordIncorrect(userId, password))
+                throw new IncorrectPasswordException();
             if (isBanned(userId)) throw new BannedUserException();
             if (getUserRole(userId) == UserRole.TEMP){
                 if (isExpiredUser(userId)){
@@ -245,24 +265,20 @@ public class UserManager {
                 }
             }
             getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
-            gateway.updateUser(getUser(userId));
-        } catch (InvalidUserIDException e) {
-            throw new RuntimeException("System failure: The ID associated with this username is invalid.");
+        } catch (InvalidUserIDException e1) {
+            throw new RuntimeException("System failure: The database ID associated with this user is invalid.");
         }
         return userId;
     }
 
-    private boolean hasTempPassword(String userId, String password){
-        if (tempPasswords.containsKey(userId)) {
-            return tempPasswords.get(userId).equals(password);
+    private boolean isTempPasswordIncorrect(String userId, String password) {
+        if (!tempPasswords.containsKey(userId) || !tempPasswords.get(userId).containsKey(password))
+            return true;
+        else if (tempPasswords.get(userId).get(password).after(Calendar.getInstance().getTime())) {
+            tempPasswords.remove(userId);
+            return true;
         }
         return false;
-    }
-
-    private void removeTempPass(String userId){
-        if (tempPasswords.containsKey(userId)){
-            tempPasswords.remove(userId);
-        }
     }
 
     private boolean isBanned(String userId) throws InvalidUserIDException {
@@ -311,7 +327,6 @@ public class UserManager {
             String username = users.get(userId).getUsername();
             users.remove(userId);
             userIds.remove(username);
-            removeTempPass(userId);
         } else {
             gateway.updateUser(getUser(userId));
         }
@@ -335,20 +350,18 @@ public class UserManager {
      * @throws IOException if the database is not found
      */
     public void editPassword(String userId, String oldPassword, String newPassword) throws
-            IncorrectPasswordException, IOException, InvalidUserIDException, WeakPasswordException {
-        if (isPasswordIncorrect(userId, oldPassword)){
-            if (!hasTempPassword(userId,oldPassword)){
-                throw new IncorrectPasswordException();
-            }
-        }
-
-        if (!checkPasswordStrength(newPassword)){
-           throw new WeakPasswordException();
+            IncorrectPasswordException, InvalidUserIDException {
+        if (isPasswordIncorrect(userId, oldPassword) && isTempPasswordIncorrect(userId, newPassword)){
+            throw new IncorrectPasswordException();
         }
 
         getUser(userId).setPassword(newPassword);
 
-        gateway.updateUser(getUser(userId));
+        try {
+            gateway.updateUser(getUser(userId));
+        } catch (IOException e) {
+            throw new RuntimeException("Fatal error: Can't connect to the database.");
+        }
     }
 
     /**
@@ -361,8 +374,7 @@ public class UserManager {
      * @throws InvalidUserIDException if no user has the specified userId
      * @throws IOException if the database is not found
      */
-    public void editUsername(String userId, String newUsername) throws
-             IOException, InvalidUserIDException, DuplicateUsernameException {
+    public void editUsername(String userId, String newUsername) throws InvalidUserIDException, DuplicateUsernameException {
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
         if (userIds.containsKey(newUsername) && !newUsername.equals(getUser(userId).getUsername()))
@@ -373,7 +385,11 @@ public class UserManager {
         userIds.put(newUsername, userId);
         user.setUsername(newUsername);
 
-        gateway.updateUser(user);
+        try {
+            gateway.updateUser(user);
+        } catch (IOException e) {
+            throw new RuntimeException("Fatal: Can't connect to the database.");
+        }
     }
 
 

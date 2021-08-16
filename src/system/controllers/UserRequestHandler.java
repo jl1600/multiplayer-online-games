@@ -7,6 +7,7 @@ import shared.DTOs.Responses.LoginResponseBody;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
 import system.use_cases.managers.UserManager;
+import system.utilities.EmailService;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -19,13 +20,15 @@ public class UserRequestHandler extends RequestHandler {
      * a user manager that can manipulate all user entities
      */
     private final UserManager userManager;
-
+    private final EmailService emailService;
     /**
      * Constructor for UserRequestHandler class.
      * @param um user manager that contains all user entities and able to make change to them
+     * @param eService The email service that's responsible for sending email
      */
-    public UserRequestHandler(UserManager um) {
+    public UserRequestHandler(UserManager um, EmailService eService) {
         this.userManager = um;
+        this.emailService = eService;
     }
 
     /**
@@ -108,6 +111,7 @@ public class UserRequestHandler extends RequestHandler {
                 break;
             case "edit-email":
                 handleEditEmail(exchange);
+                break;
             case "edit-password":
                 handleEditPassword(exchange);
                 break;
@@ -129,8 +133,6 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 400, "Invalid user ID.");
         }catch (IncorrectPasswordException e) {
             sendResponse(exchange, 403, "Incorrect password.");
-        }catch (WeakPasswordException e) {
-            sendResponse(exchange, 412, "Password isn't strong enough.");
         }
     }
 
@@ -267,16 +269,12 @@ public class UserRequestHandler extends RequestHandler {
 
     private void handleForgotPassword(HttpExchange exchange) throws IOException {
         PasswordResetRequestBody body = gson.fromJson(getRequestBody(exchange), PasswordResetRequestBody.class);
-        EmailComposer email = new EmailComposer();
-        String reciever = "";
         try {
-          String generatedPass = userManager.forgotPassword(body.userID, body.email);
-          email.sendResetPasswordEmail(reciever, generatedPass);
-          sendResponse(exchange, 200, null);
-        } catch (InvalidUserIDException e) {
-            sendResponse(exchange, 400, "Invalid user ID.");
-        } catch (InvalidEmailException e){
-            sendResponse(exchange, 412, "Invalid email.");
+            String generatedPass = userManager.createTempPassword(body.username, body.email);
+            emailService.sendResetPasswordEmail(body.username, generatedPass);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUsernameException | InvalidEmailException e) {
+            sendResponse(exchange, 403, "Invalid username or email");
         }
     }
 
