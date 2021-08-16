@@ -16,12 +16,23 @@ import java.security.NoSuchAlgorithmException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-
+/**
+ * ClientSocketSeeker Class
+ */
 public class ClientSocketSeeker extends Thread {
     private final String userID;
     private final String matchID;
     private final MatchManager matchManager;
     private final ServerSocket serverSocket;
+
+    /**
+     * Constructor of ClientSocketSeeker
+     *
+     * @param matchManager manager to store and manipulate GameMatch objects
+     * @param serverSocket the target server socket for communication
+     * @param userID       the player's userID
+     * @param matchID      the target matchID
+     */
     public ClientSocketSeeker(MatchManager matchManager, ServerSocket serverSocket, String userID, String matchID) {
         this.userID = userID;
         this.matchID = matchID;
@@ -29,6 +40,9 @@ public class ClientSocketSeeker extends Thread {
         this.serverSocket = serverSocket;
     }
 
+    /**
+     * Run ClientSocketSeeker
+     */
     public void run() {
         try {
             acceptPlayerSocket();
@@ -59,9 +73,9 @@ public class ClientSocketSeeker extends Thread {
     private void handShake(Socket client) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
         String input;
-        while ((input = reader.readLine())!= null) {
-           if(input.startsWith("Sec-WebSocket-Key:"))
-               break;
+        while ((input = reader.readLine()) != null) {
+            if (input.startsWith("Sec-WebSocket-Key:"))
+                break;
         }
         OutputStream out = client.getOutputStream();
         String key = input.split(" ")[1];
@@ -107,7 +121,7 @@ public class ClientSocketSeeker extends Thread {
         byte[] decoded = new byte[messageLen];
         input.read(encoded, 0, messageLen);
         for (int i = 0; i < messageLen; i++) {
-            decoded[i] = (byte)(encoded[i] ^ mask[i % 4]);
+            decoded[i] = (byte) (encoded[i] ^ mask[i % 4]);
         }
         return new String(decoded);
     }
@@ -119,7 +133,7 @@ public class ClientSocketSeeker extends Thread {
         firstTwo[0] |= (1 << 7);  // FIN, telling the client that this is a whole message
         firstTwo[0] |= 1; // Op code, 0x1, telling that this is a text
         int lenCode;    // this is the length of the message if length < 126
-        byte [] uint16Len = new byte [2];   // A backup for the length in the case it exceeds 125
+        byte[] uint16Len = new byte[2];   // A backup for the length in the case it exceeds 125
 
         if (message.length() < 126) {
             lenCode = message.length();

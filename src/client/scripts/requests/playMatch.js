@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	else document.getElementById("start-button").hidden = false;
 	createSocket();
 }, false);
+document.getElementById("match-input").addEventListener("keyup", event => {
+    if (event.keyCode === 13) sendInput();
+});
 
 function joinMatch(matchID) {
 	xhr.open("POST", "http://localhost:8000/game/join-match");
@@ -51,10 +54,10 @@ function displayStats(data) {
 	}
 }
 
-function sendInput(input) {
+function sendInput() {
 	serverSocket.send(JSON.stringify({
 		sysCommand: "",
-		gameMove: input
+		gameMove: document.getElementsByName("matchInput")[0].value
 	}));
 	document.getElementById("match-input").value = "";
     document.getElementById("match-input").focus();

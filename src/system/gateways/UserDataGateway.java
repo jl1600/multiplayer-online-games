@@ -3,11 +3,14 @@ package system.gateways;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.entities.User;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * UserDataGateway Interface
+ */
 public interface UserDataGateway {
 
     /**
@@ -52,4 +55,10 @@ public interface UserDataGateway {
      * @throws IOException if there is a problem reading from the database
      */
     int getUserCount() throws IOException;
+
+    /**
+     * Increases the number of users created by 1
+     * @throws IOException if there is a problem reading from the database
+     */
+    void incrementUserCount() throws IOException;
 }

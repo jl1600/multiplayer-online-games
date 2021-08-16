@@ -1,5 +1,8 @@
 package system.use_cases.managers;
 
+/**
+ * IdManager Class
+ */
 public class IdManager {
     private Integer nextId;
 

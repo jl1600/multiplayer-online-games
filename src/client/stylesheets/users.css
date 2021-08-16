@@ -37,7 +37,7 @@ main {
 	transform: translateY(1px);
 }
 
-#friends.column .row .button {
+#friends.column .row .button, .column .row .button-wrapper .button.suspend-button {
 	background-color: #ff6454;
 }
 

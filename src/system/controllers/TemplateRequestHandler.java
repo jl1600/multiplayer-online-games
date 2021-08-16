@@ -1,38 +1,38 @@
 package system.controllers;
 
 import com.sun.net.httpserver.HttpExchange;
-import shared.DTOs.Requests.CancelBuilderRequestBody;
-import shared.DTOs.Requests.CreateTemplateBuilderRequestBody;
-import shared.DTOs.Requests.DesignChoiceRequestBody;
+import shared.DTOs.Requests.CreateTemplateRequestBody;
 import shared.DTOs.Requests.EditTemplateRequestBody;
-import shared.DTOs.Responses.DesignQuestionResponseBody;
 import shared.DTOs.Responses.GeneralTemplateDataResponseBody;
 import shared.DTOs.Responses.TemplateAllAttrsResponseBody;
 import shared.constants.GameGenre;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.template.QuizTemplate;
 import system.use_cases.managers.TemplateManager;
-import system.use_cases.managers.UserManager;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.Set;
 
-
+/**
+ *  TemplateRequestHandler Class
+ */
 public class TemplateRequestHandler extends RequestHandler {
 
     private final TemplateManager templateManager;
-
     /**
      * Constructor for TemplateRequestHandler()
      * @param templateManager template manager that contains all templates and able to make change to them
-     * @param userManager user manager that contains all user entities and able to make change to them
      */
-    public TemplateRequestHandler(TemplateManager templateManager, UserManager userManager) {
+    public TemplateRequestHandler(TemplateManager templateManager) {
         this.templateManager = templateManager;
     }
 
+    /**
+     * handle GET requests of template related requests
+     * @param exchange the exchange that contains header and appropriate content used for handling
+     * @throws IOException issue detected regarding input-output
+     */
     @Override
     protected void handleGetRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().getPath().split("/")[2];
@@ -43,44 +43,61 @@ public class TemplateRequestHandler extends RequestHandler {
             case "all-attributes":
                 handleGetAllAttributes(exchange);
                 break;
+            case "default-attr-map":
+                handleGetDefaultAttrMap(exchange);
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
 
+    /**
+     * handle POST request related to templates
+     * @param exchange the exchange that contains header and appropriate content used for handling
+     * @throws IOException issue detected regarding input-output
+     */
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().toString().split("/")[2];
         switch (specification) {
-            case "create-builder":
-                handleCreateBuilder(exchange);
-                break;
-            case "make-design-choice":
-                handleMakeDesignChoice(exchange);
-                break;
             case "edit":
                 handleEdit(exchange);
                 break;
-            case "cancel-builder":
-                handleCancelBuilder(exchange);
+            case "create":
+                handleCreate(exchange);
                 break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
     }
 
-    private void handleCancelBuilder(HttpExchange exchange) throws IOException {
-        CancelBuilderRequestBody body = gson.fromJson(getRequestBody(exchange), CancelBuilderRequestBody.class);
+    private void handleCreate(HttpExchange exchange) throws IOException {
+        CreateTemplateRequestBody body = gson.fromJson(getRequestBody(exchange), CreateTemplateRequestBody.class);
         try {
-            templateManager.destroyBuilder(body.userID);
-            sendResponse(exchange, 204, null);
-        } catch (NoCreationInProgressException e) {
-            sendResponse(exchange, 400, "User ID is invalid or no builder is in progress.");
+            templateManager.createTemplate(body.attrMap, body.genre);
+            sendResponse(exchange, 201, "Success!");
+        } catch (NoSuchAttributeException | InvalidInputException e) {
+            sendResponse(exchange, 400, "Invalid attribute name or attribute value.");
         }
+    }
+
+    private void handleGetDefaultAttrMap(HttpExchange exchange) throws IOException {
+        String genre = getQueryArgFromGET(exchange);
+        if (genre == null)
+            return;
+        TemplateAllAttrsResponseBody res = new TemplateAllAttrsResponseBody();
+        try {
+            res.attrMap = templateManager.getDefaultAttrMap(GameGenre.valueOf(genre));
+            sendResponse(exchange, 200, gson.toJson(res));
+        } catch (IllegalArgumentException e) {
+            sendResponse(exchange, 400, "Genre is invalid.");
+        }
+
     }
 
     private void handleEdit(HttpExchange exchange) throws IOException {
         EditTemplateRequestBody body = gson.fromJson(getRequestBody(exchange), EditTemplateRequestBody.class);
         try {
+            System.out.println(body.attrMap);
             templateManager.editTemplate(body.attrMap, body.templateID);
             sendResponse(exchange, 204, null);
         } catch (NoSuchAttributeException | InvalidInputException e) {
@@ -90,57 +107,10 @@ public class TemplateRequestHandler extends RequestHandler {
         }
     }
 
-    private void handleCreateBuilder(HttpExchange exchange) throws IOException {
-        CreateTemplateBuilderRequestBody body =
-                gson.fromJson(getRequestBody(exchange), CreateTemplateBuilderRequestBody.class);
-        DesignQuestionResponseBody question = new DesignQuestionResponseBody();
-        try {
-            templateManager.initiateTemplateBuilder(body.userID, body.genre);
-            question.designQuestion = templateManager.getDesignQuestion(body.userID);
-            sendResponse(exchange, 201, gson.toJson(question));
-        } catch (CreationInProgressException e) {
-            try {
-                question.designQuestion = templateManager.getDesignQuestion(body.userID);
-                sendResponse(exchange, 200, gson.toJson(question));
-            } catch (NoCreationInProgressException f) {
-                throw new RuntimeException("No creation in progress. This should never happen.");
-            }
-        } catch (NoCreationInProgressException e) {
-            throw new RuntimeException("No creation in progress. This should never happen.");
-        }
-    }
-
-    private void handleMakeDesignChoice(HttpExchange exchange) throws IOException {
-        DesignChoiceRequestBody body = gson.fromJson(getRequestBody(exchange), DesignChoiceRequestBody.class);
-        try {
-            templateManager.makeDesignChoice(body.userID, body.designChoice);
-            try {
-                templateManager.buildTemplate(body.userID);
-                sendResponse(exchange, 201, "Success!");
-            } catch (InsufficientInputException e) {
-                DesignQuestionResponseBody res = new DesignQuestionResponseBody();
-                res.designQuestion = templateManager.getDesignQuestion(body.userID);
-                sendResponse(exchange, 200, gson.toJson(res));
-            }
-        } catch (NoCreationInProgressException e) {
-            sendResponse(exchange, 404, "No game builder associated with this user.");
-        } catch (InvalidInputException e) {
-            sendResponse(exchange, 400, "Invalid Input");
-        }
-    }
     private void handleGetAllAttributes(HttpExchange exchange) throws IOException {
-        String templateID;
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return;
-            }
-            templateID = query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
+        String templateID = getQueryArgFromGET(exchange);
+        if (templateID == null)
             return;
-        }
         try {
             TemplateAllAttrsResponseBody body = new TemplateAllAttrsResponseBody();
             body.templateID = templateID;
@@ -149,7 +119,6 @@ public class TemplateRequestHandler extends RequestHandler {
         } catch (InvalidTemplateIDException e) {
             sendResponse(exchange, 400, "Invalid Template ID.");
         }
-
     }
 
     private void handleGetAllTemplates(HttpExchange exchange) throws IOException {

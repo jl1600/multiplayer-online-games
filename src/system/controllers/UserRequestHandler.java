@@ -7,6 +7,7 @@ import shared.DTOs.Responses.LoginResponseBody;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
 import system.use_cases.managers.UserManager;
+import system.utilities.EmailService;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -19,15 +20,22 @@ public class UserRequestHandler extends RequestHandler {
      * a user manager that can manipulate all user entities
      */
     private final UserManager userManager;
-
+    private final EmailService emailService;
     /**
      * Constructor for UserRequestHandler class.
      * @param um user manager that contains all user entities and able to make change to them
+     * @param eService The email service that's responsible for sending email
      */
-    public UserRequestHandler(UserManager um) {
+    public UserRequestHandler(UserManager um, EmailService eService) {
         this.userManager = um;
+        this.emailService = eService;
     }
 
+    /**
+     * handle GET request related to users
+     * @param exchange the exchange that contains header and appropriate content used for handling
+     * @throws IOException issue detected regarding input-output
+     */
     @Override
     protected void handleGetRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().getPath().split("/")[2];
@@ -37,6 +45,9 @@ public class UserRequestHandler extends RequestHandler {
                 break;
             case "userid":
                 handleGetUserID(exchange);
+                break;
+            case "email":
+                handleGetEmail(exchange);
                 break;
             case "friends":
                 handleGetFriends(exchange);
@@ -53,6 +64,11 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
+    /**
+     * handle POST request related to users
+     * @param exchange the exchange that contains header and appropriate content used for handling
+     * @throws IOException issue detected regarding input-output
+     */
     @Override
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().getPath().split("/")[2];
@@ -78,6 +94,9 @@ public class UserRequestHandler extends RequestHandler {
             case "cancel-friend-request":
                 handleCancelFriendRequest(exchange);
                 break;
+            case "forgot-password":
+                handleForgotPassword(exchange);
+                break;
             case "decline-pending-friend":
                 handleDeclinePendingFriend(exchange);
                 break;
@@ -90,6 +109,9 @@ public class UserRequestHandler extends RequestHandler {
             case "edit-username":
                 handleEditUsername(exchange);
                 break;
+            case "edit-email":
+                handleEditEmail(exchange);
+                break;
             case "edit-password":
                 handleEditPassword(exchange);
                 break;
@@ -101,11 +123,12 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
+
     private void handleEditPassword(HttpExchange exchange) throws IOException {
         EditPasswordRequestBody body = gson.fromJson(getRequestBody(exchange), EditPasswordRequestBody.class);
         try {
             userManager.editPassword(body.userID,body.oldPassword,body.newPassword);
-            sendResponse(exchange, 204, null);
+            sendResponse(exchange, 204, "Password now set to "+body.newPassword);
         } catch (InvalidUserIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }catch (IncorrectPasswordException e) {
@@ -124,6 +147,17 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 403, "Duplicate username.");
         }
     }
+
+    private void handleEditEmail(HttpExchange exchange) throws IOException {
+        EditEmailRequestBody body = gson.fromJson(getRequestBody(exchange), EditEmailRequestBody.class);
+        try {
+            userManager.editEmail(body.userId, body.newEmail);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID.");
+        }
+    }
+
 
     private void handleRemoveFriend(HttpExchange exchange) throws IOException {
         FriendRequestBody body = gson.fromJson(getRequestBody(exchange), FriendRequestBody.class);
@@ -233,6 +267,17 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
+    private void handleForgotPassword(HttpExchange exchange) throws IOException {
+        PasswordResetRequestBody body = gson.fromJson(getRequestBody(exchange), PasswordResetRequestBody.class);
+        try {
+            String generatedPass = userManager.createTempPassword(body.username, body.email);
+            emailService.sendResetPasswordEmail(body.username, generatedPass);
+            sendResponse(exchange, 204, null);
+        } catch (InvalidUsernameException | InvalidEmailException e) {
+            sendResponse(exchange, 403, "Invalid username or email");
+        }
+    }
+
     private void handleDeleteUser(HttpExchange exchange) throws IOException {
         DeleteUserRequestBody body = gson.fromJson(getRequestBody(exchange), DeleteUserRequestBody.class);
         try {
@@ -246,10 +291,14 @@ public class UserRequestHandler extends RequestHandler {
     private void handleRegister(HttpExchange exchange) throws IOException {
         RegisterRequestBody body = gson.fromJson(getRequestBody(exchange), RegisterRequestBody.class);
         try {
-            userManager.createUser(body.username, body.password, body.role);
+            userManager.createUser(body.username, body.password, body.email, body.role);
             sendResponse(exchange, 204, null);
         } catch (DuplicateUsernameException e) {
             sendResponse(exchange, 403, "Duplicate username.");
+        } catch (WeakPasswordException e){
+            sendResponse(exchange, 412, "Password isn't strong enough.");
+        } catch (InvalidEmailException e) {
+            sendResponse(exchange, 400, "Invalid email.");
         }
     }
 
@@ -357,10 +406,34 @@ public class UserRequestHandler extends RequestHandler {
 
     }
 
+    private void handleGetEmail(HttpExchange exchange) throws IOException {
+        String userID;
+        GeneralUserInfoResponseBody body = new GeneralUserInfoResponseBody();
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null) {
+                sendResponse(exchange, 400, "Missing Query.");
+                return;
+            }
+            userID = query.split("=")[1];
+        } catch (MalformedURLException e) {
+            sendResponse(exchange, 404, "Malformed URL.");
+            return;
+        }
+        try {
+            body.userID = userID;
+            body.email = userManager.getEmail(userID);
+            sendResponse(exchange, 200, gson.toJson(body));
+        } catch (InvalidUserIDException | InvalidUsernameException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void handleGetUsername(HttpExchange exchange) throws IOException {
         String userID;
         try {
             String query = exchange.getRequestURI().getQuery();
+            // userid=57, This is the query BTW
             if (query == null) {
                 sendResponse(exchange, 400, "Missing Query.");
                 return;
@@ -377,23 +450,11 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
-    private String getQueryArgFromGET(HttpExchange exchange) throws IOException {
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return null;
-            }
-            return query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
-            return null;
-        }
-    }
-
     private void handleBanUser(HttpExchange exchange) throws IOException {
         BanUserRequestBody body = gson.fromJson(getRequestBody(exchange), BanUserRequestBody.class);
         try {
+            if (!hasPermission(exchange, userManager.getUserRole(body.adminID), UserRole.ADMIN))
+                return;
             userManager.banUser(body.adminID, body.userID, body.banLength);
             sendResponse(exchange, 204, null);
         } catch (InvalidUserIDException e) {

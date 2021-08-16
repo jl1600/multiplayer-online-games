@@ -1,0 +1,10 @@
+{
+  "TITLE": "Does your game have a title? If yes enter it, otherwise, answer 'no'",
+  "NUM_PUZZLES": "How many puzzles does your hangman game have? Enter a number.",
+  "NUM_LIVES": "How many lives will players get in total? Enter a number.",
+  "NUM_HINTS": "How many hints will players get in total? Enter a number.",
+  "PUZZLE_ANSWER": "What is the answer to the next puzzle?",
+  "PUZZLE_PROMPT": "What is the prompt for that puzzle?",
+  "PUBLIC": "Will the game be public? enter yes/no.",
+  "CONFIRMATION": "Confirm you would like to create this game, enter yes/no."
+}

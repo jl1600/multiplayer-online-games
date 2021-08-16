@@ -1,0 +1,13 @@
+{
+  "userId": "10",
+  "username": "zacharyAdmin",
+  "password": "password",
+  "email": "zachary.colavecchia@gmail.com",
+  "role": "ADMIN",
+  "onlineStatus": "OFFLINE",
+  "gameCreations": [],
+  "registerDate": "Aug 15, 2021 12:28:42 AM",
+  "friendList": [],
+  "pendingFriendList": [],
+  "lastBanDate": "Aug 15, 2021 12:28:42 AM"
+}

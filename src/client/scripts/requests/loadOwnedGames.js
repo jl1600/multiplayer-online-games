@@ -3,15 +3,21 @@ if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 document.addEventListener("DOMContentLoaded", fetchOwnedGames, false);
 
 function fetchOwnedGames() {
-	xhr.open("GET", "http://localhost:8000/game/all-owned-games?userid=" +
-		(sessionStorage.getItem("userType") === "ADMIN" ? window.location.href.split("?userId=")[1] :
-		sessionStorage.getItem("userId")));
+    if (sessionStorage.getItem("userType") === "ADMIN") {
+        document.getElementsByTagName("h1")[0].innerHTML = `${ window.location.href.match(/username=(\w+)/)[1] }'s games`;
+        xhr.open("GET", `http://localhost:8000/game/all-owned-games?userid=${ window.location.href.match(/userId=(\d+)/)[1] }`);
+        document.getElementById("create-card").hidden = true;
+    } else {
+        xhr.open("GET", `http://localhost:8000/game/all-owned-games?userid=${ sessionStorage.getItem("userId") }`);
+    }
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 			JSON.parse(xhr.response).forEach(game => createCard(game, "EDIT"));
 			listenForClicks();
-		}
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+            alert("invalid id");
+        }
 	}
 
 	xhr.send();
@@ -67,7 +73,7 @@ function deleteGame(el) {
 }
 
 function recoverGame(el) {
-	xhr.open("POST", "http://localhost:8000/game/access-level");
+	xhr.open("POST", "http://localhost:8000/game/undo-access-level");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
@@ -81,8 +87,7 @@ function recoverGame(el) {
 
 	xhr.send(JSON.stringify({
 		gameID: el.parentElement.parentElement.parentElement.getAttribute("data-id"),
-		userID: sessionStorage.getItem("userId"),
-		accessLevel: "PRIVATE"
+		userID: sessionStorage.getItem("userId")
 	}));
 }
 

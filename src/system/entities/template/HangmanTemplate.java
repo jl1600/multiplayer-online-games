@@ -1,72 +1,41 @@
 package system.entities.template;
-import shared.exceptions.use_case_exceptions.InsufficientInputException;
 
 /**
  * Hangman Game Template
  */
 public class HangmanTemplate extends Template {
-    private int numPuzzles;
-    private int numLives;
-    private int numHints;
 
+    private boolean hasHints;
     /**
      * Hangman Template Constructor
      */
     public HangmanTemplate() {
         super();
+        this.hasHints = false;
+        setTitle("Unnamed Hangman Template");
     }
 
     /**
-     * @param numPuzzles number of puzzles
-     * @throws InsufficientInputException when numPuzzles is illegal and less than 1
+     * Constructor of Hangman Template with a given template
+     * @param template the input template
      */
-    public void setNumPuzzles(int numPuzzles) throws InsufficientInputException {
-        if (numPuzzles < 1) {
-            throw new InsufficientInputException();
-        }
-        this.numPuzzles = numPuzzles;
+    public HangmanTemplate(HangmanTemplate template){
+        super(template);
+        this.hasHints = template.hasHints();
     }
 
     /**
-     * @return number of puzzles
+     * set the state of there has or no Hints
+     * @param haveHints the current state of whether there has/have Hint or not
      */
-    public int getNumPuzzles() {
-        return this.numPuzzles;
+    public void setHasHints(boolean haveHints) {
+        this.hasHints = haveHints;
     }
 
     /**
-     * @param numLives number of lives
-     * @throws InsufficientInputException when numLives is illegal and less than 1
+     * @return has hints or not
      */
-    public void setNumLives(int numLives) throws InsufficientInputException {
-        if (numLives < 1) {
-            throw new InsufficientInputException();
-        }
-        this.numLives = numLives;
-    }
-
-    /**
-     * @return number of lives
-     */
-    public int getNumLives() {
-        return this.numLives;
-    }
-
-    /**
-     * @param numHints number of hints
-     * @throws InsufficientInputException when numHints is illegal and less than 0
-     */
-    public void setNumHints(int numHints) throws InsufficientInputException {
-        if (numHints < 0) {
-            throw new InsufficientInputException();
-        }
-        this.numHints = numHints;
-    }
-
-    /**
-     * @return number of hints
-     */
-    public int getNumHints() {
-        return this.numHints;
+    public boolean hasHints() {
+        return hasHints;
     }
 }

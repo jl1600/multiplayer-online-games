@@ -1,5 +1,8 @@
-package system.use_cases.builders.interactive_builders;
+package system.use_cases.builders;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import shared.constants.GameAccessLevel;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
@@ -8,44 +11,78 @@ import system.entities.game.quiz.QuizGame;
 import system.entities.game.quiz.QuizQuestion;
 import system.entities.template.QuizTemplate;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.Set;
 
+/**
+ * QuizGameInteractiveBuilder Class
+ */
 public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
     int numQuestions;
     int numAnswerEachQ;
     int numScoreCategories;
 
     DesignSubject currentDesignSubject;
-    String currentDesignQuestion;
 
     QuizGame currentGame;
     QuizTemplate chosenTemplate;
     QuizQuestion currentQuizQuestion;
     QuizAnswer currentQuizAnswer;
     String currentCategory;
+    String currentDesignQuestion;
+    Map<DesignSubject, String> designQuestions;
 
+    /**
+     * Design subjects that the user can choose value of
+     */
     public enum DesignSubject {
         TITLE, QUESTION_NUM, ANSWER_NUM, CATEGORIES_NUM, CATEGORY_NAME, CATEGORY_END_MESSAGE,
-        MAX_ATTEMPTS, QUIZ_QUESTION, QUIZ_ANSWER, CORRECT_ANSWER, CORRECT_ANSWERS, CATEGORY_SCORE, IS_PUBLIC,
+        MAX_ATTEMPTS, QUIZ_QUESTION, QUIZ_ANSWER, CORRECT_ANSWER_INDEX, CORRECT_ANSWERS, CATEGORY_SCORE, IS_PUBLIC,
         CONFIRMATION, NULL
     }
 
+    /**
+     * Constructor of QuizGameInteractiveBuilder
+     * @param creatorID the creator of this game
+     * @param template the template this game is using
+     */
     public QuizGameInteractiveBuilder(String creatorID, QuizTemplate template) {
         super(creatorID);
         currentGame = new QuizGame("", creatorID);
         currentGame.setTemplateID(template.getID());
+        Gson gson = new Gson();
+        try {
+            JsonReader reader = new JsonReader(new FileReader(
+                    "src/system/configuration_files/quiz_design_questions.json"));
+            Type type = new TypeToken<Map<DesignSubject, String>>(){}.getType();
+            designQuestions = gson.fromJson(reader, type);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Fatal: Can't find the configuration file for hangman design questions.");
+        }
         currentDesignSubject = DesignSubject.TITLE;
-        currentDesignQuestion = "Does your quiz have a title? If yes, enter the title. If no, answer 'no'.";
+        currentDesignQuestion = designQuestions.get(DesignSubject.TITLE);
         chosenTemplate = template;
         numQuestions = 0;
         numScoreCategories = 1;
     }
 
+    /**
+     * handle design choice appropriately
+     * @param designChoice A String that represents the user input for the design of the creation.
+     * @throws InvalidInputException when parameters are illegal and passed a null value
+     */
     @Override
     public void makeDesignChoice(String designChoice) throws InvalidInputException {
         currentDesignQuestion = update(designChoice);
     }
 
+    /**
+     *
+     * @return the current design question
+     */
     @Override
     public String getDesignQuestion() {
         return currentDesignQuestion;
@@ -73,7 +110,7 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
                 return handleQuizAnswerDesignChoice(designChoice);
             case CATEGORY_SCORE:
                 return handleCategoryScoreDesignChoice(designChoice);
-            case CORRECT_ANSWER:
+            case CORRECT_ANSWER_INDEX:
                 return handleCorrectAnswerDesignChoice(designChoice);
             case CORRECT_ANSWERS:
                 return handleCorrectAnswersDesignChoice(designChoice);
@@ -111,7 +148,7 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
             }
 
             currentDesignSubject = DesignSubject.CONFIRMATION;
-            return "Quiz is ready to build. Do you want to proceed? (yes/no)";
+            return designQuestions.get(currentDesignSubject);
         } else {
             throw new InvalidInputException();
         }
@@ -137,13 +174,13 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
         if (designChoice.equals("yes")) {
             readyToBuild = true;
             currentDesignSubject = DesignSubject.NULL;
-            return "Game successfully built.";
+            return designQuestions.get(currentDesignSubject);
         }
         else {
             // abort the current game, make a new one
             currentGame = new QuizGame("", currentGame.getCreatorName());
             currentDesignSubject =  DesignSubject.TITLE;
-            return "Please enter the title: ";
+            return designQuestions.get(currentDesignSubject);
         }
     }
 
@@ -155,19 +192,19 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
         if (chosenTemplate.hasMultipleScoreCategories()) {
             updateCurrentScoreCategory();
             currentDesignSubject = DesignSubject.CATEGORY_SCORE;
-            return "How much score would this answer give for category " + "\"" + currentCategory + "\"? ";
+            return designQuestions.get(currentDesignSubject) + "\"" + currentCategory + "\"? ";
         } else {
             currentQuizAnswer.setCategoryScore("General", 1.0);
 
             if (currentQuizQuestion.getAnswerNum() < numAnswerEachQ) {
                 currentDesignSubject = DesignSubject.QUIZ_ANSWER;
-                return "Enter answer " + (currentQuizQuestion.getAnswerNum() + 1) + ": ";
+                return designQuestions.get(currentDesignSubject) + (currentQuizQuestion.getAnswerNum() + 1) + ": ";
             } else if (chosenTemplate.isMultipleChoice() && chosenTemplate.isChooseAllThatApply()) {
                 currentDesignSubject = DesignSubject.CORRECT_ANSWERS;
-                return "Enter the indices of the correct answers, separated by space: ";
+                return designQuestions.get(currentDesignSubject);
             } else if (chosenTemplate.isMultipleChoice()) {
-                currentDesignSubject = DesignSubject.CORRECT_ANSWER;
-                return "Enter the index of the correct answer";
+                currentDesignSubject = DesignSubject.CORRECT_ANSWER_INDEX;
+                return designQuestions.get(currentDesignSubject);
             }
             else {
                 return handleIsEnoughQuestions();
@@ -178,22 +215,22 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
     private String handleIsEnoughQuestions() {
         if (currentGame.getNumQuestions() < numQuestions) {
             currentDesignSubject = DesignSubject.QUIZ_QUESTION;
-            return "Enter question " + (currentGame.getNumQuestions() + 1) + ": ";
+            return designQuestions.get(currentDesignSubject) + (currentGame.getNumQuestions() + 1) + ": ";
         }
         else {
             currentDesignSubject = DesignSubject.IS_PUBLIC;
-            return "Do you want to make this game public?";
+            return designQuestions.get(currentDesignSubject);
         }
     }
 
-    private String handleCategoryScoreDesignChoice(String designChoice) {
+    private String handleCategoryScoreDesignChoice(String designChoice) throws InvalidInputException {
         try {
             currentQuizAnswer.setCategoryScore(currentCategory, Double.parseDouble(designChoice));
             updateCurrentScoreCategory();
             if (currentCategory == null) {
                 if (currentQuizQuestion.getAnswerNum() < numAnswerEachQ) {
                     currentDesignSubject = DesignSubject.QUIZ_ANSWER;
-                    return "Enter answer " + (currentQuizQuestion.getAnswerNum() + 1) + ": ";
+                    return designQuestions.get(currentDesignSubject) + (currentQuizQuestion.getAnswerNum() + 1) + ": ";
                 }
                 else {
                     return handleIsEnoughQuestions();
@@ -201,11 +238,11 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
             }
             else {
                 currentDesignSubject = DesignSubject.CATEGORY_SCORE;
-                return "How much score would this answer give for category " + "\"" + currentCategory + "\"? ";
+                return designQuestions.get(currentDesignSubject) + "\"" + currentCategory + "\"? ";
             }
         }
         catch (NumberFormatException e) {
-            return "Invalid input for score, please make sure score is a double. Re-enter the number:";
+            throw new InvalidInputException();
         }
     }
 
@@ -225,13 +262,13 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
         currentQuizQuestion = new QuizQuestion(designChoice);
         currentGame.addQuestion(currentQuizQuestion);
         currentDesignSubject = DesignSubject.QUIZ_ANSWER;
-        return "Enter first answer: ";
+        return designQuestions.get(currentDesignSubject) + "1:";
     }
 
     private String handleMaxAttemptDesignChoice(String designChoice) {
         currentGame.setMaxAttempts(Integer.parseInt(designChoice));
         currentDesignSubject = DesignSubject.QUIZ_QUESTION;
-        return "Enter the first question: ";
+        return designQuestions.get(currentDesignSubject) + "1:";
     }
 
     private String handleCategoryEndMessageDesignChoice(String designChoice) {
@@ -239,11 +276,11 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
         currentGame.setEndingMessage(currentCategory, designChoice);
         if (numScoreCategories > currentGame.getNumScoreCategories()) {
             currentDesignSubject = DesignSubject.CATEGORY_NAME;
-            return "Enter the next category name: ";
+            return designQuestions.get(currentDesignSubject) + (currentGame.getNumScoreCategories() + 1);
         }
         else {
             currentDesignSubject = DesignSubject.MAX_ATTEMPTS;
-            return "Enter the maximum number of attempts for each question:";
+            return designQuestions.get(currentDesignSubject);
         }
     }
 
@@ -252,35 +289,35 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
         if (chosenTemplate.hasCustomEndingMessage()) {
             currentCategory = designChoice;
             currentDesignSubject = DesignSubject.CATEGORY_END_MESSAGE;
-            return "What is the ending message when this category has the highest score?";
+            return designQuestions.get(currentDesignSubject);
         }
         currentGame.setEndingMessage(designChoice, "Category with highest score is: " + designChoice + ".");
         if (numScoreCategories > currentGame.getNumScoreCategories()) {
             currentDesignSubject = DesignSubject.CATEGORY_NAME;
-            return "Enter the next category name: ";
+            return designQuestions.get(currentDesignSubject) + (currentGame.getNumScoreCategories() + 1);
         }
         else {
             currentDesignSubject = DesignSubject.MAX_ATTEMPTS;
-            return "Enter the maximum number of attempts for each question:";
+            return designQuestions.get(currentDesignSubject);
         }
     }
 
     private String handleCategoryNumDesignChoice(String designChoice) {
         numScoreCategories = Integer.parseInt(designChoice);
         currentDesignSubject = DesignSubject.CATEGORY_NAME;
-        return "Enter the first category name";
+        return designQuestions.get(currentDesignSubject) + "1:";
     }
 
     private String handleAnswerNumDesignChoice(String designChoice) {
         numAnswerEachQ = Integer.parseInt(designChoice);
         if (chosenTemplate.hasMultipleScoreCategories()) {
             currentDesignSubject = DesignSubject.CATEGORIES_NUM;
-            return "Enter the number of score categories of your quiz: ";
+            return designQuestions.get(currentDesignSubject);
         }
         else {
             currentGame.addScoreCategory("General");
             currentDesignSubject = DesignSubject.MAX_ATTEMPTS;
-            return "Enter the maximum number of attempts for each question:";
+            return designQuestions.get(currentDesignSubject);
         }
     }
 
@@ -289,14 +326,14 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
             numQuestions = Integer.parseInt(designChoice);
             if (chosenTemplate.isMultipleChoice()) {
                 currentDesignSubject = DesignSubject.ANSWER_NUM;
-                return "Enter the number of answers for each question:";
+                return designQuestions.get(currentDesignSubject);
             }
 
             else { // The case of Exact answer quiz
                 numAnswerEachQ = 1;
                 currentGame.addScoreCategory("General");
                 currentDesignSubject = DesignSubject.MAX_ATTEMPTS;
-                return "Enter the maximum number of attempts for each question: ";
+                return designQuestions.get(currentDesignSubject);
             }
         }
         catch (NumberFormatException e) {
@@ -313,10 +350,16 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
             currentGame.setTitle(designChoice);
         }
         currentDesignSubject = DesignSubject.QUESTION_NUM;
-        return "How many questions does your quiz have?";
+        return designQuestions.get(currentDesignSubject);
     }
 
 
+    /**
+     *
+     * @param id the gameID to be assigned to the game
+     * @return the current built game
+     * @throws InsufficientInputException if there isn't enough inputs given to fulfills the least requirement to build yet
+     */
     @Override
     public QuizGame build(String id) throws InsufficientInputException {
         if (!isReadyToBuild()) {

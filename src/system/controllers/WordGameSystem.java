@@ -4,21 +4,26 @@ import com.sun.net.httpserver.HttpServer;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.gateways.*;
 import system.use_cases.managers.*;
+import system.utilities.EmailService;
+import system.utilities.PseudoEmailComposer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-
+/**
+ * WordGameSystem Class
+ */
 public class WordGameSystem {
-
-    private final GameRequestHandler gameRH;
-    private final TemplateRequestHandler templateRH;
-    private final UserRequestHandler userRH;
 
     private final HttpServer server;
 
+    /**
+     * Constructor of WordGameSystem
+     * @throws IOException issue detected regarding input-output
+     * @throws InvalidUserIDException the user id responsible for this exception is not in the userManager's user list
+     */
     public WordGameSystem() throws IOException, InvalidUserIDException{
 
         GameDataGateway gameGateway = new GameDataMapper();
@@ -28,13 +33,15 @@ public class WordGameSystem {
         TemplateManager tm = new TemplateManager(templateDataGateway);
 
         UserDataGateway userGateway = new UserDataMapper();
-
         UserManager um = new UserManager(userGateway);
 
         MatchManager mm = new MatchManager();
-        gameRH = new GameRequestHandler(gm, tm, um, mm);
-        templateRH = new TemplateRequestHandler(tm, um);
-        userRH = new UserRequestHandler(um);
+
+        GameRequestHandler gameRH = new GameRequestHandler(gm, tm, um, mm);
+        TemplateRequestHandler templateRH = new TemplateRequestHandler(tm);
+
+        EmailService eService = new PseudoEmailComposer();
+        UserRequestHandler userRH = new UserRequestHandler(um, eService);
 
         server = HttpServer.create(new InetSocketAddress("localhost", 8000), 20);
 
@@ -46,11 +53,18 @@ public class WordGameSystem {
 
     }
 
+    /**
+     * run WorldGameSystem Helper
+     */
     public void run() {
         server.start();
         System.out.println(" Server started on port 8000");
     }
 
+    /**
+     * main function of WorldGameSystem
+     * @param args args
+     */
     public static void main(String[] args) {
         try {
             WordGameSystem server = new WordGameSystem();

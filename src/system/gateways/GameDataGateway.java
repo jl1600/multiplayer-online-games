@@ -7,6 +7,9 @@ import system.entities.game.Game;
 import java.io.IOException;
 import java.util.Set;
 
+/**
+ * GameDataGateway Interface
+ */
 public interface GameDataGateway {
 
     /**
@@ -41,7 +44,6 @@ public interface GameDataGateway {
      * @throws IOException if there is a problem reading from the database
      */
     Set<Game> getAllGames() throws IOException;
-
 
     /**
      * Get the count of Game objects ever created by the program.

@@ -1,8 +1,0 @@
-"Enter the name of your template"
-"Is your quiz multiple choice? (yes/no)"
-"Is your quiz choose all that apply? (yes/no)"
-"Does your quiz have multiple categories for score? (yes/no)"
-"Do your score categories have different weights? (yes/no)"
-"Does your quiz have custom ending messages? (yes/no)"
-"Ready to create new template. Are you sure that you want proceed? (yes/no)"
-""

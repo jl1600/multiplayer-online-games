@@ -9,7 +9,7 @@ import system.entities.game.quiz.QuizGame;
 import system.entities.template.Template;
 import system.entities.game.Game;
 import system.gateways.GameDataGateway;
-import system.use_cases.builders.interactive_builders.GameInteractiveBuilder;
+import system.use_cases.builders.GameInteractiveBuilder;
 import system.use_cases.factories.GameBuilderFactory;
 
 import java.io.IOException;
@@ -18,18 +18,26 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * GameManager Class
+ */
 public class GameManager {
     private final Map<String, Game> games;
     private final Map<String, GameInteractiveBuilder> gameBuilders; // mapping of username to builder object
     private final IdManager idManager;
     private final GameDataGateway gateway;
 
+    /**
+     * Constructor of GameManager
+     * @param gateway the gateway that communicate with database
+     * @throws IOException if there is an issue with input-output
+     */
     public GameManager(GameDataGateway gateway) throws IOException {
         games = new HashMap<>();
         gameBuilders = new HashMap<>();
         this.gateway = gateway;
 
-        for (Game game: this.gateway.getAllGames()) {
+        for (Game game : this.gateway.getAllGames()) {
             games.put(game.getID(), game);
         }
         this.idManager = new IdManager(gateway.getGameCount() + 1);
@@ -37,15 +45,15 @@ public class GameManager {
 
     /**
      * Starts the process of building a game.
-     *
+     * <p>
      * This method will create an Interactive builder, which can be accessed by user ID. A game is gradually
      * built using this builder.
      *
      * @param creatorID The ID of the creator of this game.
-     * @param template A Template object, which is used to skip some steps in the process of game building.
+     * @param template  A Template object, which is used to skip some steps in the process of game building.
      * @throws CreationInProgressException Exception is thrown when there is already a game building that correspond
-     * to the given user ID.
-     * */
+     *                                     to the given user ID.
+     */
     public void initiateGameBuilder(String creatorID, Template template) throws CreationInProgressException {
         if (gameBuilders.containsKey(creatorID)) {
             throw new CreationInProgressException();
@@ -62,7 +70,7 @@ public class GameManager {
      *
      * @param creatorID The string identifier of the user that is building this game.
      * @throws NoCreationInProgressException No such user with such ID is building any game.
-     * */
+     */
     public String getDesignQuestion(String creatorID) throws NoCreationInProgressException {
 
         if (!gameBuilders.containsKey(creatorID)) {
@@ -74,11 +82,10 @@ public class GameManager {
     /**
      * Provides input for the building process of the game that is being built by the user with creatorID.
      *
-     * @param creatorID The string identifier of the user that is building this game.
+     * @param creatorID    The string identifier of the user that is building this game.
      * @param designChoice The input for the building process.
-     *
      * @throws InvalidInputException The design choice provided is invalid.
-     * */
+     */
     public void makeDesignChoice(String creatorID, String designChoice)
             throws NoCreationInProgressException, InvalidInputException {
 
@@ -94,7 +101,7 @@ public class GameManager {
      *
      * @param creatorID The user ID associated with this builder.
      * @throws NoCreationInProgressException when there is no such builder to be destroyed.
-     * */
+     */
     public void destroyBuilder(String creatorID) throws NoCreationInProgressException {
         if (!gameBuilders.containsKey(creatorID)) {
             throw new NoCreationInProgressException();
@@ -102,14 +109,15 @@ public class GameManager {
             gameBuilders.remove(creatorID);
         }
     }
+
     /**
      * Conclude the building process. Provide the game with and ID and stores it. Remove the CreatorID
      * from the collection of users that are in building process.
      *
      * @param creatorID The string identifier of the user that is building this game.
      * @throws NoCreationInProgressException No such user with such ID is building any game.
-     * @throws InsufficientInputException Game is not ready to be built. Need more input.
-     * */
+     * @throws InsufficientInputException    Game is not ready to be built. Need more input.
+     */
     public String buildGame(String creatorID)
             throws NoCreationInProgressException, InsufficientInputException {
 
@@ -141,8 +149,8 @@ public class GameManager {
      *
      * @param creatorID The string identifier of the user that is building this game.
      * @throws NoCreationInProgressException No such user with such ID is building any game.
-     * @throws InsufficientInputException Game is not ready to be built. Need more input.
-     * */
+     * @throws InsufficientInputException    Game is not ready to be built. Need more input.
+     */
     public String buildTemporaryGame(String creatorID)
             throws NoCreationInProgressException, InsufficientInputException {
 
@@ -170,7 +178,7 @@ public class GameManager {
      *
      * @param gameId The String identifier of the Game.
      * @throws InvalidGameIDException There is no such a game in the system.
-     * */
+     */
     public void removeGame(String gameId) throws InvalidGameIDException {
         if (games.containsKey(gameId)) {
             try {
@@ -189,7 +197,7 @@ public class GameManager {
      *
      * @param id The string identifier of the Game
      * @throws InvalidIDException There is no such game in the system.
-     * */
+     */
     public Game getGame(String id) throws InvalidIDException {
         if (!games.containsKey(id))
             throw new InvalidIDException();
@@ -198,17 +206,17 @@ public class GameManager {
 
     /**
      * Returns a mapping of all Game Ids to game titles.
-     * */
-    public Set<String> getAllGamesID() {
+     */
+    public Set<String> getAllGameIDs() {
         return new HashSet<>(games.keySet());
     }
 
     /**
      * Returns a set of public game ids.
-     * */
+     */
     public Set<String> getAllPublicGamesID() {
         Set<String> publicIDs = new HashSet<>();
-        for (String id: games.keySet()) {
+        for (String id : games.keySet()) {
             if (games.get(id).isPublic()) {
                 publicIDs.add(id);
             }
@@ -218,28 +226,45 @@ public class GameManager {
 
     /**
      * Set the public status of the game to the specified value.
-     * @param gameID The ID of the game.
+     *
+     * @param gameID          The ID of the game.
      * @param gameAccessLevel The value representing whether the game is public, private, friends only, deleted
-     * */
+     */
     public void setGameAccessLevel(String gameID, GameAccessLevel gameAccessLevel) throws InvalidGameIDException {
-        if(!games.containsKey(gameID)) {
+        System.out.println("setGML");
+        if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
-        games.get(gameID).setGameAccessLevel(gameAccessLevel);
-        try {
-            gateway.updateGame(games.get(gameID));
-        } catch (IOException e) {
-            throw new RuntimeException("Dysfunctional Database.");
+        if (gameAccessLevel != null) {
+            games.get(gameID).setGameAccessLevel(gameAccessLevel);
+            try {
+                gateway.updateGame(games.get(gameID));
+                System.out.println(games.get(gameID).getTitle());
+                System.out.println(games.get(gameID).getGameAccessLevel().name());
+            } catch (IOException e) {
+                throw new RuntimeException("Dysfunctional Database.");
+            }
         }
-    }
 
+    }
+    /**
+     * Revert the publicity status of the game based on its stored value
+     * @param gameID The ID of the game.
+     * */
     public void undoSetGameAccessLevel(String gameID) throws InvalidGameIDException {
-        if(!games.containsKey(gameID)) {
+        System.out.println("undoGML");
+        if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
-        games.get(gameID).setGameAccessLevel(games.get(gameID).getPreviousGameAccessLevel());
+        GameAccessLevel currentAC = games.get(gameID).getGameAccessLevel();
+        GameAccessLevel prevAC = games.get(gameID).getPreviousGameAccessLevel();
+        games.get(gameID).setGameAccessLevel(prevAC);
+        games.get(gameID).setPreviousGameAccessLevel(currentAC);
         try {
             gateway.updateGame(games.get(gameID));
+            System.out.println(games.get(gameID).getTitle());
+            System.out.println(games.get(gameID).getGameAccessLevel().name());
+            System.out.println(games.get(gameID).getPreviousGameAccessLevel().name());
         } catch (IOException e) {
             throw new RuntimeException("Dysfunctional Database.");
         }
@@ -247,10 +272,11 @@ public class GameManager {
 
     /**
      * Returns whether the game is a public game
+     *
      * @param gameID The unique string identifier of the game
-     * */
+     */
     public boolean checkIsPublic(String gameID) throws InvalidGameIDException {
-        if(!games.containsKey(gameID)) {
+        if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
         return games.get(gameID).isPublic();
@@ -258,9 +284,9 @@ public class GameManager {
 
     /**
      * Returns the genre of the game.
-     * */
+     */
     public GameGenre getGenre(String gameID) throws InvalidGameIDException {
-        if(!games.containsKey(gameID)) {
+        if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
         if (games.get(gameID) instanceof QuizGame) {
@@ -270,10 +296,11 @@ public class GameManager {
 
     /**
      * Returns the title of a game
+     *
      * @param gameID The unique string identifier of the game
-     * */
+     */
     public String getGameTitle(String gameID) throws InvalidGameIDException {
-        if(!games.containsKey(gameID)) {
+        if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
         return games.get(gameID).getTitle();
@@ -281,10 +308,11 @@ public class GameManager {
 
     /**
      * Returns the template ID of a game
+     *
      * @param gameID The unique string identifier of the game
-     * */
+     */
     public String getTemplateID(String gameID) throws InvalidGameIDException {
-        if(!games.containsKey(gameID)) {
+        if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
         return games.get(gameID).getTemplateID();
@@ -292,27 +320,79 @@ public class GameManager {
 
     /**
      * Returns the owner ID of a game
+     *
      * @param gameID The unique string identifier of the game
-     * */
+     */
     public String getOwnerID(String gameID) throws InvalidGameIDException {
-        if(!games.containsKey(gameID)) {
+        if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
         return games.get(gameID).getOwnerId();
     }
 
+    /**
+     * get a specified game's access level
+     * @param gameID the inputted game id
+     * @return the access level of the parameter game id
+     * @throws InvalidGameIDException if gameID is not in the current games list or is null
+     */
     public GameAccessLevel getAccessLevel(String gameID) throws InvalidGameIDException {
-        if(!games.containsKey(gameID)) {
+        if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
         return games.get(gameID).getGameAccessLevel();
     }
 
+    /**
+     * get a specified game's previous access level
+     * @param gameID the inputted game id
+     * @return the access level of the parameter game id
+     * @throws InvalidGameIDException if gameID is not in the current games list or is null
+     */
     public GameAccessLevel getPreviousAccessLevel(String gameID) throws InvalidGameIDException {
-        if(!games.containsKey(gameID)) {
+        if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
         return games.get(gameID).getPreviousGameAccessLevel();
     }
 
+    /**
+     * get games owned by a user that has any access level except DELETED
+     * @param userID the specified user's id
+     * @return a list of userID's owned not deleted games
+     */
+    public Set<String> getOwnedNotDeletedGameID(String userID) {
+        Set<String> ownedNotDeletedGameIDs = new HashSet<>();
+        for (String id : games.keySet()) {
+            //if owner id match and game is not deleted
+            String ownerID = games.get(id).getOwnerId();
+            if (ownerID.equals(userID)) {
+                if (!games.get(id).getGameAccessLevel().equals(GameAccessLevel.DELETED)) {
+                    ownedNotDeletedGameIDs.add(id);
+                }
+            }
+        }
+        return ownedNotDeletedGameIDs;
+    }
+
+    /**
+     * get games owned by a user that has FRIEND only access level
+     * @param userID the specified user's id
+     * @return a list of userID's owned and has access level of FRIEND
+     */
+    public Set<String> getOwnedFriendOnlyGameID(String userID) {
+        Set<String> friendOnlyGameIDs = new HashSet<>();
+
+        for (String id : games.keySet()) {
+            //if owner id match and game is FRIEND only
+            String ownerID = games.get(id).getOwnerId();
+            if (ownerID.equals(userID)) {
+                if (games.get(id).getGameAccessLevel().equals(GameAccessLevel.FRIEND)) {
+                    friendOnlyGameIDs.add(id);
+                }
+            }
+        }
+
+        return friendOnlyGameIDs;
+    }
 }

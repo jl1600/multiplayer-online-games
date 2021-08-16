@@ -8,13 +8,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Represents a User.
- *
+/**
+ * User Class
  */
 public class User {
     private final String userId;
     private String username;
     private String password;
+    private String email;
     private UserRole role;
     private OnlineStatus onlineStatus;
     private final Set<String> gameCreations;
@@ -24,16 +25,17 @@ public class User {
     private Date lastBanDate; // a word play on the last ban date and the last given ban date
 
     /**
-     *
+     * Constructor of User
      * @param userId the string identifier of this user for within system program communication
      * @param username the username that user use to login and identify themselves
      * @param password the password user use to prove their identity
      * @param role the user role that determines the appropriate action to take and rules to follow for this user
      */
-    public User(String userId, String username, String password, UserRole role, Date registerDate) {
+    public User(String userId, String username, String password, String email, UserRole role, Date registerDate) {
         this.userId = userId;
         this.username = username;
         this.password = password;
+        this.email = email;
         this.role = role;
         this.onlineStatus = OnlineStatus.OFFLINE;
         this.gameCreations = new HashSet<>();
@@ -97,12 +99,9 @@ public class User {
      * @return all ids of the games created by the user
      */
     public Set<String> getGameCreationSet() {
-        return new HashSet<String>(gameCreations);
+        return new HashSet<>(gameCreations);
     }
 
-    public void addGameCreation(String newGameID) {
-        this.gameCreations.add(newGameID);
-    }
     /**
      * @return online status of the user
      */
@@ -129,41 +128,97 @@ public class User {
         }
     }
 
+    /**
+     * @return this user's password
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     *
+     * @return this user's email
+     */
+    public String getEmail() { return email;}
+
+    /**
+     * @param email inputted email
+     */
+    public void setEmail(String email) {this.email = email;}
+
+    /**
+     *
+     * @param gameID the game id wish to be removed
+     */
     public void removeGameID(String gameID) {
         gameCreations.remove(gameID);
     }
 
+    /**
+     *
+     * @return this user's register date
+     */
     public Date getRegisterDate(){return registerDate;}
 
+    /**
+     *
+     * @return this user's friend list
+     */
     public Set<String> getFriendList() {
         return friendList;
     }
 
+    /**
+     *
+     * @param senderID the id of the sender who will now be added to this user's friend list
+     */
     public void addFriend(String senderID) {
         this.friendList.add(senderID);
     }
+
+    /**
+     *
+     * @param friendID the id which will be removed from this user's friend list
+     */
     public void removeFriend(String friendID) {
         this.friendList.remove(friendID);
     }
-
+    /**
+     *
+     * @return this user's pending friend list
+     */
     public Set<String> getPendingFriendList() {
         return pendingFriendList;
     }
 
+    /**
+     *
+     * @param senderID the id that will be added to this user's pending friend list
+     */
     public void addPendingFriend(String senderID) {
         this.pendingFriendList.add(senderID);
     }
-    public void removePendingFriend(String friendID) {
-        this.pendingFriendList.remove(friendID);
+
+    /**
+     *
+     * @param senderID the id that will be removed from this user's friend list
+     */
+    public void removePendingFriend(String senderID) {
+        this.pendingFriendList.remove(senderID);
     }
 
+    /**
+     *
+     * @return the last ban date of this user
+     */
     public Date getLastBanDate() {
         return lastBanDate;
     }
+
+    /**
+     *
+     * @param lastBanDate the desired last ban date
+     */
     public void setLastBanDate(Date lastBanDate) {
         this.lastBanDate = lastBanDate;
     }

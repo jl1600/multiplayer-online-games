@@ -5,19 +5,29 @@
 		<link href="../stylesheets/general.css" rel="stylesheet" />
 		<link href="../stylesheets/form.css" rel="stylesheet" />
 		<script src="../scripts/requests/newTrial.js"></script>
+		<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
 		<title>Sign up for Multiplayer Games</title>
 	</head>
 
 	<body>
 		<iframe id="header" src="../components/header.html" width="100%"></iframe>
 
-		<form onsubmit="signup(this.username.value, this.password.value, this.confirmPassword.value, this.userType.value); return false">
+		<form onsubmit="signup(this.username.value, this.password.value, this.confirmPassword.value, this.email.value, this.userType.value); return false">
 			<h1>Sign up</h1>
 
 			<input type="text" name="username" placeholder="Username" required>
+			<input id="email" type="text" name="email" placeholder="Email" required>
 			<input id="password" type="password" name="password" placeholder="Password" required>
 			<input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm password" required onfocusout="checkPassword()">
 			<div id="errorMessage"></div>
+
+			<ul>
+				<li style="list-style-type:none"><span class="characters"> <i class="fa fa-times" aria-hidden="true"></i> Upper and Lower Case Characters </span></li>
+				<li style="list-style-type:none"><span class="numbers"> <i class="fa fa-times" aria-hidden="true"></i> Numbers </span> </li>
+				<li style="list-style-type:none"><span class="special"> <i class="fa fa-times" aria-hidden="true"></i> Special Characters </span> </li>
+				<li style="list-style-type:none"><span class="length"> <i class="fa fa-times" aria-hidden="true"></i> Length of at least 6 Characters </span> </li>
+			</ul>
+
 			<div id="user-type">User type:
 				<label>
 					<input type="radio" name="userType" value="TEMP" />Temporary

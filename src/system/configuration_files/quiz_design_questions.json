@@ -1,0 +1,17 @@
+{
+  "TITLE": "Does your quiz have a title? If yes, enter the title. If no, answer 'no'.",
+  "QUESTION_NUM": "Please enter the number of questions: ",
+  "ANSWER_NUM": "Enter the number of answers for each question: ",
+  "CATEGORIES_NUM": "How many score categories does your quiz have?",
+  "CATEGORY_NAME": "Enter the name of category ",
+  "CATEGORY_END_MESSAGE": "What message do you want to display when this category ends up with highest score?",
+  "MAX_ATTEMPTS": "How many attempts is allowed for each question?",
+  "QUIZ_QUESTION": "Enter question ",
+  "QUIZ_ANSWER": "Enter answer ",
+  "CORRECT_ANSWER_INDEX": "Enter the index of the correct answer: ",
+  "CORRECT_ANSWERS": "Enter the indices of correct answers, separated by space",
+  "CATEGORY_SCORE": "How much score would this answer give to category ",
+  "IS_PUBLIC": "Do you want to make this game public? (yes/no)",
+  "CONFIRMATION": "Ready to build game, do you want to confirm? (yes/no)",
+  "NULL": "Game successfully built!"
+}

@@ -8,10 +8,14 @@ import shared.exceptions.use_case_exceptions.InvalidInputException;
 import shared.exceptions.use_case_exceptions.InvalidMatchIDException;
 import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.use_cases.managers.MatchManager;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * PlayerInputListener Class
+ */
 public class PlayerInputListener extends Thread {
 
     InputStream inStream;
@@ -21,6 +25,14 @@ public class PlayerInputListener extends Thread {
     String playerID;
     Gson gson;
 
+    /**
+     * Constructor of PlayerInputListener
+     *
+     * @param socket   the web socket used for communication
+     * @param manager  the match manager that contains all matches and can manipulate them
+     * @param matchID  the current match id
+     * @param playerID the current player id
+     */
     public PlayerInputListener(Socket socket, MatchManager manager, String matchID, String playerID) {
         try {
             inStream = socket.getInputStream();
@@ -34,6 +46,11 @@ public class PlayerInputListener extends Thread {
         this.gson = new Gson();
     }
 
+    /**
+     * Run PlayerInputListener
+     * <p>
+     * Monitors the socket input stream and handles player inputs depending on the match status.
+     */
     public void run() {
         while (true) {
             try {
@@ -57,7 +74,6 @@ public class PlayerInputListener extends Thread {
                             break;
                     }
                     if (!inData.gameMove.equals("")) {
-                        System.out.println("trying to play move");
                         manager.playGameMove(playerID, matchID, inData.gameMove);
                     }
                 }
@@ -106,7 +122,7 @@ public class PlayerInputListener extends Thread {
         byte[] decoded = new byte[messageLen];
         input.read(encoded, 0, messageLen);
         for (int i = 0; i < messageLen; i++) {
-            decoded[i] = (byte)(encoded[i] ^ mask[i % 4]);
+            decoded[i] = (byte) (encoded[i] ^ mask[i % 4]);
         }
         return new String(decoded);
     }
@@ -118,7 +134,7 @@ public class PlayerInputListener extends Thread {
         firstTwo[0] |= (1 << 7);  // FIN, telling the client that this is a whole message
         firstTwo[0] |= 1; // Op code, 0x1, telling that this is a text
         int lenCode;    // this is the length of the message if length < 126
-        byte [] uint16Len = new byte [2];   // A backup for the length in the case it exceeds 125
+        byte[] uint16Len = new byte[2];   // A backup for the length in the case it exceeds 125
 
         if (message.length() < 126) {
             lenCode = message.length();

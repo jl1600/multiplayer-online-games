@@ -11,6 +11,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * MatchManager Class
+ */
 public class MatchManager {
     private final ConcurrentMap<String, GameMatch> preparingMatches;
     private final ConcurrentMap<String, GameMatch> ongoingMatches;
@@ -18,6 +21,9 @@ public class MatchManager {
     private final IdManager matchIdMgr;
     private final GameMatchFactory matchFactory;
 
+    /**
+     * Constructor of MatchManager
+     */
     public MatchManager() {
         preparingMatches = new ConcurrentHashMap<>();
         ongoingMatches = new ConcurrentHashMap<>();

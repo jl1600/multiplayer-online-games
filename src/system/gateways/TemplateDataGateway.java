@@ -5,6 +5,9 @@ import system.entities.template.Template;
 import java.io.*;
 import java.util.Set;
 
+/**
+ * TemplateDataGateway Interface
+ */
 public interface TemplateDataGateway {
     /**
      * Adds a template to the database and increments the template count by 1.
