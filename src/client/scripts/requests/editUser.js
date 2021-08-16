@@ -59,7 +59,7 @@ function updateEmail() {
 		    alert("Invalid userID");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
 		    alert("Duplicate email");
-		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 412) {
             alert("Invalid email");
         }
 	}
