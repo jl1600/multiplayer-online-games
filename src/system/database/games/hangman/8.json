@@ -18,5 +18,8 @@
   "templateId": "6",
   "gameAccessLevel": "PUBLIC",
   "previousGameAccessLevel": "PRIVATE",
-  "title": "Movie Hangman Quiz"
+  "title": "Movie Hangman Quiz",
+  "numPuzzles": 3,
+  "numLives": 5,
+  "numHints": 5
 }

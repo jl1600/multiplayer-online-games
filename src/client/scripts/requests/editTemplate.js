@@ -38,15 +38,15 @@ function editTemplate() {
 }
 
 function promptAttributes(map) {
-    document.getElementsByTagName("input")[0].value = map.Title;
-    delete map.Title;
+    document.getElementsByTagName("input")[0].value = map.title;
+    delete map.title;
 
     for (const [key, value] of Object.entries(map)) {
         addOption(key, value);
     }
 
     restrictOptions();
-    document.getElementById("is-multiple-choice").onclick = restrictOptions;
+    document.getElementById("isMultipleChoice").onclick = restrictOptions;
 }
 
 function addOption(label, checked) {
@@ -54,7 +54,7 @@ function addOption(label, checked) {
     labelEl.innerHTML = label;
     const input = document.createElement("input");
     input.type = "checkbox";
-    input.setAttribute("id", label.toLowerCase().replace(/\s/g, "-"));
+    input.setAttribute("id", label);
     input.checked = checked === "true";
 
     labelEl.prepend(input);
@@ -63,13 +63,13 @@ function addOption(label, checked) {
 }
 
 function restrictOptions() {
-    if (!document.getElementById("is-multiple-choice").checked) {
-        document.querySelectorAll("input[type='checkbox']:not(#is-multiple-choice)").forEach(el => {
+    if (!document.getElementById("isMultipleChoice").checked) {
+        document.querySelectorAll("input[type='checkbox']:not(#isMultipleChoice)").forEach(el => {
             el.checked = false;
             el.disabled = true;
         });
     } else {
-        document.querySelectorAll("input[type='checkbox']:not(#is-multiple-choice)").forEach(el => el.disabled = false);
+        document.querySelectorAll("input[type='checkbox']:not(#isMultipleChoice)").forEach(el => el.disabled = false);
     }
 }
 
@@ -77,11 +77,11 @@ function getAttrMap() {
     const inputs = Array.from(document.getElementsByTagName("input"));
 
     let attrMap = {
-        Title: inputs.shift().value
+        title: inputs.shift().value
     };
 
     for (const el of inputs) {
-        attrMap[capitalize(el.getAttribute("id").replace(/-/g, " "))] = el.checked.toString();
+        attrMap[el.getAttribute("id")] = el.checked.toString();
     }
 
     return attrMap;

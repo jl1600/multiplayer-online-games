@@ -379,20 +379,6 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
-    private String getQueryArgFromGET(HttpExchange exchange) throws IOException {
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return null;
-            }
-            return query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
-            return null;
-        }
-    }
-
     private void handleBanUser(HttpExchange exchange) throws IOException {
         BanUserRequestBody body = gson.fromJson(getRequestBody(exchange), BanUserRequestBody.class);
         try {
