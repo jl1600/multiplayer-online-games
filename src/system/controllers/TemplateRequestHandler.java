@@ -9,7 +9,6 @@ import shared.constants.GameGenre;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.template.QuizTemplate;
 import system.use_cases.managers.TemplateManager;
-import system.use_cases.managers.UserManager;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -53,6 +52,7 @@ public class TemplateRequestHandler extends RequestHandler {
                 break;
             case "create":
                 handleCreate(exchange);
+                break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
@@ -73,13 +73,19 @@ public class TemplateRequestHandler extends RequestHandler {
         if (genre == null)
             return;
         TemplateAllAttrsResponseBody res = new TemplateAllAttrsResponseBody();
-        res.attrMap = templateManager.getDefaultAttrMap(GameGenre.valueOf(genre));
-        sendResponse(exchange, 200, gson.toJson(res));
+        try {
+            res.attrMap = templateManager.getDefaultAttrMap(GameGenre.valueOf(genre));
+            sendResponse(exchange, 200, gson.toJson(res));
+        } catch (IllegalArgumentException e) {
+            sendResponse(exchange, 400, "Genre is invalid.");
+        }
+
     }
 
     private void handleEdit(HttpExchange exchange) throws IOException {
         EditTemplateRequestBody body = gson.fromJson(getRequestBody(exchange), EditTemplateRequestBody.class);
         try {
+            System.out.println(body.attrMap);
             templateManager.editTemplate(body.attrMap, body.templateID);
             sendResponse(exchange, 204, null);
         } catch (NoSuchAttributeException | InvalidInputException e) {
@@ -101,7 +107,6 @@ public class TemplateRequestHandler extends RequestHandler {
         } catch (InvalidTemplateIDException e) {
             sendResponse(exchange, 400, "Invalid Template ID.");
         }
-
     }
 
     private void handleGetAllTemplates(HttpExchange exchange) throws IOException {

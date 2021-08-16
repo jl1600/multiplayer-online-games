@@ -48,7 +48,7 @@ function createElement(className) {
 function createOverlayButtons(type, publicity) {
 	const imgs = createElement("img-container");
 
-	if (type === "EDIT") {
+	if (type === "EDIT" && !!publicity) {
 		createEditButtons(publicity).forEach(el => imgs.appendChild(el));
 	} else {
 		const btn = createElement("button");
@@ -60,6 +60,7 @@ function createOverlayButtons(type, publicity) {
 	return imgs;
 }
 function createEditButtons(publicity) {
+
     const visibilityImg = createImg(publicity.toLowerCase(), "png");
 	visibilityImg.classList.add("button");
 	visibilityImg.classList.add("publicity");

@@ -5,8 +5,8 @@ import com.sun.istack.internal.NotNull;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import shared.exceptions.use_case_exceptions.NoSuchAttributeException;
 import system.entities.template.Template;
-
-import java.util.HashMap;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import java.util.Map;
 
 public abstract class TemplateEditor {
@@ -31,7 +31,8 @@ public abstract class TemplateEditor {
     public Map<String, String> getAttributeMap() {
         Gson gson = new Gson();
         String json = gson.toJson(getTemplate());
-        Map<String, String> attrs = gson.fromJson(json, HashMap.class);
+        Type type = new TypeToken <Map<String, String>>(){}.getType();
+        Map<String, String> attrs = gson.fromJson(json, type);
         attrs.remove("id");
         return attrs;
     }

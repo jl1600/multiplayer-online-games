@@ -77,11 +77,11 @@ function getAttrMap() {
     const inputs = Array.from(document.getElementsByTagName("input"));
 
     let attrMap = {
-        Title: inputs.shift().value
+        title: inputs.shift().value
     };
 
     for (const el of inputs) {
-        attrMap[capitalize(el.getAttribute("id").replace(/-/g, " "))] = el.checked.toString();
+        attrMap[el.getAttribute("id")] = el.checked.toString();
     }
 
     return attrMap;

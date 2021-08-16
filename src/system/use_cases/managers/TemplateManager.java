@@ -39,26 +39,25 @@ public class TemplateManager {
      * */
     public void createTemplate(Map<String, String> attrMap, GameGenre type) throws
             NoSuchAttributeException, InvalidInputException {
-        TemplateFactory factory = new TemplateFactory();
-        Template temp = factory.getTemplate(type);
-        TemplateEditorFactory editFactory = new TemplateEditorFactory();
-        TemplateEditor editor = editFactory.getTemplateEditor(temp);
+
+        Template temp =  new TemplateFactory().getTemplate(type);
+        temp.setID(idManager.getNextId());
+        TemplateEditor editor = new TemplateEditorFactory().getTemplateEditor(temp);
 
         for (String attrName: attrMap.keySet()) {
             editor.editAttribute(attrName, attrMap.get(attrName));
         }
         Template res = editor.getTemplate();
-        res.setID(idManager.getNextId());
+        addTemplate(res);
     }
 
     /**
      * Returns the default version of a template attribute map.
      * */
     public Map<String, String> getDefaultAttrMap(GameGenre type) {
-        TemplateFactory factory = new TemplateFactory();
-        Template temp = factory.getTemplate(type);
-        TemplateEditorFactory editFactory = new TemplateEditorFactory();
-        TemplateEditor editor = editFactory.getTemplateEditor(temp);
+        Template temp =  new TemplateFactory().getTemplate(type);
+        temp.setID("-1");
+        TemplateEditor editor = new TemplateEditorFactory().getTemplateEditor(temp);
         return editor.getAttributeMap();
     }
 
@@ -91,9 +90,13 @@ public class TemplateManager {
         return editor.getAttributeMap();
     }
 
-    private void addTemplate(Template template) throws IOException {
+    private void addTemplate(Template template) {
         templates.put(template.getID(), template);
-        gateway.addTemplate(template);
+        try {
+            gateway.addTemplate(template);
+        } catch (IOException e) {
+            throw new RuntimeException("Fatal: Cannot save template data.");
+        }
     }
 
     public Set<String> getAllTemplateIDs() {
