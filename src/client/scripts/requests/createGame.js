@@ -49,6 +49,19 @@ function makeDesignChoice() {
 	}));
 }
 
+function cancelCreateGame(){
+    xhr.open("POST", "http://localhost:8000/game/cancel-builder");
+
+	xhr.onreadystatechange = () => {
+		window.location = "http://localhost:8080/pages/my-games.html"
+	}
+
+	xhr.send(JSON.stringify({
+		userID: sessionStorage.getItem("userId")
+	}));
+}
+
+
 function resetQuestions() {
 	xhr.open("POST", "http://localhost:8000/game/cancel-builder");
 
@@ -64,3 +77,5 @@ function resetQuestions() {
 		userID: sessionStorage.getItem("userId")
 	}));
 }
+
+
