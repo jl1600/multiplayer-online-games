@@ -96,8 +96,6 @@ function allowEditPassword() {
 
     if (document.getElementById("password-strength").style.display === "none") {
         document.getElementById("password-strength").style.display = "block";
-     } else {
-        document.getElementById("password-strength").style.display = "none";
      }
 
      document.getElementById("new-password").addEventListener("input", () => {
@@ -120,6 +118,7 @@ function updatePassword() {
 
             document.getElementById("old-password").value = "xxxxxxxx";
             document.getElementById("old-password").readOnly = true;
+            document.getElementById("password-strength").style.display = "none"
             alert("Password edit success.");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
             alert("Invalid userID");
