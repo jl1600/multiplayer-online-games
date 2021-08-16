@@ -311,22 +311,13 @@ public class GameRequestHandler extends RequestHandler {
     }
 
     private void handleGetAvailableGamesByUserID(HttpExchange exchange) throws IOException {
-        String userID;
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return;
-            }
-            userID = query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
+        String ownerID = getQueryArgFromGET(exchange);
+        if (ownerID == null)
             return;
-        }
-
         try{
-            sendResponse(exchange, 200, getAvailableGameDataByUserID(userID));
+            sendResponse(exchange, 200, getAvailableGameDataByUserID(ownerID));
         } catch (InvalidUserIDException e) {
+            System.out.println("inv");
             sendResponse(exchange, 400, "Invalid User ID.");
             return;
         }
@@ -422,18 +413,21 @@ public class GameRequestHandler extends RequestHandler {
 
     private String getAvailableGameDataByUserID(String userID) throws InvalidUserIDException {
         Set<GameDataResponseBody> dataSet = new HashSet<>();
-        Set<String> userFriendList = userManager.getFriendList(userID);
-
         //duplicates will be take cared by built in
         Set<String> availableGameIDs = new HashSet<>();
 
-        //Step 1: get all public games
-        availableGameIDs.addAll(gameManager.getAllPublicGamesID());
-        //Step 2: get all owned creations that are not DELETED
-        availableGameIDs.addAll(gameManager.getOwnedNotDeletedGameID(userID));
-        //Step 3: for every friend, get all of their friend only games
-        for (String friendID : userFriendList){
-            availableGameIDs.addAll(gameManager.getOwnedFriendOnlyGameID(friendID));
+        if (userManager.getUserRole(userID).equals(UserRole.ADMIN)){
+            availableGameIDs = gameManager.getAllGameIDs();
+        } else{
+            Set<String> userFriendList = userManager.getFriendList(userID);
+            //Step 1: get all public games
+            availableGameIDs.addAll(gameManager.getAllPublicGamesID());
+            //Step 2: get all owned creations that are not DELETED
+            availableGameIDs.addAll(gameManager.getOwnedNotDeletedGameID(userID));
+            //Step 3: for every friend, get all of their friend only games
+            for (String friendID : userFriendList){
+                availableGameIDs.addAll(gameManager.getOwnedFriendOnlyGameID(friendID));
+            }
         }
 
         for (String id: availableGameIDs) {

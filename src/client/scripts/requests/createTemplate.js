@@ -1,66 +1,96 @@
 if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 
-window.addEventListener("beforeunload", resetQuestions);
+getDefaultAttributes();
 
-function createTemplateBuilder() {
-	xhr.open("POST", "http://localhost:8000/template/create-builder");
+function getDefaultAttributes() {
+    var genre = document.querySelector("input[name='templateGenre']:checked").value;
+    xhr.open("GET", "http://localhost:8000/template/default-attr-map?genre=" + genre);
 
-	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-            resetQuestions();
-        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
-            promptQuestion(JSON.parse(xhr.response).designQuestion);
-            document.getElementsByTagName("button")[1].onclick = makeDesignChoice;
-        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {
-            alert("The userID or the genre is invalid");
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            promptAttributes(JSON.parse(xhr.response).attrMap);
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+            alert("Invalid game genre.")
         }
-	};
+    }
 
-	xhr.send(JSON.stringify({
-		genre: document.querySelector("input[name='templateGenre']:checked").value,
-		userID: sessionStorage.getItem("userId")
-	}));
+    xhr.send();
 }
 
-function makeDesignChoice() {
-	const inputs = document.getElementsByTagName("input");
-	const choice = inputs[inputs.length - 1].value;
-	if (choice == "") return alert("The input is invalid. Please re-enter");
-
-	xhr.open("POST", "http://localhost:8000/template/make-design-choice");
-
-	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-			inputs[inputs.length - 1].readOnly = true;
-			promptQuestion(JSON.parse(xhr.response).designQuestion);
-		} else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 201) {
-			alert("Successfully created template");
-			window.location = "http://localhost:8080/pages/templates.html";
-		} else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 400) {
-			alert("The input is invalid. Please re-enter");
-		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {
-		    alert("You haven't started creating a template");
-		}
-	}
-
-	xhr.send(JSON.stringify({
-		userID: sessionStorage.getItem("userId"),
-		designChoice: choice
-	}));
+function onRadioButtonChange() {
+    document.getElementById("checkboxes").innerHTML = '';
+    getDefaultAttributes();
 }
 
-function resetQuestions() {
-	xhr.open("POST", "http://localhost:8000/template/cancel-builder");
+function createTemplate() {
+	xhr.open("POST", "http://localhost:8000/template/create");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
-			window.location.reload();
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
+		    alert("Successfully created template");
+            window.location = "http://localhost:8080/pages/templates.html";
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
-		    alert("You haven't started building anything");
+            alert("There's an invalid attribute or value");
 		}
 	}
 
+    const attrMap = getAttrMap();
+
 	xhr.send(JSON.stringify({
-		userID: sessionStorage.getItem("userId")
+		attrMap
 	}));
+}
+
+function promptAttributes(map) {
+    document.getElementsByTagName("input")[2].value = map.title;
+    delete map.title;
+
+    for (const [key, value] of Object.entries(map)) {
+        addOption(key, value);
+    }
+
+    restrictOptions();
+    document.getElementById("multipleChoice").onclick = restrictOptions;
+}
+
+function addOption(label, checked) {
+    const labelEl = document.createElement("label");
+    labelEl.innerHTML = label;
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.setAttribute("id", label);
+    input.checked = checked === "true";
+
+    labelEl.prepend(input);
+
+    document.getElementById("checkboxes").appendChild(labelEl);
+}
+
+function restrictOptions() {
+    if (!document.getElementById("multipleChoice").checked) {
+        document.querySelectorAll("input[type='checkbox']:not(#multipleChoice)").forEach(el => {
+            el.checked = false;
+            el.disabled = true;
+        });
+    } else {
+        document.querySelectorAll("input[type='checkbox']:not(#multipleChoice)").forEach(el => el.disabled = false);
+    }
+}
+
+function getAttrMap() {
+    const inputs = Array.from(document.getElementsByTagName("input"));
+
+    let attrMap = {
+       title: inputs.shift().value
+    };
+
+    for (const el of inputs) {
+        attrMap[el.getAttribute("id")] = el.checked.toString();
+    }
+
+    return attrMap;
+}
+
+function capitalize(text) {
+    return text[0].toUpperCase() + text.substring(1).toLowerCase();
 }

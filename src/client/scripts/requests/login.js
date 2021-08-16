@@ -17,7 +17,7 @@ function login(username, password) {
 			window.location = data.role === "ADMIN" ? "http://localhost:8080/pages/templates.html" : "http://localhost:8080/pages/matches.html";
 			document.getElementById("header").contentWindow.updateHeader();
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
-		    alert("Wrong username or password");
+		    alert(xhr.responseText);
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
             alert(xhr.responseText);
         }

@@ -57,7 +57,6 @@ public class PlayerInputListener extends Thread {
                             break;
                     }
                     if (!inData.gameMove.equals("")) {
-                        System.out.println("trying to play move");
                         manager.playGameMove(playerID, matchID, inData.gameMove);
                     }
                 }

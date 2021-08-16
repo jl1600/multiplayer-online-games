@@ -120,8 +120,8 @@ public class HangmanMatch extends GameMatch {
             players.add(playerID);
             playerNames.put(playerID, playerName);
             scores.put(playerID, 0);
-            remainingLives.put(playerID, template.getNumLives());
-            remainingHints.put(playerID, template.getNumHints());
+            remainingLives.put(playerID, game.getNumLives());
+            remainingHints.put(playerID, game.getNumHints());
             setChanged();
             notifyObservers();
         }
@@ -303,7 +303,7 @@ public class HangmanMatch extends GameMatch {
     }
 
     private boolean hasNextPuzzle() {
-        return currentPuzzleIndex + 1 < this.template.getNumPuzzles();
+        return currentPuzzleIndex + 1 < game.getNumPuzzles();
     }
 
     private void loadPuzzle() {
@@ -316,7 +316,7 @@ public class HangmanMatch extends GameMatch {
     }
 
     private String simpleOutput() {
-        return "Puzzle " + (currentPuzzleIndex + 1) + " of " + this.template.getNumPuzzles() + ".\n"
+        return "Puzzle " + (currentPuzzleIndex + 1) + " of " + game.getNumPuzzles() + ".\n"
                 + game.getPrompt(currentPuzzleIndex) + "\n"
                 + "\n"
                 + String.valueOf(gameState) + "\n"

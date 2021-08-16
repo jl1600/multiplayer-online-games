@@ -17,21 +17,21 @@
 			<div id="form">
 				<div id="template-genre">Select a genre:
 					<label>
-						<input type="radio" name="templateGenre" value="QUIZ" checked />Quiz
+						<input type="radio" name="templateGenre" value="QUIZ" onchange="onRadioButtonChange()" checked />Quiz
 					</label>
 					<label>
-						<input type="radio" name="templateGenre" value="HANGMAN" />Hangman
+						<input type="radio" name="templateGenre" value="HANGMAN" onchange="onRadioButtonChange()" />Hangman
 					</label>
 				</div>
-
-				<div class="buttons">
-					<button type="reset" onclick="resetQuestions()">Reset</button>
-					<button type="button" onclick="createTemplateBuilder()">Next</button>
+				<label>
+					Title: <input required />
+				</label>
+				<div id="checkboxes">
 				</div>
+				<button type="button" onclick="createTemplate()">Save</button>
 			</div>
 		</main>
 
-		<script src="../scripts/promptQuestion.js"></script>
 		<script src="../scripts/requests/createTemplate.js"></script>
 	</body>
 </html>

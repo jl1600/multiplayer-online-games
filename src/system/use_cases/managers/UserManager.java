@@ -178,7 +178,7 @@ public class UserManager {
             hasNumbers = true;
         }
 
-        Pattern specialRegex = Pattern.compile("[$&+,:;=?@#|]");
+        Pattern specialRegex = Pattern.compile("[$&+,:;=?@#|!]");
         Matcher specialMatcher = specialRegex.matcher(password);
         if (specialMatcher.find()){
             hasSpecialChar = true;
@@ -286,7 +286,7 @@ public class UserManager {
         //add 30 days in millisec gives the expiration date
         // if current date > expiration date
         //return true (expired)
-        return currentTime.getTime() > getUser(userId).getRegisterDate().getTime() + TimeUnit.DAYS.toMillis(30);
+        return currentTime.getTime() > getUser(userId).getRegisterDate().getTime() + TimeUnit.MINUTES.toMillis(5);
     }
 
     /**
@@ -331,10 +331,9 @@ public class UserManager {
             IncorrectPasswordException, IOException, InvalidUserIDException {
         if (isPasswordIncorrect(userId, oldPassword)) throw new IncorrectPasswordException();
 
-        User user = getUser(userId);
-        user.setPassword(newPassword);
+        getUser(userId).setPassword(newPassword);
 
-        gateway.updateUser(user);
+        gateway.updateUser(getUser(userId));
     }
 
     /**

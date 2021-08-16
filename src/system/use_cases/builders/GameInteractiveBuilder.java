@@ -1,14 +1,14 @@
-package system.use_cases.builders.interactive_builders;
+package system.use_cases.builders;
 
+import shared.exceptions.use_case_exceptions.InsufficientInputException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
+import system.entities.game.Game;
 
-public abstract class InteractiveBuilder {
+public abstract class GameInteractiveBuilder {
+
+    private final String creatorID;
 
     protected boolean readyToBuild;
-
-    public InteractiveBuilder(){
-        this.readyToBuild = false;
-    }
 
     /**
      * Returns whether the builder has collected enough input to build the object.
@@ -30,4 +30,18 @@ public abstract class InteractiveBuilder {
      * in order to build the object.
      * */
     public abstract String getDesignQuestion();
+    public GameInteractiveBuilder(String creatorName) {
+        this.creatorID = creatorName;
+    }
+
+    public String getCreatorID(){
+        return creatorID;
+    }
+
+    /**
+     * Returns the Game object that this builder has been building.
+     *
+     * @param id The id to be assigned to the newly created Game object.
+     * */
+    public abstract Game build(String id) throws InsufficientInputException;
 }

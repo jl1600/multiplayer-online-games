@@ -20,8 +20,8 @@ function allowEditUsername() {
     document.getElementById("edit-username").hidden = true;
     document.getElementById("save-username").hidden = false;
 }
-function updateUsername(username) {
-	xhr.open("POST", "http://localhost:8000/edit-username");
+function updateUsername() {
+	xhr.open("POST", "http://localhost:8000/user/edit-username");
 
 	xhr.onreadystatechange = () => {
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
@@ -37,7 +37,7 @@ function updateUsername(username) {
 
 	xhr.send(JSON.stringify({
 	    userID: sessionStorage.getItem("userId"),
-	    newUsername
+	    newUsername: document.getElementById("username").value
 	}));
 }
 
@@ -50,19 +50,21 @@ function allowEditPassword() {
     document.getElementById("new-password").hidden = false;
     document.getElementById("confirm-password").hidden = false;
 }
-function updatePassword(oldPassword, newPassword) {
-    xhr.open("POST", "http://localhost:8000/edit-password");
-	xhr.setRequestHeader("Content-Type", "application/json");
+function updatePassword() {
+    xhr.open("POST", "http://localhost:8000/user/edit-password");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
             document.getElementById("edit-password").hidden = false;
             document.getElementById("save-password").hidden = true;
+            document.getElementById("new-password").value = "";
             document.getElementById("new-password").hidden = true;
+            document.getElementById("confirm-password").value = "";
             document.getElementById("confirm-password").hidden = true;
 
             document.getElementById("old-password").value = "xxxxxxxx";
             document.getElementById("old-password").readOnly = true;
+            alert("Password edit success.");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
             alert("Invalid userID");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
@@ -72,7 +74,7 @@ function updatePassword(oldPassword, newPassword) {
 
 	xhr.send(JSON.stringify({
 	    userID: sessionStorage.getItem("userId"),
-	    oldPassword,
-	    newPassword
+	    oldPassword: document.getElementById("old-password").value,
+	    newPassword: document.getElementById("new-password").value
 	}));
 }

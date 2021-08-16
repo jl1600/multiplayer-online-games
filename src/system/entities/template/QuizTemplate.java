@@ -15,6 +15,12 @@ public class QuizTemplate extends Template {
      * Quiz Template Constructor
      */
     public QuizTemplate(){
+        this.hasCustomEndingMessage = false;
+        this.multipleChoice = true;
+        this.chooseAllThatApply = false;
+        this.hasMultipleScoreCategories = false;
+        this.hasScoreWeight = false;
+        setTitle("Unnamed Quiz Template");
     }
 
     /**
@@ -46,13 +52,6 @@ public class QuizTemplate extends Template {
         return chooseAllThatApply;
     }
 
-    /**
-     *
-     * @return if quiz has a score weight
-     */
-    public boolean hasScoreWeight() {
-        return hasScoreWeight;
-    }
 
     /**
      *

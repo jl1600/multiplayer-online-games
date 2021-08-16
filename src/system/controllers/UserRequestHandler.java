@@ -108,7 +108,7 @@ public class UserRequestHandler extends RequestHandler {
         EditPasswordRequestBody body = gson.fromJson(getRequestBody(exchange), EditPasswordRequestBody.class);
         try {
             userManager.editPassword(body.userID,body.oldPassword,body.newPassword);
-            sendResponse(exchange, 204, null);
+            sendResponse(exchange, 204, "Password now set to "+body.newPassword);
         } catch (InvalidUserIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }catch (IncorrectPasswordException e) {
@@ -396,20 +396,6 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 200, "{\"username\":\"" + userManager.getUsername(userID)+"\"}");
         } catch (InvalidUserIDException e) {
             e.printStackTrace();
-        }
-    }
-
-    private String getQueryArgFromGET(HttpExchange exchange) throws IOException {
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return null;
-            }
-            return query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
-            return null;
         }
     }
 

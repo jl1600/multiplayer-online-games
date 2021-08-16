@@ -9,7 +9,7 @@ import system.entities.game.quiz.QuizGame;
 import system.entities.template.Template;
 import system.entities.game.Game;
 import system.gateways.GameDataGateway;
-import system.use_cases.builders.interactive_builders.GameInteractiveBuilder;
+import system.use_cases.builders.GameInteractiveBuilder;
 import system.use_cases.factories.GameBuilderFactory;
 
 import java.io.IOException;
@@ -332,9 +332,11 @@ public class GameManager {
         Set<String> ownedNotDeletedGameIDs = new HashSet<>();
         for (String id: games.keySet()) {
             //if owner id match and game is not deleted
-            if ( games.get(id).getOwnerId() == userID &&
-                    !(games.get(id).getGameAccessLevel() == GameAccessLevel.DELETED)) {
-                ownedNotDeletedGameIDs.add(id);
+            String ownerID = games.get(id).getOwnerId();
+            if ( ownerID.equals(userID)) {
+                if (!games.get(id).getGameAccessLevel().equals(GameAccessLevel.DELETED)){
+                    ownedNotDeletedGameIDs.add(id);
+                }
             }
         }
         return ownedNotDeletedGameIDs;
@@ -345,9 +347,11 @@ public class GameManager {
 
         for (String id: games.keySet()) {
             //if owner id match and game is FRIEND only
-            if ( games.get(id).getOwnerId() == userID &&
-                    (games.get(id).getGameAccessLevel() == GameAccessLevel.FRIEND)) {
-                friendOnlyGameIDs.add(id);
+            String ownerID = games.get(id).getOwnerId();
+            if ( ownerID.equals(userID)) {
+                if (games.get(id).getGameAccessLevel().equals(GameAccessLevel.FRIEND)){
+                    friendOnlyGameIDs.add(id);
+                }
             }
         }
 
