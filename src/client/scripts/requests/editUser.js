@@ -54,15 +54,17 @@ function updatePassword() {
     xhr.open("POST", "http://localhost:8000/user/edit-password");
 
 	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-		    alert("!!!!!1!!!!!");
+		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
             document.getElementById("edit-password").hidden = false;
             document.getElementById("save-password").hidden = true;
+            document.getElementById("new-password").value = "";
             document.getElementById("new-password").hidden = true;
+            document.getElementById("confirm-password").value = "";
             document.getElementById("confirm-password").hidden = true;
 
             document.getElementById("old-password").value = "xxxxxxxx";
             document.getElementById("old-password").readOnly = true;
+            alert("Password edit success.");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
             alert("Invalid userID");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
