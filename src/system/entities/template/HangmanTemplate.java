@@ -15,15 +15,26 @@ public class HangmanTemplate extends Template {
         setTitle("Unnamed Hangman Template");
     }
 
+    /**
+     * Constructor of Hangman Template with a given template
+     * @param template the input template
+     */
     public HangmanTemplate(HangmanTemplate template){
         super(template);
         this.hasHints = template.hasHints();
     }
 
+    /**
+     * set the state of there has or no Hints
+     * @param haveHints the current state of whether there has/have Hint or not
+     */
     public void setHasHints(boolean haveHints) {
         this.hasHints = haveHints;
     }
 
+    /**
+     * @return has hints or not
+     */
     public boolean hasHints() {
         return hasHints;
     }

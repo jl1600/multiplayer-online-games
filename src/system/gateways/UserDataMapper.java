@@ -9,6 +9,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
+/**
+ * UserDataMapper Class
+ */
 public class UserDataMapper implements UserDataGateway {
     private final String PATH = System.getProperty("user.dir");
     private final String USER_FOLDER = PATH + "/src/system/database/users/";

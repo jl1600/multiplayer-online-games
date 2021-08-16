@@ -41,6 +41,12 @@ public class HangmanGame extends Game {
         this.puzzles.add(combined);
     }
 
+    /**
+     * add a answer
+     * @param puzzleIndex the index of the puzzle
+     * @param answer the answer to be added
+     * @throws InvalidInputException when parameters are illegal and passed a null value
+     */
     public void addAnswer(int puzzleIndex, String answer) throws InvalidInputException {
         if (answer == null | answer.equals("")) {
             throw new InvalidInputException();
@@ -56,6 +62,12 @@ public class HangmanGame extends Game {
 
     }
 
+    /**
+     * add a prompt
+     * @param puzzleIndex the current puzzle index
+     * @param prompt prompt to be added
+     * @throws InvalidInputException when parameters are illegal and passed a null value
+     */
     public void addPrompt(int puzzleIndex, String prompt) throws InvalidInputException {
         if (prompt == null | prompt.equals("")) {
             throw new InvalidInputException();
@@ -71,6 +83,11 @@ public class HangmanGame extends Game {
 
     }
 
+    /**
+     * set the number of puzzles
+     * @param numPuzzles the desired number of puzzles
+     * @throws InvalidInputException when parameters are illegal and passed a null value
+     */
     public void setNumPuzzles(int numPuzzles) throws InvalidInputException {
         if (numPuzzles < 1) {
             throw new InvalidInputException();

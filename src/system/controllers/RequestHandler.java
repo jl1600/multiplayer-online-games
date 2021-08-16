@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 
 /**
- * RequestHandler Class
+ * Abstract RequestHandler Class
  */
 public abstract class RequestHandler implements HttpHandler {
 

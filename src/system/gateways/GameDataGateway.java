@@ -7,6 +7,9 @@ import system.entities.game.Game;
 import java.io.IOException;
 import java.util.Set;
 
+/**
+ * GameDataGateway Interface
+ */
 public interface GameDataGateway {
 
     /**

@@ -11,6 +11,9 @@ import java.nio.file.Files;
 import java.util.*;
 import java.lang.String;
 
+/**
+ * GameDataMapper Class
+ */
 public class GameDataMapper implements GameDataGateway {
     private final String PATH = System.getProperty("user.dir");
     private final String GAME_FOLDER = PATH + "/src/system/database/games/";

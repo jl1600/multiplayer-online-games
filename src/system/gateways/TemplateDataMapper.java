@@ -10,6 +10,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * TemplateDataMapper Class
+ */
 public class TemplateDataMapper implements TemplateDataGateway {
     private final String PATH = System.getProperty("user.dir");
     private final String TEMPLATE_FOLDER = PATH + "/src/system/database/templates/";
