@@ -16,12 +16,22 @@ import java.security.NoSuchAlgorithmException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-
+/**
+ * ClientSocketSeeker Class
+ */
 public class ClientSocketSeeker extends Thread {
     private final String userID;
     private final String matchID;
     private final MatchManager matchManager;
     private final ServerSocket serverSocket;
+
+    /**
+     * Constructor of ClientSocketSeeker
+     * @param matchManager manager that contains all matches and able to perform manipulations of them
+     * @param serverSocket the server socket that is connected to
+     * @param userID the current user's ID
+     * @param matchID the current match's ID
+     */
     public ClientSocketSeeker(MatchManager matchManager, ServerSocket serverSocket, String userID, String matchID) {
         this.userID = userID;
         this.matchID = matchID;
@@ -29,6 +39,9 @@ public class ClientSocketSeeker extends Thread {
         this.serverSocket = serverSocket;
     }
 
+    /**
+     * run ClientSocekSeeker
+     */
     public void run() {
         try {
             acceptPlayerSocket();

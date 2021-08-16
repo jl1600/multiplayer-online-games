@@ -20,6 +20,9 @@ import java.net.ServerSocket;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * GameRequestHandlerClass
+ */
 public class GameRequestHandler extends RequestHandler {
 
     private final GameManager gameManager;
@@ -28,6 +31,13 @@ public class GameRequestHandler extends RequestHandler {
     private final MatchManager matchManager;
     private final ServerSocket serverSocket;
 
+    /**
+     * Constructor of GameRequestHandler
+     * @param gameManager the game manager that contains all games and can manipulate them
+     * @param templateManager the template manager that contains all template and can manipulate them
+     * @param userManager the user manager that contains user games and can manipulate them
+     * @param matchManager the match manager that contains all match and can manipulate them
+     */
     public GameRequestHandler(GameManager gameManager,
                               TemplateManager templateManager,
                               UserManager userManager,
@@ -43,6 +53,11 @@ public class GameRequestHandler extends RequestHandler {
         }
     }
 
+    /**
+     * handles game related GET requests
+     * @param exchange the exchange that contains header and appropriate content used for handling
+     * @throws IOException issue detected regarding input-output
+     */
     protected void handleGetRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().getPath().split("/")[2];
         switch (specification) {
@@ -71,6 +86,11 @@ public class GameRequestHandler extends RequestHandler {
     }
 
 
+    /**
+     * handles game related POST requests
+     * @param exchange the exchange that contains header and appropriate content used for handling
+     * @throws IOException issue detected regarding input-output
+     */
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().toString().split("/")[2];
         switch (specification) {

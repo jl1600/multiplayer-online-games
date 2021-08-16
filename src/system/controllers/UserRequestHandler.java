@@ -28,6 +28,11 @@ public class UserRequestHandler extends RequestHandler {
         this.userManager = um;
     }
 
+    /**
+     * handle GET request related to users
+     * @param exchange the exchange that contains header and appropriate content used for handling
+     * @throws IOException issue detected regarding input-output
+     */
     @Override
     protected void handleGetRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().getPath().split("/")[2];
@@ -56,6 +61,11 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
+    /**
+     * handle POST request related to users
+     * @param exchange the exchange that contains header and appropriate content used for handling
+     * @throws IOException issue detected regarding input-output
+     */
     @Override
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().getPath().split("/")[2];

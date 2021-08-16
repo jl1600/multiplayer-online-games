@@ -12,6 +12,9 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * PlayerInputListener Class
+ */
 public class PlayerInputListener extends Thread {
 
     InputStream inStream;
@@ -21,6 +24,13 @@ public class PlayerInputListener extends Thread {
     String playerID;
     Gson gson;
 
+    /**
+     * Constructor of PlayerInputListener
+     * @param socket the web socket used for communication
+     * @param manager the match manager that contains all matches and can manipulate them
+     * @param matchID the current match id
+     * @param playerID the current player id
+     */
     public PlayerInputListener(Socket socket, MatchManager manager, String matchID, String playerID) {
         try {
             inStream = socket.getInputStream();
@@ -34,6 +44,10 @@ public class PlayerInputListener extends Thread {
         this.gson = new Gson();
     }
 
+    /**
+     * run PlayerInputListener
+     * play the game, and check current status to give corresponding handling.
+     */
     public void run() {
         while (true) {
             try {

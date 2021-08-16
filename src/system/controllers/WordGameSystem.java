@@ -10,11 +10,18 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-
+/**
+ * WordGameSystem Class
+ */
 public class WordGameSystem {
 
     private final HttpServer server;
 
+    /**
+     * Constructor of WordGameSystem
+     * @throws IOException issue detected regarding input-output
+     * @throws InvalidUserIDException the user id responsible for this exception is not in the userManager's user list
+     */
     public WordGameSystem() throws IOException, InvalidUserIDException{
 
         GameDataGateway gameGateway = new GameDataMapper();
@@ -42,11 +49,18 @@ public class WordGameSystem {
 
     }
 
+    /**
+     * run WorldGameSystem Helper
+     */
     public void run() {
         server.start();
         System.out.println(" Server started on port 8000");
     }
 
+    /**
+     * main function of WorldGameSystem
+     * @param args args
+     */
     public static void main(String[] args) {
         try {
             WordGameSystem server = new WordGameSystem();

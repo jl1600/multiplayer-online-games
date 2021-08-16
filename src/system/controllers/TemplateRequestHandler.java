@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-
+/**
+ *  TemplateRequestHandler Class
+ */
 public class TemplateRequestHandler extends RequestHandler {
 
     private final TemplateManager templateManager;
@@ -26,6 +28,11 @@ public class TemplateRequestHandler extends RequestHandler {
         this.templateManager = templateManager;
     }
 
+    /**
+     * handle GET requests of template related requests
+     * @param exchange the exchange that contains header and appropriate content used for handling
+     * @throws IOException issue detected regarding input-output
+     */
     @Override
     protected void handleGetRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().getPath().split("/")[2];
@@ -44,6 +51,11 @@ public class TemplateRequestHandler extends RequestHandler {
         }
     }
 
+    /**
+     * handle POST request related to templates
+     * @param exchange the exchange that contains header and appropriate content used for handling
+     * @throws IOException issue detected regarding input-output
+     */
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
         String specification = exchange.getRequestURI().toString().split("/")[2];
         switch (specification) {

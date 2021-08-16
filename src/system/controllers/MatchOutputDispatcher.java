@@ -11,14 +11,39 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * MatchOutputDispatcher Class
+ */
 public class MatchOutputDispatcher implements Observer {
 
+    /**
+     * the match manager that contains all matches and can manipulate them
+     */
     public final MatchManager matchManager;
+    /**
+     * the outputs
+     */
     public final OutputStream outStream;
+    /**
+     * the current match id
+     */
     public final String matchID;
+    /**
+     * current user id
+     */
     public final String userID;
+    /**
+     * gson used to convert to json, for communication across parts
+     */
     public final Gson gson;
 
+    /**
+     *
+     * @param out the outputs
+     * @param manager the match manager that contains all matches and can manipulate them
+     * @param matchID the current match id
+     * @param userID the current user id
+     */
     public MatchOutputDispatcher(OutputStream out, MatchManager manager, String matchID, String userID) {
         this.matchManager = manager;
         this.matchID = matchID;
