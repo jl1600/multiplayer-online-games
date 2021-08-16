@@ -414,7 +414,7 @@ public class UserRequestHandler extends RequestHandler {
         }
         try {
             sendResponse(exchange, 200, "{\"email\":\"" + userManager.getEmail(userID)+"\"}");
-        } catch (InvalidUserIDException | InvalidUsernameException e) {
+        } catch (InvalidUserIDException e) {
             e.printStackTrace();
         }
     }
