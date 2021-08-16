@@ -10,6 +10,9 @@ import system.entities.template.HangmanTemplate;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/**
+ * HangmanMatch Class
+ */
 public class HangmanMatch extends GameMatch {
 
     private final static int PLAYER_LIMIT = 4; //maximum allowed players
@@ -33,6 +36,14 @@ public class HangmanMatch extends GameMatch {
 
     private enum MoveType {HINT, INVALID, USED, NORMAL}
 
+    /**
+     * Constructor of HangmanMatch
+     * @param matchID the current match id
+     * @param userID the host user id
+     * @param username the host user name
+     * @param game the game that is being used
+     * @param template the template ths is being used
+     */
     public HangmanMatch(String matchID, String userID, String username, HangmanGame game, HangmanTemplate template) {
         super(matchID, userID, username, PLAYER_LIMIT);
         this.template = template;
@@ -146,6 +157,11 @@ public class HangmanMatch extends GameMatch {
         }
     }
 
+    /**
+     * remove a player from the current match
+     * @param playerID The unique string identifier of the player.
+     * @throws InvalidUserIDException this user does not exist in system's list of users or is null
+     */
     @Override
     public void removePlayer(String playerID) throws InvalidUserIDException {
         if (players.contains(playerID)) {

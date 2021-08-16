@@ -11,6 +11,9 @@ import system.entities.template.QuizTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * QuizGameMatch Class
+ */
 public class QuizGameMatch extends GameMatch {
 
     private final static int PLAYER_LIMIT = 10; //maximum allowed players
@@ -27,6 +30,10 @@ public class QuizGameMatch extends GameMatch {
         private String lastInput;
         private int numAttempted = 0;
 
+        /**
+         * Constructor of PlayerStat
+         * @param username
+         */
         public PlayerStat(String username) {
             this.username = username;
             this.scoresByCategory = new HashMap<>();
@@ -36,25 +43,45 @@ public class QuizGameMatch extends GameMatch {
             lastInput = null;
         }
 
+        /**
+         * clear the last trun by set last input to null and set attempt back to 0
+         */
         public void clearLastTurn() {
             lastInput = null;
             numAttempted = 0;
         }
 
+        /**
+         * increase current score by @param
+         * @param valuesToAdd the desired value to be added to score
+         */
         public void increaseScores(Map<String, Double> valuesToAdd) {
             for (String category: valuesToAdd.keySet()) {
                 increaseScore(category, valuesToAdd.get(category));
             }
         }
 
+        /**
+         * increase specific category's score by value
+         * @param category the choosen category
+         * @param valueToAdd the desired value to be added to that category
+         */
         public void increaseScore(String category, Double valueToAdd) {
             scoresByCategory.put(category, scoresByCategory.get(category) + valueToAdd);
         }
 
+        /**
+         * increase score based on given answer index
+         * @param answerIndex  the given answer index
+         */
         public void increaseScoreByAnswer(int answerIndex) {
             this.increaseScores(game.getQuestion(currQuestionIndex).getAnswerScoreRewards(answerIndex));
         }
 
+        /**
+         * get category with highest score
+         * @return category with highest score
+         */
         public String getCategoryWithHighestScore() {
             Double max = -1.0;
             String highestCat = null;
@@ -67,6 +94,10 @@ public class QuizGameMatch extends GameMatch {
             return highestCat;
         }
 
+        /**
+         * get the highest score among all categories
+         * @return the highest score among all categories
+         */
         public Double getHighestScore() {
             Double max = -1.0;
             for (String category: scoresByCategory.keySet()) {
@@ -79,6 +110,14 @@ public class QuizGameMatch extends GameMatch {
     }
 
 
+    /**
+     * Constructor of QuizGameMatch
+     * @param matchID the current match id
+     * @param userID the host user id
+     * @param username the host user name
+     * @param game the game used
+     * @param template the template used
+     */
     public QuizGameMatch(String matchID, String userID, String username, QuizGame game, QuizTemplate template){
         super(matchID, userID, username, PLAYER_LIMIT); // temporary player limit
         this.game = game;
@@ -91,6 +130,13 @@ public class QuizGameMatch extends GameMatch {
         }
     }
 
+    /**
+     * add a player to match
+     * @param userID the added player id
+     * @param username the added player's name
+     * @throws DuplicateUserIDException if user id already in match
+     * @throws MaxPlayerReachedException if player limit going over current player
+     */
     @Override
     public void addPlayer(String userID, String username) throws DuplicateUserIDException, MaxPlayerReachedException {
         if (playerStats.containsKey(userID)) {
@@ -103,6 +149,11 @@ public class QuizGameMatch extends GameMatch {
         notifyObservers();
     }
 
+    /**
+     * remove a player from current match
+     * @param playerID The unique string identifier of the player.
+     * @throws InvalidUserIDException if user id is not in current player list or is null
+     */
     @Override
     public void removePlayer(String playerID) throws InvalidUserIDException {
         if (playerStats.containsKey(playerID)) {
@@ -117,6 +168,10 @@ public class QuizGameMatch extends GameMatch {
         return playerStats.containsKey(playerID);
     }
 
+    /**
+     * get text content based on current match states
+     * @return appropriate text content
+     */
     @Override
     public String getTextContent()  {
 
@@ -182,6 +237,10 @@ public class QuizGameMatch extends GameMatch {
         }
     }
 
+    /**
+     *
+     * @return all player stats
+     */
     @Override
     public Map<String, String> getAllPlayerStats(){
         Map<String, String> playersMove = new HashMap<>();
@@ -195,16 +254,27 @@ public class QuizGameMatch extends GameMatch {
         return playersMove;
     }
 
+    /**
+     *
+     * @return number of players currently in match
+     */
     @Override
     public int getPlayerCount() {
         return playerStats.size();
     }
 
+    /**
+     *
+     * @return the current game id
+     */
     @Override
     public String getGameId() {
         return game.getID();
     }
 
+    /**
+     * start a match
+     */
     @Override
     public void startMatch() {
         if (getStatus() == MatchStatus.PREPARING) {
@@ -231,6 +301,13 @@ public class QuizGameMatch extends GameMatch {
     }
 
 
+    /**
+     * play a move based on appropriate parameters
+     * @param playerID The unique string identifier of the player.
+     * @param move     The string representing the player input
+     * @throws InvalidUserIDException If the user id is not in current user list or is null
+     * @throws InvalidInputException when parameters are illegal and passed a null value
+     */
     @Override
     public void playMove(String playerID, String move) throws InvalidUserIDException, InvalidInputException {
 

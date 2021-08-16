@@ -9,6 +9,9 @@ import shared.exceptions.use_case_exceptions.MaxPlayerReachedException;
 import java.util.Map;
 import java.util.Observable;
 
+/**
+ * Abstract GameMatch Class
+ */
 public abstract class GameMatch extends Observable {
 
     private final String id;
@@ -17,6 +20,13 @@ public abstract class GameMatch extends Observable {
     private MatchStatus status;
     private int playerLimit;
 
+    /**
+     * Constructor of GameMatch
+     * @param matchID the current match id
+     * @param userID the host user id
+     * @param username the host user name
+     * @param playerLimit the max player limit
+     */
     public GameMatch(String matchID, String userID, String username, int playerLimit) {
         this.id = matchID;
         this.hostID = userID;
@@ -25,6 +35,10 @@ public abstract class GameMatch extends Observable {
         this.hostName = username;
     }
 
+    /**
+     *
+     * @param value the desired player limit
+     */
     protected void setPlayerLimit(int value) {
         playerLimit = value;
     }

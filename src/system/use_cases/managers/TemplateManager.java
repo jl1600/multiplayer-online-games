@@ -14,12 +14,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * TemplateManager Class
+ */
 public class TemplateManager {
 
     private final HashMap<String, Template> templates;
     private final TemplateDataGateway gateway;
     private final IdManager idManager;
 
+    /**
+     * Constructor of Template Manager
+     * @param gateway the gateway used to communicate with database
+     * @throws IOException If issue regarding input-output is detected
+     */
     public TemplateManager(TemplateDataGateway gateway) throws IOException {
         templates = new HashMap<>();
         this.gateway = gateway;
@@ -30,6 +38,11 @@ public class TemplateManager {
         this.idManager = new IdManager(gateway.getTemplateCount() + 1);
     }
 
+    /**
+     * get the title of a specified template
+     * @param templateID the specified template's id
+     * @return the specified template's title
+     */
     public String getTemplateTitle(String templateID) {
         return templates.get(templateID).getTitle();
     }
@@ -61,6 +74,14 @@ public class TemplateManager {
         return editor.getAttributeMap();
     }
 
+    /**
+     * edit a specified template by specified attribute values
+     * @param attrMap a map of specified attribute vlaues
+     * @param templateID the specified template's id
+     * @throws NoSuchAttributeException specified attribute is in template's attribute last or attribute is null
+     * @throws InvalidInputException when parameters are illegal and passed a null value
+     * @throws InvalidTemplateIDException specified template id is not in template list or id is null
+     */
     public void editTemplate(Map<String, String> attrMap, String templateID) throws
             NoSuchAttributeException, InvalidInputException, InvalidTemplateIDException {
 
@@ -80,6 +101,12 @@ public class TemplateManager {
         }
     }
 
+    /**
+     * get a specified templateID's attribute map
+     * @param templateID the specified template's id
+     * @return that specified template's attribute map
+     * @throws InvalidTemplateIDException specified template id is not in template list or id is null
+     */
     public Map<String, String> getAttributeMap(String templateID) throws InvalidTemplateIDException {
 
         if (!templates.containsKey(templateID))
@@ -99,10 +126,20 @@ public class TemplateManager {
         }
     }
 
+    /**
+     * get all template ids
+     * @return all template ids in a set
+     */
     public Set<String> getAllTemplateIDs() {
        return new HashSet<>(templates.keySet());
     }
 
+    /**
+     * get specific template based on specified id
+     * @param id the specified id
+     * @return the specific template
+     * @throws InvalidIDException id is not in template list or id is null
+     */
     public Template getTemplate(String id) throws InvalidIDException {
         if (!templates.containsKey(id))
             throw new InvalidIDException();
@@ -110,6 +147,12 @@ public class TemplateManager {
         return templates.get(id);
     }
 
+    /**
+     * Remove a specified template based on specified id
+     * @param templateID the specified template id
+     * @throws IOException if issue regarding input-output is detected
+     * @throws InvalidIDException if the specifed id is not in the template's list or is null
+     */
     public void deleteTemplate(String templateID) throws IOException, InvalidIDException {
         if (!templates.containsKey(templateID)) {
             throw new InvalidIDException();

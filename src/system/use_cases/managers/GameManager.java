@@ -18,12 +18,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * GameManager Class
+ */
 public class GameManager {
     private final Map<String, Game> games;
     private final Map<String, GameInteractiveBuilder> gameBuilders; // mapping of username to builder object
     private final IdManager idManager;
     private final GameDataGateway gateway;
 
+    /**
+     * Constructor of GameManager
+     * @param gateway the gateway that communicate with database
+     * @throws IOException if there is an issue with input-output
+     */
     public GameManager(GameDataGateway gateway) throws IOException {
         games = new HashMap<>();
         gameBuilders = new HashMap<>();
@@ -238,7 +246,10 @@ public class GameManager {
         }
 
     }
-
+    /**
+     * Revert the publicity status of the game based on its stored value
+     * @param gameID The ID of the game.
+     * */
     public void undoSetGameAccessLevel(String gameID) throws InvalidGameIDException {
         System.out.println("undoGML");
         if(!games.containsKey(gameID)) {
@@ -314,6 +325,12 @@ public class GameManager {
         return games.get(gameID).getOwnerId();
     }
 
+    /**
+     * get a specified game's access level
+     * @param gameID the inputted game id
+     * @return the access level of the parameter game id
+     * @throws InvalidGameIDException if gameID is not in the current games list or is null
+     */
     public GameAccessLevel getAccessLevel(String gameID) throws InvalidGameIDException {
         if(!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
@@ -321,6 +338,12 @@ public class GameManager {
         return games.get(gameID).getGameAccessLevel();
     }
 
+    /**
+     * get a specified game's previous access level
+     * @param gameID the inputted game id
+     * @return the access level of the parameter game id
+     * @throws InvalidGameIDException if gameID is not in the current games list or is null
+     */
     public GameAccessLevel getPreviousAccessLevel(String gameID) throws InvalidGameIDException {
         if(!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
@@ -328,6 +351,11 @@ public class GameManager {
         return games.get(gameID).getPreviousGameAccessLevel();
     }
 
+    /**
+     * get games owned by a user that has any access level except DELETED
+     * @param userID the specified user's id
+     * @return a list of userID's owned not deleted games
+     */
     public Set<String> getOwnedNotDeletedGameID(String userID){
         Set<String> ownedNotDeletedGameIDs = new HashSet<>();
         for (String id: games.keySet()) {
@@ -342,6 +370,11 @@ public class GameManager {
         return ownedNotDeletedGameIDs;
     }
 
+    /**
+     * get games owned by a user that has FRIEND only access level
+     * @param userID the specified user's id
+     * @return a list of userID's owned and has access level of FRIEND
+     */
     public Set<String> getOwnedFriendOnlyGameID(String userID){
         Set<String> friendOnlyGameIDs = new HashSet<>();
 
