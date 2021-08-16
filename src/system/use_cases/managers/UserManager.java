@@ -334,18 +334,19 @@ public class UserManager {
      */
     public void editPassword(String userId, String oldPassword, String newPassword) throws
             IncorrectPasswordException, IOException, InvalidUserIDException, WeakPasswordException {
-        if (isPasswordIncorrect(userId, oldPassword)){
-            if (!hasTempPassword(userId,oldPassword)){
+        if (!users.containsKey(userId))
+            throw new InvalidUserIDException();
+
+        if (isPasswordIncorrect(userId, oldPassword) || oldPassword.length() == 0){
+            if (!hasTempPassword(userId, oldPassword)){
                 throw new IncorrectPasswordException();
             }
         }
-
         if (!checkPasswordStrength(newPassword)){
            throw new WeakPasswordException();
         }
 
         getUser(userId).setPassword(newPassword);
-
         gateway.updateUser(getUser(userId));
     }
 

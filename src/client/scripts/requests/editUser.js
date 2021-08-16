@@ -90,6 +90,8 @@ function allowEditPassword() {
     document.getElementById("save-password").hidden = false;
     document.getElementById("old-password").value = "";
     document.getElementById("old-password").readOnly = false;
+    document.getElementById("old-password").required = true;
+
     document.getElementById("old-password").focus();
     document.getElementById("new-password").hidden = false;
     document.getElementById("confirm-password").hidden = false;
