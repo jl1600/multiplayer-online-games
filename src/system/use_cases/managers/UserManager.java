@@ -235,15 +235,12 @@ public class UserManager {
             throws InvalidUsernameException, BannedUserException, IncorrectPasswordException,
              ExpiredUserException {
 
-        System.out.println(1);
         if (!userIds.containsKey(username)) throw new InvalidUsernameException();
-        System.out.println(2);
         String userId = getUserId(username);
 
         try {
             if (isPasswordIncorrect(userId, password) && isTempPasswordIncorrect(userId, password))
                 throw new IncorrectPasswordException();
-                System.out.println(3);
             if (isBanned(userId)) throw new BannedUserException();
             if (getUserRole(userId) == UserRole.TEMP && isExpiredUser(userId)) {
                 throw new ExpiredUserException();
