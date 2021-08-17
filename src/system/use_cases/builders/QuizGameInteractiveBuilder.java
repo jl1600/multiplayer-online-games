@@ -70,9 +70,7 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
     }
 
     /**
-     * handle design choice appropriately
-     * @param designChoice A String that represents the user input for the design of the creation.
-     * @throws InvalidInputException when parameters are illegal and passed a null value
+     * {@inheritDoc}
      */
     @Override
     public void makeDesignChoice(String designChoice) throws InvalidInputException {
@@ -80,8 +78,7 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
     }
 
     /**
-     *
-     * @return the current design question
+     * {@inheritDoc}
      */
     @Override
     public String getDesignQuestion() {
@@ -355,10 +352,7 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
 
 
     /**
-     *
-     * @param id the gameID to be assigned to the game
-     * @return the current built game
-     * @throws NotReadyException if there isn't enough inputs given to fulfills the least requirement to build yet
+     * {@inheritDoc}
      */
     @Override
     public QuizGame build(String id) throws NotReadyException {

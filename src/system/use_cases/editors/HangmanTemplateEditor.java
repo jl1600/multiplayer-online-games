@@ -21,8 +21,7 @@ public class HangmanTemplateEditor extends TemplateEditor {
     }
 
     /**
-     *
-     * @return the current edited template
+     * {@inheritDoc}
      */
     @Override
     public Template getTemplate() {
@@ -30,10 +29,7 @@ public class HangmanTemplateEditor extends TemplateEditor {
     }
 
     /**
-     * edit template attribute appropriately
-     * @param attributeName The name of the attribute
-     * @param value The string representation of the value
-     * @throws InvalidInputException when parameters are illegal and passed a null value
+     * {@inheritDoc}
      */
     @Override
     public void editAttribute(String attributeName, String value) throws InvalidInputException {

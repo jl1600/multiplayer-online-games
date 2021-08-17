@@ -20,8 +20,7 @@ public class QuizTemplateEditor extends TemplateEditor {
     }
 
     /**
-     *
-     * @return get the current template
+     * {@inheritDoc}
      */
     @Override
     public Template getTemplate() {
@@ -29,10 +28,7 @@ public class QuizTemplateEditor extends TemplateEditor {
     }
 
     /**
-     * edit template's attribute appropriately
-     * @param attributeName The name of the attribute
-     * @param value The string representation of the value
-     * @throws InvalidInputException when parameters are illegal and passed a null value
+     * {@inheritDoc}
      */
     @Override
     public void editAttribute(String attributeName, String value)

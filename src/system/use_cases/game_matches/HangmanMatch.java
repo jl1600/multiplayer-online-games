@@ -161,9 +161,7 @@ public class HangmanMatch extends GameMatch {
     }
 
     /**
-     * remove a player from the current match
-     * @param playerID The unique string identifier of the player.
-     * @throws InvalidIDException this user does not exist in system's list of users or is null
+     * {@inheritDoc}
      */
     @Override
     public void removePlayer(String playerID) throws InvalidIDException {
@@ -183,8 +181,7 @@ public class HangmanMatch extends GameMatch {
      * "hint" is a special phrase that will consume a remaining hint and reveal an alphanumeric
      * character in the Answer.
      *
-     * @param PlayerID the userId of the player making this move
-     * @param move     The string representing the player input
+     * {@inheritDoc}
      */
     @Override
     public void playMove(String PlayerID, String move) {

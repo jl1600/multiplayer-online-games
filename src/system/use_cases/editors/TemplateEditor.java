@@ -14,21 +14,21 @@ import java.util.Map;
 public abstract class TemplateEditor {
 
     /**
-     * Returns the template that this editor is holding.
-     * */
+     * @return the template that this editor is holding.
+     */
     public abstract Template getTemplate();
 
     /**
      * Change the attribute of the current template to the specified value.
-     *
      * @param attributeName The name of the attribute
      * @param value The string representation of the value
+     * @throws InvalidInputException when parameters are illegal and passed a null value
      * */
     public abstract void editAttribute(@NotNull String attributeName, @NotNull String value)
             throws InvalidInputException;
 
     /**
-     * Returns a mapping of attribute names to string representations of attribute values.
+     * @return a mapping of attribute names to string representations of attribute values.
      * */
     public Map<String, String> getAttributeMap() {
         Gson gson = new Gson();
