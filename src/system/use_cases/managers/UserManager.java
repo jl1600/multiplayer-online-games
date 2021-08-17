@@ -345,12 +345,16 @@ public class UserManager {
      * @param newPassword the password to change into
      * @throws InvalidUserIDException if no user has the specified userId
      * @throws IncorrectPasswordException if oldPassword does not match the user's current password
-     * @throws IOException if the database is not found
+     * @throws WeakPasswordException if the password is too weak
      */
     public void editPassword(String userId, String oldPassword, String newPassword) throws
-            IncorrectPasswordException, InvalidUserIDException {
+            IncorrectPasswordException, InvalidUserIDException, WeakPasswordException {
         if (isPasswordIncorrect(userId, oldPassword) && isTempPasswordIncorrect(userId, newPassword)){
             throw new IncorrectPasswordException();
+        }
+
+        if (!checkPasswordStrength(newPassword)){
+            throw new WeakPasswordException();
         }
 
         getUser(userId).setPassword(newPassword);
@@ -360,6 +364,37 @@ public class UserManager {
         } catch (IOException e) {
             throw new RuntimeException("Fatal error: Can't connect to the database.");
         }
+    }
+
+
+    /**
+     * Changes a trial user to a normal user with the specified username and password
+     * and keeps their game creations.
+     * The username must not be taken already.
+     * This stores the created user in the database
+     * @param userId id of the trial user
+     * @param username username of the user to create
+     * @param password password of the user to create
+     * @throws InvalidUserIDException if no user has the specified userId
+     * @throws DuplicateUsernameException if the username is already taken
+     * @throws IOException if the database is not found
+     * @throws UnaccountedUserRoleException if the user specified user is not a trial user
+     */
+    public void promoteTrialUser(String userId, String username, String password) throws
+            InvalidUserIDException, DuplicateUsernameException, IOException, UnaccountedUserRoleException {
+        if (userIds.containsKey(userId))
+            throw new InvalidUserIDException();
+        if (userIds.containsKey(username))
+            throw new DuplicateUsernameException();
+
+        User user = getUser(userId);
+        if (user.getRole() != UserRole.TRIAL)
+            throw new UnaccountedUserRoleException();
+
+        user.setUsername(username);
+        user.setPassword(password);
+        user.trialToNormal();
+        gateway.addUser(user);
     }
 
     /**
@@ -395,40 +430,9 @@ public class UserManager {
         if (!users.containsKey(userId))
             throw new InvalidUserIDException();
 
-
         User user = getUser(userId);
         user.setEmail(newEmail);
         gateway.updateUser(user);
-    }
-
-    /**
-     * Changes a trial user to a normal user with the specified username and password
-     * and keeps their game creations.
-     * The username must not be taken already.
-     * This stores the created user in the database
-     * @param userId id of the trial user
-     * @param username username of the user to create
-     * @param password password of the user to create
-     * @throws InvalidUserIDException if no user has the specified userId
-     * @throws DuplicateUsernameException if the username is already taken
-     * @throws IOException if the database is not found
-     * @throws UnaccountedUserRoleException if the user specified user is not a trial user
-     */
-    public void promoteTrialUser(String userId, String username, String password) throws
-            InvalidUserIDException, DuplicateUsernameException, IOException, UnaccountedUserRoleException {
-        if (userIds.containsKey(userId))
-            throw new InvalidUserIDException();
-        if (userIds.containsKey(username))
-            throw new DuplicateUsernameException();
-
-        User user = getUser(userId);
-        if (user.getRole() != UserRole.TRIAL)
-            throw new UnaccountedUserRoleException();
-
-        user.setUsername(username);
-        user.setPassword(password);
-        user.trialToNormal();
-        gateway.addUser(user);
     }
 
     /**

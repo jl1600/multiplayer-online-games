@@ -120,11 +120,11 @@ function updatePassword() {
             document.getElementById("old-password").readOnly = true;
             document.getElementById("password-strength").style.display = "none"
             alert("Password edit success.");
-		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {
             alert("Invalid userID");
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
             alert("Incorrect old password");
-        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 412) {
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
             alert("Password isn't strong enough");
         }
 	}
