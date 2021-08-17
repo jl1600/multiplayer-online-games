@@ -362,11 +362,10 @@ public class UserManager {
      * @param password password of the user to create
      * @throws InvalidUserIDException if no user has the specified userId
      * @throws DuplicateUsernameException if the username is already taken
-     * @throws IOException if the database is not found
      * @throws UnaccountedUserRoleException if the user specified user is not a trial user
      */
-    public void promoteTrialUser(String userId, String username, String password) throws
-            InvalidUserIDException, DuplicateUsernameException, IOException, UnaccountedUserRoleException {
+    public void promoteTrialUser(String userId, String username, String email, UserRole role, String password) throws
+            InvalidUserIDException, DuplicateUsernameException, UnaccountedUserRoleException {
         if (userIds.containsKey(userId))
             throw new InvalidUserIDException();
         if (userIds.containsKey(username))
@@ -378,8 +377,13 @@ public class UserManager {
 
         user.setUsername(username);
         user.setPassword(password);
-        user.trialToNormal();
-        gateway.addUser(user);
+        user.setEmail(email);
+        user.setRole(role);
+        try {
+            gateway.addUser(user);
+        } catch (IOException e) {
+            throw new RuntimeException("System failure: Can't connect to the database");
+        }
     }
 
     /**
@@ -390,7 +394,6 @@ public class UserManager {
      * @param newUsername the username to change into
      * @throws IDAlreadySetException if the username is already taken
      * @throws InvalidUserIDException if no user has the specified userId
-     * @throws IOException if the database is not found
      */
     public void editUsername(String userId, String newUsername) throws InvalidUserIDException, DuplicateUsernameException {
         if (!users.containsKey(userId))
@@ -406,7 +409,7 @@ public class UserManager {
         try {
             gateway.updateUser(user);
         } catch (IOException e) {
-            throw new RuntimeException("Fatal: Can't connect to the database.");
+            throw new RuntimeException("System failure: Can't connect to the database.");
         }
     }
 
@@ -447,18 +450,6 @@ public class UserManager {
 
         User user = users.get(userID);
         user.addGameID(gameID);
-
-        if (user.getRole() != UserRole.TRIAL) {
-            gateway.updateUser(user);
-        }
-    }
-
-    public void removeOwnedGameID(String userID, String gameID) throws InvalidUserIDException, IOException {
-        if (!users.containsKey(userID))
-            throw new InvalidUserIDException();
-
-        User user = users.get(userID);
-        user.removeGameID(gameID);
 
         if (user.getRole() != UserRole.TRIAL) {
             gateway.updateUser(user);

@@ -23,6 +23,7 @@ import java.util.Set;
 public class GameManager {
     private final Map<String, Game> games;
     private final Map<String, GameInteractiveBuilder> gameBuilders; // mapping of username to builder object
+    private final Map<String, Game> temporaryGames;
     private final IdManager idManager;
     private final GameDataGateway gateway;
 
@@ -34,6 +35,7 @@ public class GameManager {
     public GameManager(GameDataGateway gateway) throws IOException {
         games = new HashMap<>();
         gameBuilders = new HashMap<>();
+        temporaryGames = new HashMap<>();
         this.gateway = gateway;
 
         for (Game game : this.gateway.getAllGames()) {
@@ -165,6 +167,7 @@ public class GameManager {
             id = idManager.getNextId();
             Game game = gameBuilders.get(creatorID).build(id);
             games.put(id, game);
+            temporaryGames.put(id, game);
         } catch (IDNotYetSetException e) {
             throw new IDNotYetSetException();
         }
@@ -173,21 +176,15 @@ public class GameManager {
     }
 
     /**
-     * Removes the game from the system and database.
-     *
-     * @param gameId The String identifier of the Game.
-     * @throws InvalidGameIDException There is no such a game in the system.
+     * Save the temporary game with the given ID to the database.
      */
-    public void removeGame(String gameId) throws InvalidGameIDException {
-        if (games.containsKey(gameId)) {
-            try {
-                gateway.deleteGame(gameId);
-            } catch (IOException e) {
-                throw new RuntimeException("Cannot delete game from the database");
-            }
-            games.remove(gameId);
-        } else {
+    public void saveTemporaryGame(String gameID) throws InvalidGameIDException {
+        if (!temporaryGames.containsKey(gameID))
             throw new InvalidGameIDException();
+        try {
+            gateway.addGame(temporaryGames.remove(gameID));
+        } catch (IOException e) {
+            throw new RuntimeException("System failure: Can't connect to the database");
         }
     }
 
@@ -230,7 +227,6 @@ public class GameManager {
      * @param gameAccessLevel The value representing whether the game is public, private, friends only, deleted
      */
     public void setGameAccessLevel(String gameID, GameAccessLevel gameAccessLevel) throws InvalidGameIDException {
-        System.out.println("setGML");
         if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
@@ -251,7 +247,6 @@ public class GameManager {
      * @param gameID The ID of the game.
      * */
     public void undoSetGameAccessLevel(String gameID) throws InvalidGameIDException {
-        System.out.println("undoGML");
         if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }

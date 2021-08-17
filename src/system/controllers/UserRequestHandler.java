@@ -6,6 +6,7 @@ import shared.DTOs.Responses.GeneralUserInfoResponseBody;
 import shared.DTOs.Responses.LoginResponseBody;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
+import system.use_cases.managers.GameManager;
 import system.use_cases.managers.UserManager;
 import system.utilities.EmailService;
 
@@ -20,15 +21,17 @@ public class UserRequestHandler extends RequestHandler {
      * a user manager that can manipulate all user entities
      */
     private final UserManager userManager;
+    private final GameManager gameManager;
     private final EmailService emailService;
     /**
      * Constructor for UserRequestHandler class.
      * @param um user manager that contains all user entities and able to make change to them
      * @param eService The email service that's responsible for sending email
      */
-    public UserRequestHandler(UserManager um, EmailService eService) {
+    public UserRequestHandler(UserManager um, GameManager gm, EmailService eService) {
         this.userManager = um;
         this.emailService = eService;
+        this.gameManager = gm;
     }
 
     /**
@@ -58,7 +61,6 @@ public class UserRequestHandler extends RequestHandler {
             case "all-members":
                 handleGetAllMembers(exchange);
                 break;
-
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
@@ -296,7 +298,15 @@ public class UserRequestHandler extends RequestHandler {
     private void handleRegister(HttpExchange exchange) throws IOException {
         RegisterRequestBody body = gson.fromJson(getRequestBody(exchange), RegisterRequestBody.class);
         try {
-            userManager.createUser(body.username, body.password, body.email, body.role);
+            if (body.role != UserRole.ADMIN) {
+                userManager.promoteTrialUser(body.userID, body.username, body.email, body.role, body.password);
+                Set<String> gameIDs = userManager.getOwnedGamesID(body.userID);
+                for (String id: gameIDs) {
+                    gameManager.saveTemporaryGame(id);
+                }
+            } else {
+                userManager.createUser(body.username, body.password, body.email, body.role);
+            }
             sendResponse(exchange, 204, null);
         } catch (DuplicateUsernameException e) {
             sendResponse(exchange, 403, "Duplicate username.");
@@ -304,6 +314,10 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 412, "Password isn't strong enough.");
         } catch (InvalidEmailException e) {
             sendResponse(exchange, 400, "Invalid email.");
+        } catch (InvalidUserIDException e) {
+            sendResponse(exchange, 404, "Invalid user ID");
+        } catch (InvalidGameIDException e) {
+            throw new RuntimeException("Fatal: the game ID got from user data is invalid.");
         }
     }
 
@@ -412,19 +426,10 @@ public class UserRequestHandler extends RequestHandler {
     }
 
     private void handleGetEmail(HttpExchange exchange) throws IOException {
-        String userID;
         GeneralUserInfoResponseBody body = new GeneralUserInfoResponseBody();
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return;
-            }
-            userID = query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
+        String userID = getQueryArgFromGET(exchange);
+        if (userID == null)
             return;
-        }
         try {
             body.userID = userID;
             body.email = userManager.getEmail(userID);
@@ -435,19 +440,9 @@ public class UserRequestHandler extends RequestHandler {
     }
 
     private void handleGetUsername(HttpExchange exchange) throws IOException {
-        String userID;
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            // userid=57, This is the query BTW
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return;
-            }
-            userID = query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
+        String userID = getQueryArgFromGET(exchange);
+        if (userID == null)
             return;
-        }
         try {
             sendResponse(exchange, 200, "{\"username\":\"" + userManager.getUsername(userID)+"\"}");
         } catch (InvalidUserIDException e) {

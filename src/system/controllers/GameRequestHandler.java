@@ -12,10 +12,8 @@ import system.use_cases.managers.MatchManager;
 import system.use_cases.managers.TemplateManager;
 import system.use_cases.managers.UserManager;
 
-
 import java.io.*;
 
-import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.util.HashSet;
 import java.util.Set;
@@ -262,18 +260,9 @@ public class GameRequestHandler extends RequestHandler {
     }
 
     private void handleGetPublicGamesByTemplate(HttpExchange exchange) throws IOException {
-        String templateID;
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return;
-            }
-            templateID = query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
+        String templateID = getQueryArgFromGET(exchange);
+        if (templateID == null)
             return;
-        }
         sendResponse(exchange, 200, getPublicGameDataByTemplate(templateID));
     }
 
@@ -342,7 +331,6 @@ public class GameRequestHandler extends RequestHandler {
         } catch (InvalidUserIDException e) {
             System.out.println("inv");
             sendResponse(exchange, 400, "Invalid User ID.");
-            return;
         }
 
     }
@@ -359,18 +347,9 @@ public class GameRequestHandler extends RequestHandler {
     }
 
     private void handleGetPublicOwnedGames(HttpExchange exchange) throws IOException {
-        String userID;
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return;
-            }
-            userID = query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
+        String userID = getQueryArgFromGET(exchange);
+        if (userID == null)
             return;
-        }
         try {
             sendResponse(exchange, 200, getPublicOwnedGamesData(userID));
         } catch (InvalidUserIDException e) {

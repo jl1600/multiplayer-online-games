@@ -41,7 +41,7 @@ public class WordGameSystem {
         TemplateRequestHandler templateRH = new TemplateRequestHandler(tm);
 
         EmailService eService = new PseudoEmailComposer();
-        UserRequestHandler userRH = new UserRequestHandler(um, eService);
+        UserRequestHandler userRH = new UserRequestHandler(um, gm, eService);
 
         server = HttpServer.create(new InetSocketAddress("localhost", 8000), 20);
 

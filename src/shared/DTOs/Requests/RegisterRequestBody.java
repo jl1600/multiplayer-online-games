@@ -7,6 +7,11 @@ import shared.constants.UserRole;
  * Content used to perform register request
  */
 public class RegisterRequestBody {
+
+    /**
+     * The ID if this request is to promote a trial user.
+     * */
+    public String userID;
     /**
      * the submitted username
      */

@@ -89,6 +89,12 @@ public class User {
     }
 
     /**
+     * Set the role of this user.
+     * */
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+    /**
      * @param id id of the game to add to the user's set of game creations
      */
     public void addGameID(String id) {
@@ -116,17 +122,6 @@ public class User {
         onlineStatus = status;
     }
 
-    /**
-     * Changes a trial user to a normal user
-     * @throws UnaccountedUserRoleException if the user is not a trial user
-     */
-    public void trialToNormal() throws UnaccountedUserRoleException {
-        if (role == UserRole.TRIAL) {
-            role = UserRole.MEMBER;
-        } else {
-            throw new UnaccountedUserRoleException();
-        }
-    }
 
     /**
      * @return this user's password
