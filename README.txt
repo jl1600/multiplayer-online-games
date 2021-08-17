@@ -55,7 +55,7 @@ code can be reused or the strategy class can be replaced with a different
 strategy without changing anything in the managers
 
 #### Factory
-`GameBuilderFactory`, `GameMatchFactory`, `TemplateEditorFactory`
+`GameBuilderFactory`, `GameMatchFactory`, `TemplateEditorFactory`, `TemplateFactory`
 
 The Factories construct the appropriate use-case class based on the provided
 input. Each type of template has its own implementation of the Template, Game,
@@ -66,18 +66,26 @@ the superclass which can be treated the same by the rest of the program.
 
 ## List of features
 #### Mandatory features
-- Add an extra template: Hangman
-- New user type
-- Change at least one template from phase 1: QuizGame, multiplechoice quiz game, scorecategories
-- Allow admin user to set creation access level
-- Admin users can see all creations and delete
-- Admin can ban / suspend users
+- Add an extra template: Each game genre corresponds to a type of template. The templates contain a series of true/false
+ options that dictates how a game is built and how it is played. The system currently support two game genres:
+ Quiz and Hangman. With respect to each game genre, templates can be created by admins using the GUI.
+
+- New user type: Temporary User.
+
+- Change at least one template from phase 1: Changes to any of the template attribute from QuizTemplate will change how
+a game with that template is played. An example is changing Exact answer quiz template to Multiple choice.
+- Allow admin user to set any of the user's creation access level from public to private and vice versa.
+- Admin users can see all creations and delete them. The deletes are soft-deletes, which can be recovered.
+- Admin can ban / suspend users.
 
 #### Optional features
 - Password strength system
-- Users can modify/Delete creations, public/private/friends only
-- Graphical User Interface (counts as two)
+- Users can modify/Delete creations, public/private/friends only.
+- Graphical User Interface: using HTML/CSS/JavaScript. This is a functional application which can be deployed on the
+web platform.
 
 #### Extra features
-- Web UI and WebSocket connection
-- Live multiplayer gameplay
+- Game-playing uses web-socket connection, which is faster and is more resource-saving than HTTP request/responses. It
+also allows server to send data to client without client making a request. This allows online-multiplayer games.
+
+Online multiplayer games can be tested by having two accounts on two different tabs.
