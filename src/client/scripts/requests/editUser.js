@@ -68,12 +68,12 @@ function updateEmail(){
             document.getElementById("edit-email").hidden = false;
             document.getElementById("save-email").hidden = true;
             document.getElementById("email").readOnly = true;
-		}else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+		}else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 404) {
          	alert("Invalid userID");
-        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 403) {
-         	alert("Duplicate email");
         } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 412) {
-            alert("Invalid email");
+         	alert("Duplicate email");
+        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
+            alert("Invalid email address.");
         }
 	}
 

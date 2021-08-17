@@ -287,10 +287,6 @@ public class UserManager {
 
     private boolean isExpiredUser(String userId) throws InvalidIDException {
         Date currentTime = Calendar.getInstance().getTime();
-        //getTime return a long that is total millisec since Jan 1st 1970
-        //add 30 days in millisec gives the expiration date
-        // if current date > expiration date
-        //return true (expired)
         return currentTime.getTime() > getUser(userId).getRegisterDate().getTime() + TimeUnit.MINUTES.toMillis(30);
     }
 
@@ -337,11 +333,9 @@ public class UserManager {
         if (isPasswordIncorrect(userId, oldPassword) && isTempPasswordIncorrect(userId, newPassword)){
             throw new IncorrectPasswordException();
         }
-
         if (!isPasswordString(newPassword)){
             throw new WeakPasswordException();
         }
-
         getUser(userId).setPassword(newPassword);
 
         try {
@@ -411,9 +405,12 @@ public class UserManager {
     }
 
 
-    public void editEmail(String userId, String newEmail) throws IOException, InvalidIDException {
+    public void editEmail(String userId, String newEmail) throws IOException, InvalidIDException,
+            InvalidEmailException {
         if (!users.containsKey(userId))
             throw new InvalidIDException(IDType.USER);
+        if (!isValidEmail(newEmail))
+            throw new InvalidEmailException();
 
         User user = getUser(userId);
         user.setEmail(newEmail);

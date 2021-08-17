@@ -159,7 +159,9 @@ public class UserRequestHandler extends RequestHandler {
             userManager.editEmail(body.userId, body.newEmail);
             sendResponse(exchange, 204, null);
         } catch (InvalidIDException e) {
-            sendResponse(exchange, 400, "Invalid user ID.");
+            sendResponse(exchange, 404, "Invalid user ID.");
+        } catch (InvalidEmailException e) {
+            sendResponse(exchange, 400, "Invalid Email Address.");
         }
     }
 
