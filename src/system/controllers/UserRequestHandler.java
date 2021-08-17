@@ -318,8 +318,9 @@ public class UserRequestHandler extends RequestHandler {
         } catch (InvalidIDException e) {
             if (e.getIDType() == IDType.USER)
                 sendResponse(exchange, 404, "Invalid user ID");
-            else if (e.getIDType() == IDType.GAME)
+            else if (e.getIDType() == IDType.GAME) {
                 throw new RuntimeException("Fatal: the game ID got from user data is invalid.");
+            }
         }
     }
 
