@@ -25,7 +25,9 @@ function newTrial() {
 			const data = JSON.parse(xhr.response);
 			sessionStorage.setItem("userId", data.userID);
 			sessionStorage.setItem("userType", "TRIAL");
-			document.getElementById("header").contentWindow.updateHeader();
+
+			const updateHeader = document.getElementById("header").contentWindow.updateHeader;
+			if (updateHeader) updateHeader();
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 500) {
 		    alert("Server error");
 		}
