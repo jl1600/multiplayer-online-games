@@ -113,6 +113,12 @@ public class GameDataMapper implements GameDataGateway {
         return gson.toJson(game);
     }
 
+    /**
+     * Converts Json string to Game
+     * @param gameString the game string details to convert
+     * @param subfolder indicating which game type folder it is from
+     * @return Game object from the json string
+     */
     public Game jsonToGame(String gameString, String subfolder) {
         if (subfolder.equals(SUBFOLDERS[0])) {
             return gson.fromJson(gameString, QuizGame.class);

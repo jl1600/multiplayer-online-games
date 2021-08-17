@@ -4,8 +4,6 @@ import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.entities.User;
 
 import java.io.*;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
