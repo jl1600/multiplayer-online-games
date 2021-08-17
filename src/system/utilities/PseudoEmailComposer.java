@@ -3,9 +3,6 @@ package system.utilities;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import system.entities.game.hangman.HangmanGame;
-import system.entities.template.HangmanTemplate;
-import system.use_cases.builders.HangmanGameInteractiveBuilder;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
