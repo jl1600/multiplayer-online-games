@@ -63,5 +63,9 @@ public abstract class Template {
         return title;
     }
 
+    /**
+     *
+     * @return the genre of the game
+     */
     public abstract GameGenre getGenre();
 }

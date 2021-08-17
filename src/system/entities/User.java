@@ -2,8 +2,6 @@ package system.entities;
 
 import shared.constants.OnlineStatus;
 import shared.constants.UserRole;
-import shared.exceptions.entities_exception.UnaccountedUserRoleException;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;

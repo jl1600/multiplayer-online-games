@@ -4,8 +4,6 @@ import shared.constants.GameAccessLevel;
 import shared.constants.GameGenre;
 import shared.exceptions.entities_exception.IDAlreadySetException;
 
-import java.util.ArrayList;
-
 /**
  * Abstract Game Class
  */
@@ -129,6 +127,10 @@ public abstract class Game {
         this.gameAccessLevel = b;
     }
 
+    /**
+     *
+     * @return boolean indicating if Game is public
+     */
     public boolean isPublic(){
         if (this.gameAccessLevel.equals(GameAccessLevel.PUBLIC)){
             return true;
