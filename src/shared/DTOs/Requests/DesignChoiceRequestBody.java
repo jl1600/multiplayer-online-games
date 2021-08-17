@@ -8,5 +8,8 @@ public class DesignChoiceRequestBody {
      * the user who is sending this request
      */
     public String userID;
+    /**
+     * the design choice for this request
+     */
     public String designChoice;
 }
