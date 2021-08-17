@@ -132,11 +132,8 @@ public class QuizGameMatch extends GameMatch {
     }
 
     /**
-     * add a player to match
-     * @param userID the added player id
-     * @param username the added player's name
-     * @throws DuplicateUserIDException if user id already in match
-     * @throws MaxPlayerReachedException if player limit going over current player
+     * {@inheritDoc}
+     *
      */
     @Override
     public void addPlayer(String userID, String username) throws DuplicateUserIDException, MaxPlayerReachedException {
@@ -151,9 +148,7 @@ public class QuizGameMatch extends GameMatch {
     }
 
     /**
-     * remove a player from current match
-     * @param playerID The unique string identifier of the player.
-     * @throws InvalidIDException if user id is not in current player list or is null
+     * {@inheritDoc}
      */
     @Override
     public void removePlayer(String playerID) throws InvalidIDException {
@@ -171,7 +166,7 @@ public class QuizGameMatch extends GameMatch {
 
     /**
      * get text content based on current match states
-     * @return appropriate text content
+     * {@inheritDoc}
      */
     @Override
     public String getTextContent()  {
@@ -239,8 +234,7 @@ public class QuizGameMatch extends GameMatch {
     }
 
     /**
-     *
-     * @return all player stats
+     * {@inheritDoc}
      */
     @Override
     public Map<String, String> getAllPlayerStats(){
@@ -256,8 +250,7 @@ public class QuizGameMatch extends GameMatch {
     }
 
     /**
-     *
-     * @return number of players currently in match
+     * {@inheritDoc}
      */
     @Override
     public int getPlayerCount() {
@@ -265,8 +258,7 @@ public class QuizGameMatch extends GameMatch {
     }
 
     /**
-     *
-     * @return the current game id
+     * {@inheritDoc}
      */
     @Override
     public String getGameId() {
@@ -275,6 +267,7 @@ public class QuizGameMatch extends GameMatch {
 
     /**
      * start a match
+     * {@inheritDoc}
      */
     @Override
     public void startMatch() {
@@ -303,11 +296,7 @@ public class QuizGameMatch extends GameMatch {
 
 
     /**
-     * play a move based on appropriate parameters
-     * @param playerID The unique string identifier of the player.
-     * @param move     The string representing the player input
-     * @throws InvalidIDException If the user id is not in current user list or is null
-     * @throws InvalidInputException when parameters are illegal and passed a null value
+     * {@inheritDoc}
      */
     @Override
     public void playMove(String playerID, String move) throws InvalidIDException, InvalidInputException {
