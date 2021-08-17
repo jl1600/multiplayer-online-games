@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import shared.constants.GameGenre;
 import system.entities.game.Game;
 import shared.exceptions.entities_exception.game_exceptions.NoScoreCategoryException;
 
@@ -82,6 +83,11 @@ public class QuizGame extends Game {
      */
     public QuizGame() {
         this(null, null);
+    }
+
+    @Override
+    public GameGenre getGenre() {
+        return GameGenre.QUIZ;
     }
 
     /**

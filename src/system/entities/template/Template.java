@@ -1,5 +1,6 @@
 package system.entities.template;
 
+import shared.constants.GameGenre;
 import shared.exceptions.entities_exception.IDAlreadySetException;
 import shared.exceptions.entities_exception.IDNotYetSetException;
 
@@ -10,7 +11,6 @@ import shared.exceptions.entities_exception.IDNotYetSetException;
 public abstract class Template {
     private String id;
     private String title;
-
     /**
      * Constructor of Template
      */
@@ -63,4 +63,5 @@ public abstract class Template {
         return title;
     }
 
+    public abstract GameGenre getGenre();
 }

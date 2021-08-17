@@ -1,6 +1,8 @@
 package system.entities.template;
 
 
+import shared.constants.GameGenre;
+
 /**
  * Quiz Template Class
  */
@@ -21,6 +23,11 @@ public class QuizTemplate extends Template {
         this.hasMultipleScoreCategories = false;
         this.hasScoreWeight = false;
         setTitle("Unnamed Quiz Template");
+    }
+
+    @Override
+    public GameGenre getGenre() {
+        return GameGenre.QUIZ;
     }
 
     /**

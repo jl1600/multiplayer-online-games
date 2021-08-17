@@ -1,5 +1,6 @@
 package system.entities.game.hangman;
 
+import shared.constants.GameGenre;
 import shared.exceptions.use_case_exceptions.InsufficientInputException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.Game;
@@ -22,6 +23,11 @@ public class HangmanGame extends Game {
     public HangmanGame() {
         super();
         this.puzzles = new ArrayList<>();
+    }
+
+    @Override
+    public GameGenre getGenre() {
+        return GameGenre.HANGMAN;
     }
 
     /**

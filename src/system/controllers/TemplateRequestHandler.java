@@ -7,7 +7,6 @@ import shared.DTOs.Responses.GeneralTemplateDataResponseBody;
 import shared.DTOs.Responses.TemplateAllAttrsResponseBody;
 import shared.constants.GameGenre;
 import shared.exceptions.use_case_exceptions.*;
-import system.entities.template.QuizTemplate;
 import system.use_cases.managers.TemplateManager;
 
 import java.io.IOException;
@@ -128,14 +127,12 @@ public class TemplateRequestHandler extends RequestHandler {
         for (String id: allIDs) {
             try {
                 GeneralTemplateDataResponseBody datum = new GeneralTemplateDataResponseBody();
-                if (templateManager.getTemplate(id) instanceof QuizTemplate)
-                    datum.gameGenre = GameGenre.QUIZ;
-                else datum.gameGenre = GameGenre.HANGMAN;
+                datum.gameGenre = templateManager.getGenre(id);
                 datum.templateID = id;
                 datum.title = templateManager.getTemplateTitle(id);
                 dataSet.add(datum);
-            } catch (InvalidIDException e) {
-                e.printStackTrace();
+            } catch (InvalidTemplateIDException e) {
+               throw new RuntimeException("System failure: The template ID got from template manager is invalid");
             }
         }
         sendResponse(exchange, 200, gson.toJson(dataSet));

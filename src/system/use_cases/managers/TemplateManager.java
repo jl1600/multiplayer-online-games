@@ -75,6 +75,17 @@ public class TemplateManager {
     }
 
     /**
+     * Returns the genre, a.k.a the type of the template
+     * */
+    public GameGenre getGenre(String templateID) throws InvalidTemplateIDException {
+        if (!templates.containsKey(templateID))
+            throw new InvalidTemplateIDException();
+
+        return templates.get(templateID).getGenre();
+    }
+
+
+    /**
      * edit a specified template by specified attribute values
      * @param attrMap a map of specified attribute vlaues
      * @param templateID the specified template's id
@@ -145,19 +156,5 @@ public class TemplateManager {
             throw new InvalidIDException();
 
         return templates.get(id);
-    }
-
-    /**
-     * Remove a specified template based on specified id
-     * @param templateID the specified template id
-     * @throws IOException if issue regarding input-output is detected
-     * @throws InvalidIDException if the specifed id is not in the template's list or is null
-     */
-    public void deleteTemplate(String templateID) throws IOException, InvalidIDException {
-        if (!templates.containsKey(templateID)) {
-            throw new InvalidIDException();
-        }
-        templates.remove(templateID);
-        gateway.deleteTemplate(templateID);
     }
 }

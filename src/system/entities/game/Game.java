@@ -1,6 +1,7 @@
 package system.entities.game;
 
 import shared.constants.GameAccessLevel;
+import shared.constants.GameGenre;
 import shared.exceptions.entities_exception.IDAlreadySetException;
 
 import java.util.ArrayList;
@@ -142,4 +143,9 @@ public abstract class Game {
     public void setPreviousGameAccessLevel(GameAccessLevel previousGameAccessLevel) {
         this.previousGameAccessLevel = previousGameAccessLevel;
     }
+
+    /**
+     * Return the genre or type of this game
+     * */
+    public abstract GameGenre getGenre();
 }

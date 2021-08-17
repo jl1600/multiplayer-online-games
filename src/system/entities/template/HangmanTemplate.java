@@ -1,5 +1,7 @@
 package system.entities.template;
 
+import shared.constants.GameGenre;
+
 /**
  * Hangman Game Template
  */
@@ -13,6 +15,11 @@ public class HangmanTemplate extends Template {
         super();
         this.hasHints = false;
         setTitle("Unnamed Hangman Template");
+    }
+
+    @Override
+    public GameGenre getGenre() {
+        return GameGenre.HANGMAN;
     }
 
     /**

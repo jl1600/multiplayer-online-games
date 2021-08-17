@@ -5,7 +5,6 @@ import shared.constants.GameGenre;
 import shared.exceptions.entities_exception.IDNotYetSetException;
 import shared.exceptions.use_case_exceptions.*;
 
-import system.entities.game.quiz.QuizGame;
 import system.entities.template.Template;
 import system.entities.game.Game;
 import system.gateways.GameDataGateway;
@@ -289,9 +288,7 @@ public class GameManager {
         if (!games.containsKey(gameID)) {
             throw new InvalidGameIDException();
         }
-        if (games.get(gameID) instanceof QuizGame) {
-            return GameGenre.QUIZ;
-        } else return GameGenre.HANGMAN;
+        return games.get(gameID).getGenre();
     }
 
     /**
