@@ -37,10 +37,10 @@ public class PseudoEmailComposer implements EmailService {
         }
     }
 
-    public void sendResetPasswordEmail(String receiverEmail, String tempPassword) {
+    public void sendResetPasswordEmail(String receiverEmail, String receiverName, String tempPassword) {
         String text = emailTemplates.get(TemplateTag.RESET_PASSWORD) + tempPassword;
         try {
-            PrintWriter writer = new PrintWriter("to:" + receiverEmail + ".txt", "UTF-8");
+            PrintWriter writer = new PrintWriter("to_" + receiverName + ".txt", "UTF-8");
             writer.println(text);
             writer.close();
         } catch (UnsupportedEncodingException | FileNotFoundException e) {

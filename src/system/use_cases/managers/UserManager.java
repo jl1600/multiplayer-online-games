@@ -251,7 +251,7 @@ public class UserManager {
 
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
-
+        System.out.println(password);
         String userId = getUserId(username);
         try {
             if (isPasswordIncorrect(userId, password) && isTempPasswordIncorrect(userId, password))
@@ -272,7 +272,7 @@ public class UserManager {
     private boolean isTempPasswordIncorrect(String userId, String password) {
         if (!tempPasswords.containsKey(userId) || !tempPasswords.get(userId).containsKey(password))
             return true;
-        else if (tempPasswords.get(userId).get(password).after(Calendar.getInstance().getTime())) {
+        else if (tempPasswords.get(userId).get(password).before(Calendar.getInstance().getTime())) {
             tempPasswords.remove(userId);
             return true;
         }

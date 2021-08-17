@@ -271,10 +271,13 @@ public class UserRequestHandler extends RequestHandler {
         PasswordResetRequestBody body = gson.fromJson(getRequestBody(exchange), PasswordResetRequestBody.class);
         try {
             String generatedPass = userManager.createTempPassword(body.username, body.email);
-            emailService.sendResetPasswordEmail(body.username, generatedPass);
+            emailService.sendResetPasswordEmail(userManager.getEmail(userManager.getUserId(body.username)),
+                                                body.username, generatedPass);
             sendResponse(exchange, 204, null);
         } catch (InvalidUsernameException | InvalidEmailException e) {
             sendResponse(exchange, 403, "Invalid username or email");
+        } catch (InvalidUserIDException e) {
+            throw new RuntimeException("Corrupted data: Invalid Email");
         }
     }
 
