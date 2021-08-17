@@ -1,0 +1,33 @@
+{
+  "puzzles": [
+    [
+      "Space Invaders",
+      "Don\u0027t get zapped!"
+    ],
+    [
+      "Frogger",
+      "Try to make it to the other side"
+    ],
+    [
+      "Donkey Kong",
+      "Dodge and climb your way to the top"
+    ],
+    [
+      "Street Fighter",
+      "Battle it out in hand to hand combat"
+    ],
+    [
+      "Dig Dug",
+      "Underground adventure"
+    ]
+  ],
+  "numPuzzles": 5,
+  "numLives": 4,
+  "numHints": 3,
+  "gameId": "10",
+  "ownerId": "7",
+  "templateId": "6",
+  "gameAccessLevel": "PUBLIC",
+  "previousGameAccessLevel": "PRIVATE",
+  "title": "Old Video Games"
+}
