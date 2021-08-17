@@ -4,7 +4,7 @@
 
     - This project use the Gson library from Google to read and write data in the JSON
     format.
-    - Gson can be installed through Intellij Maven by going through
+    - Gson can be installed through Intellij by going through
       File -> Project Structure -> modules -> Dependencies -> '+' -> libraries -> From Maven
       and type in com.google.code.gson:gson:2.8.7
 
@@ -98,3 +98,7 @@ web platform.
 also allows server to send data to client without client making a request. This allows online-multiplayer games.
 
 Online multiplayer games can be tested by having two accounts on two different tabs.
+
+
+## Response to Phase 1's feedbacks
+
