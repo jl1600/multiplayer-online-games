@@ -179,6 +179,7 @@ public class GameManager {
 
     /**
      * Save the temporary game with the given ID to the database.
+     * @param gameID the gameID to save
      */
     public void saveTemporaryGame(String gameID) throws InvalidIDException {
         if (!temporaryGames.containsKey(gameID))
@@ -192,7 +193,6 @@ public class GameManager {
 
     /**
      * Returns the Game object with the corresponding ID.
-     *
      * @param id The string identifier of the Game
      * @throws InvalidIDException There is no such game in the system.
      */
@@ -203,14 +203,14 @@ public class GameManager {
     }
 
     /**
-     * Returns a mapping of all Game Ids to game titles.
+     * @return a mapping of all Game Ids to game titles.
      */
     public Set<String> getAllGameIDs() {
         return new HashSet<>(games.keySet());
     }
 
     /**
-     * Returns a set of public game ids.
+     * @return a set of public game ids.
      */
     public Set<String> getAllPublicGamesID() {
         Set<String> publicIDs = new HashSet<>();
@@ -227,6 +227,7 @@ public class GameManager {
      *
      * @param gameID          The ID of the game.
      * @param gameAccessLevel The value representing whether the game is public, private, friends only, deleted
+     * @throws InvalidIDException when there is an invalid Game ID
      */
     public void setGameAccessLevel(String gameID, GameAccessLevel gameAccessLevel) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
@@ -247,6 +248,7 @@ public class GameManager {
     /**
      * Revert the publicity status of the game based on its stored value
      * @param gameID The ID of the game.
+     * @throws InvalidIDException when there is an Invalid GameID
      * */
     public void undoSetGameAccessLevel(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
@@ -268,8 +270,8 @@ public class GameManager {
 
     /**
      * Returns whether the game is a public game
-     *
      * @param gameID The unique string identifier of the game
+     * @throws InvalidIDException when there is an invalid GameID
      */
     public boolean checkIsPublic(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
@@ -279,7 +281,9 @@ public class GameManager {
     }
 
     /**
-     * Returns the genre of the game.
+     * @param gameID the game id
+     * @return the genre of the game.
+     * @throws InvalidIDException when there is an Invalid GameID
      */
     public GameGenre getGenre(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
@@ -292,6 +296,7 @@ public class GameManager {
      * Returns the title of a game
      *
      * @param gameID The unique string identifier of the game
+     * @throws InvalidIDException when there is an Invalid GameID
      */
     public String getGameTitle(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
@@ -304,6 +309,7 @@ public class GameManager {
      * Returns the template ID of a game
      *
      * @param gameID The unique string identifier of the game
+     * @throws InvalidIDException when there is an Invalid GameID
      */
     public String getTemplateID(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
@@ -314,8 +320,8 @@ public class GameManager {
 
     /**
      * Returns the owner ID of a game
-     *
      * @param gameID The unique string identifier of the game
+     * @throws InvalidIDException when there is an Invalid GameID
      */
     public String getOwnerID(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
