@@ -1,13 +1,16 @@
 if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 
 function signup(username, password, confirmPassword, email, userType) {
-	if (!username || !password) return false;
-	if (!checkPassword()) return false;
-	if (!checkValidEmail(email)) return false;
+	if (!username || !password || !checkPassword()) return false;
+	if (!checkValidEmail(email)) {
+	    alert("Email is invalid");
+	    return false;
+	}
 
 	xhr.open("POST", "http://localhost:8000/user/register");
 
 	xhr.onreadystatechange = () => {
+	    console.log(xhr.status)
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
 			window.location = "http://localhost:8080/pages/login.html";
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
@@ -19,6 +22,13 @@ function signup(username, password, confirmPassword, email, userType) {
          }
 	};
 
+    console.log(JSON.stringify({
+                	    userID: sessionStorage.getItem("userId"),
+                	    username,
+                	    password,
+                	    email,
+                	    role: userType
+                	}))
 	xhr.send(JSON.stringify({
 	    userID: sessionStorage.getItem("userId"),
 	    username,
@@ -44,45 +54,52 @@ document.getElementById("password").addEventListener("input", () => {
 
 
 function passwordStrengthChecker(password){
-    var charactersBool = false;
-    var numberBool = false;
-    var specialCharacterBool = false;
-    var lengthBool = false;
-
-    if (password.match(/([a-z].*[A-Z])/) || password.match(/([A-Z].*[a-z])/)){
-        addCheck("characters");
-        charactersBool = true;
-    } else {
-        removeCheck("characters");
-        charactersBool = false;
-    }
-
-
-    if (password.match(/([0-9])/)){
-        addCheck("numbers");
-        numberBool = true;
-    } else {
-        removeCheck("numbers");
-        numberBool = false;
-    }
-
-    if (password.match(/[!@#$%^&*()_~?,.<>/;:]/)){
-        addCheck("special");
-        specialCharacterBool = true;
-    } else{
-        removeCheck("special");
-        specialCharacterBool = false;
-    }
-
-    if (password.length >= 6){
-        addCheck("length");
-        lengthBool = true;
-    } else{
-        removeCheck("length");
-        lengthBool = false;
-    }
+    const charactersBool = hasCharacters(password);
+    const numberBool = hasNumber(password);
+    const specialCharacterBool = hasSpecialCharacter(password);
+    const lengthBool = hasMinLength(password);
 
     return [charactersBool, numberBool, specialCharacterBool, lengthBool].every(Boolean);
+}
+
+function hasCharacters(password) {
+    if (password.match(/([a-z].*[A-Z])/) || password.match(/([A-Z].*[a-z])/)){
+        addCheck("characters");
+        return true;
+    } else {
+        removeCheck("characters");
+        return false;
+    }
+}
+
+function hasNumber(password) {
+    if (password.match(/([0-9])/)) {
+        addCheck("numbers");
+        return true;
+    } else {
+        removeCheck("numbers");
+        return false;
+    }
+}
+
+function hasSpecialCharacter(password) {
+    if (password.match(/[!@#$%^&*()_~?,.<>/;:]/)){
+        addCheck("special");
+        return true;
+    } else{
+        removeCheck("special");
+        return false;
+    }
+}
+
+function hasMinLength(password) {
+    if (password.length >= 6){
+        addCheck("length");
+        return true;
+    } else {
+        removeCheck("length");
+        return false;
+    }
 }
 
 function addCheck(value){
