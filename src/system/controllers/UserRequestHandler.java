@@ -459,7 +459,7 @@ public class UserRequestHandler extends RequestHandler {
         try {
             if (!hasPermission(exchange, userManager.getUserRole(body.adminID), UserRole.ADMIN))
                 return;
-            userManager.banUser(body.adminID, body.userID, body.banLength);
+            userManager.banUser(body.userID, body.banLength);
             sendResponse(exchange, 204, null);
         } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");

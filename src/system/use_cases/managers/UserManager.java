@@ -462,6 +462,12 @@ public class UserManager {
     }
 
 
+    /**
+     * Returns a set of user IDs that correspond to friends of this user.
+     *
+     * @param userID the ID of the user.
+     * @throws InvalidIDException If there is no such user with the given ID.
+     * */
     public Set<String> getFriendList(String userID) throws InvalidIDException {
         if (!users.containsKey(userID))
             throw new InvalidIDException(IDType.USER);
@@ -469,7 +475,12 @@ public class UserManager {
         return users.get(userID).getFriendList();
     }
 
-
+    /**
+     * Returns a set of user IDs that correspond to pendingfriends of this user.
+     *
+     * @param userID the ID of the user.
+     * @throws InvalidIDException If there is no such user with the given ID.
+     * */
     public Set<String> getPendingFriendList(String userID) throws InvalidIDException {
         if (!users.containsKey(userID))
             throw new InvalidIDException(IDType.USER);
@@ -477,11 +488,14 @@ public class UserManager {
         return users.get(userID).getPendingFriendList();
     }
 
+    /**
+     * Add an User ID to the list of pending friend of the owner.
+     *
+     * @param ownerID The owner of the list of pending friends
+     * @param subjectID The user that is to be added.
+     * */
     public void addPendingFriend(String ownerID, String subjectID) throws InvalidIDException, IOException {
-        if (!users.containsKey(subjectID))
-            throw new InvalidIDException(IDType.USER);
-
-        if (!users.containsKey(ownerID))
+        if (!users.containsKey(subjectID) || !users.containsKey(ownerID))
             throw new InvalidIDException(IDType.USER);
 
         if (!users.get(ownerID).getPendingFriendList().contains(subjectID)){//to avoid duplicate sends
@@ -491,10 +505,19 @@ public class UserManager {
 
     }
 
+    /**
+     * Returns all user IDs in the system.
+     * */
     public Set<String> getAllUserIDs() {
         return new HashSet<>(users.keySet());
     }
 
+    /**
+     * Remove the subjectID from the pending friend list of the user with ownerID.
+     *
+     * @param ownerID The owner of the list of pending friends
+     * @param subjectID The user that is to be removed.
+     * */
     public void removePendingFriend(String ownerID, String subjectID) throws InvalidIDException, IOException {
         if (!users.containsKey(subjectID))
             throw new InvalidIDException(IDType.USER);
@@ -504,6 +527,13 @@ public class UserManager {
         gateway.updateUser(users.get(ownerID));
     }
 
+    /**
+     * Add the subject to the friend list of the owner.
+     *
+     * @param ownerID The ID of the owner of the list
+     * @param subjectID The userID to be added.
+     * @throws InvalidIDException when either of the IDs is invalid
+     * */
     public void addFriend(String ownerID, String subjectID) throws InvalidIDException, IOException {
         if (!users.containsKey(subjectID))
             throw new InvalidIDException(IDType.USER);
@@ -514,6 +544,13 @@ public class UserManager {
 
     }
 
+    /**
+     * Remove the subject from the friend list of the owner.
+     *
+     * @param ownerID The ID of the owner of the list
+     * @param subjectID The userID to be added.
+     * @throws InvalidIDException when either of the IDs is invalid
+     * */
     public void removeFriend(String ownerID, String subjectID) throws InvalidIDException, IOException {
         if (!users.containsKey(subjectID))
             throw new InvalidIDException(IDType.USER);
@@ -524,11 +561,16 @@ public class UserManager {
 
     }
 
-    public void banUser(String adminID, String subjectID, int duration) throws InvalidIDException, IOException{
+    /**
+     * Ban an user for a duration.
+     *
+     * @param subjectID The id of the person that is to be banned.
+     * @param duration The duration of the ban, in days.
+     * */
+    public void banUser(String subjectID, int duration) throws InvalidIDException, IOException{
 
-        if (!users.containsKey(subjectID) || !users.containsKey(adminID))
+        if (!users.containsKey(subjectID))
             throw new InvalidIDException(IDType.USER);
-
 
         Calendar date = Calendar.getInstance();
         date.add(Calendar.DAY_OF_YEAR, duration);
