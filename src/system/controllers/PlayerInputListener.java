@@ -81,7 +81,7 @@ public class PlayerInputListener extends Thread {
                 throw new RuntimeException("Match ID is invalid. This should never happen.");
             } catch (InvalidInputException e) {
                 try {
-                    sendWSMessage(outStream, "Invalid input.");
+                    MatchOutputDispatcher.sendWSMessage(outStream, "Invalid input.");
                 } catch (IOException ioException) {
                     try {
                         manager.removePlayer(playerID, matchID);
@@ -102,7 +102,7 @@ public class PlayerInputListener extends Thread {
         }
     }
 
-    private String readWSMessage(InputStream input) throws IOException {
+    static String readWSMessage(InputStream input) throws IOException {
         input.read(); // Skip the first bit, FIN, which should always be 1.
         int byteValue = input.read();
         int messageLen;
@@ -125,39 +125,6 @@ public class PlayerInputListener extends Thread {
             decoded[i] = (byte) (encoded[i] ^ mask[i % 4]);
         }
         return new String(decoded);
-    }
-
-    // Sending a websocket text message
-    // Formatting the byte array so that it follows the standard for websocket communication
-    private void sendWSMessage(OutputStream output, String message) throws IOException {
-        byte[] firstTwo = new byte[2];
-        firstTwo[0] |= (1 << 7);  // FIN, telling the client that this is a whole message
-        firstTwo[0] |= 1; // Op code, 0x1, telling that this is a text
-        int lenCode;    // this is the length of the message if length < 126
-        byte[] uint16Len = new byte[2];   // A backup for the length in the case it exceeds 125
-
-        if (message.length() < 126) {
-            lenCode = message.length();
-        } else {
-            lenCode = 126;
-            uint16Len[1] = (byte) (message.length() & 0xFF);
-            uint16Len[0] = (byte) ((message.length() >>> 8) & 0xFF);
-        } // It will never happen that message.len > 65536
-        firstTwo[1] |= (byte) lenCode;  // writing the lenCode to the last 7 bits of the second byte.
-
-        byte[] result;
-        if (lenCode < 126) {
-            result = new byte[2 + message.length()];
-            System.arraycopy(firstTwo, 0, result, 0, 2);
-            System.arraycopy(message.getBytes(StandardCharsets.UTF_8), 0, result, 2, message.length());
-        } else {
-            result = new byte[4 + message.length()];
-            System.arraycopy(firstTwo, 0, result, 0, 2);
-            System.arraycopy(uint16Len, 0, result, 2, 2);
-            System.arraycopy(message.getBytes(StandardCharsets.UTF_8), 0, result, 4, message.length());
-        }
-        output.write(result);
-        output.flush();
     }
 
 }

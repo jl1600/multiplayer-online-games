@@ -85,7 +85,7 @@ public class MatchOutputDispatcher implements Observer {
     // Read a websocket text message
     // Sending a websocket text message
     // Formatting the byte array so that it follows the standard for websocket communication
-    private void sendWSMessage(OutputStream output, String message) throws IOException {
+    static void sendWSMessage(OutputStream output, String message) throws IOException {
         byte[] firstTwo = new byte[2];
         firstTwo[0] |= (1 << 7);  // FIN, telling the client that this is a whole message
         firstTwo[0] |= 1; // Op code, 0x1, telling that this is a text

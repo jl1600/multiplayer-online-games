@@ -348,18 +348,9 @@ public class GameRequestHandler extends RequestHandler {
     }
 
     private void handleGetAllOwnedGames(HttpExchange exchange) throws IOException {
-        String userID;
-        try {
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null) {
-                sendResponse(exchange, 400, "Missing Query.");
-                return;
-            }
-            userID = query.split("=")[1];
-        } catch (MalformedURLException e) {
-            sendResponse(exchange, 404, "Malformed URL.");
+        String userID = getQueryArgFromGET(exchange);
+        if (userID == null)
             return;
-        }
         try {
             sendResponse(exchange, 200, getOwnedGamesData(userID));
         } catch (InvalidUserIDException e) {
@@ -452,6 +443,10 @@ public class GameRequestHandler extends RequestHandler {
             }
         }
 
+        return getJsonDataFromGameIDs(dataSet, availableGameIDs);
+    }
+
+    private String getJsonDataFromGameIDs(Set<GameDataResponseBody> dataSet, Set<String> availableGameIDs) {
         for (String id : availableGameIDs) {
             GameDataResponseBody game = new GameDataResponseBody();
             game.id = id;
@@ -474,21 +469,6 @@ public class GameRequestHandler extends RequestHandler {
     private String getAllPublicGamesData() {
         Set<GameDataResponseBody> dataSet = new HashSet<>();
         Set<String> publicGames = gameManager.getAllPublicGamesID();
-        for (String id : publicGames) {
-            GameDataResponseBody game = new GameDataResponseBody();
-            game.id = id;
-            try {
-                game.title = gameManager.getGameTitle(id);
-                game.ownerName = userManager.getUsername(gameManager.getOwnerID(id));
-                game.accessLevel = gameManager.getAccessLevel(id);
-                game.previousAccessLevel = gameManager.getPreviousAccessLevel(id);
-                game.genre = gameManager.getGenre(id);
-            } catch (InvalidGameIDException | InvalidUserIDException e) {
-                throw new RuntimeException("Game ID or user ID got from public game list is invalid.");
-            }
-
-            dataSet.add(game);
-        }
-        return gson.toJson(dataSet);
+        return getJsonDataFromGameIDs(dataSet, publicGames);
     }
 }

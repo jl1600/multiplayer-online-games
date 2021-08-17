@@ -54,14 +54,14 @@ public class ClientSocketSeeker extends Thread {
     private void acceptPlayerSocket() throws IOException, InvalidMatchIDException {
         Socket connection = serverSocket.accept();
         handShake(connection);
-        String playerID = readWSMessage(connection.getInputStream());
+        String playerID = PlayerInputListener.readWSMessage(connection.getInputStream());
 
         // Refusing connection until it's the correct user ID that we are looking for.
         while (!playerID.equals(userID)) {
             connection.close();
             connection = serverSocket.accept();
             handShake(connection);
-            playerID = readWSMessage(connection.getInputStream());
+            playerID = PlayerInputListener.readWSMessage(connection.getInputStream());
         }
         PlayerInputListener inputListener = new PlayerInputListener(connection, matchManager, matchID, playerID);
         MatchOutputDispatcher outputDispatcher = new MatchOutputDispatcher(connection.getOutputStream(),
@@ -100,62 +100,4 @@ public class ClientSocketSeeker extends Thread {
         return DatatypeConverter.printBase64Binary(buff);
     }
 
-    // Read a websocket text message
-    private String readWSMessage(InputStream input) throws IOException {
-        input.read(); // Skip the first bit, FIN, which should always be 1.
-        int byteValue = input.read();
-        int messageLen;
-        if (byteValue - 128 <= 125) {
-            messageLen = byteValue - 128;
-        } else if (byteValue - 128 == 126) {
-            byte[] buffer = new byte[2];
-            messageLen = input.read(buffer, 0, 2);
-        } else {
-            byte[] buffer = new byte[8];
-            messageLen = input.read(buffer, 0, 8);
-        }
-
-        byte[] mask = new byte[4];
-        input.read(mask, 0, 4);
-        byte[] encoded = new byte[messageLen];
-        byte[] decoded = new byte[messageLen];
-        input.read(encoded, 0, messageLen);
-        for (int i = 0; i < messageLen; i++) {
-            decoded[i] = (byte) (encoded[i] ^ mask[i % 4]);
-        }
-        return new String(decoded);
-    }
-
-    // Sending a websocket text message
-    // Formatting the byte array so that it follows the standard for websocket communication
-    private void sendWSMessage(OutputStream output, String message) throws IOException {
-        byte[] firstTwo = new byte[2];
-        firstTwo[0] |= (1 << 7);  // FIN, telling the client that this is a whole message
-        firstTwo[0] |= 1; // Op code, 0x1, telling that this is a text
-        int lenCode;    // this is the length of the message if length < 126
-        byte[] uint16Len = new byte[2];   // A backup for the length in the case it exceeds 125
-
-        if (message.length() < 126) {
-            lenCode = message.length();
-        } else {
-            lenCode = 126;
-            uint16Len[1] = (byte) (message.length() & 0xFF);
-            uint16Len[0] = (byte) ((message.length() >>> 8) & 0xFF);
-        } // It will never happen that message.len > 65536
-        firstTwo[1] |= (byte) lenCode;  // writing the lenCode to the last 7 bits of the second byte.
-
-        byte[] result;
-        if (lenCode < 126) {
-            result = new byte[2 + message.length()];
-            System.arraycopy(firstTwo, 0, result, 0, 2);
-            System.arraycopy(message.getBytes(StandardCharsets.UTF_8), 0, result, 2, message.length());
-        } else {
-            result = new byte[4 + message.length()];
-            System.arraycopy(firstTwo, 0, result, 0, 2);
-            System.arraycopy(uint16Len, 0, result, 2, 2);
-            System.arraycopy(message.getBytes(StandardCharsets.UTF_8), 0, result, 4, message.length());
-        }
-        output.write(result);
-        output.flush();
-    }
 }
