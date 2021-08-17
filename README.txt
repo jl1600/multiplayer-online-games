@@ -1,6 +1,15 @@
 ## Installation
 
+# Project dependencies:
+
+    - This project use the Gson library from Google to read and write data in the JSON
+    format.
+    - Gson can be installed through Intellij Maven by going through
+      File -> Project Structure -> modules -> Dependencies -> '+' -> libraries -> From Maven
+      and type in com.google.code.gson:gson:2.8.7
+      
 ## Running instruction
+
 0. Make sure you don't have anything running on port 8080 and 8000
 1. In your command line/terminal, navigate to phase2/src/client
   Enter command `python -m http.server 8080` on windows
