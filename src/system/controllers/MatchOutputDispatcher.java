@@ -2,8 +2,7 @@ package system.controllers;
 
 import com.google.gson.Gson;
 import shared.DTOs.sockets.MatchOutput;
-import shared.exceptions.use_case_exceptions.InvalidMatchIDException;
-import shared.exceptions.use_case_exceptions.InvalidUserIDException;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import system.use_cases.managers.MatchManager;
 
 import java.io.IOException;
@@ -65,7 +64,7 @@ public class MatchOutputDispatcher implements Observer {
             matchOutput.textContent = matchManager.getMatchTextContent(matchID);
             matchOutput.playerStats = matchManager.getAllPlayerStats(matchID);
             matchOutput.numPlayers = matchManager.getPlayerCount(matchID);
-        } catch (InvalidMatchIDException e) {
+        } catch (InvalidIDException e) {
             System.out.println("Match no longer exists");
         }
         try {
@@ -74,7 +73,7 @@ public class MatchOutputDispatcher implements Observer {
             try {
                 matchManager.deleteObserver(this, matchID);
                 matchManager.removePlayer(userID, matchID);
-            } catch (InvalidMatchIDException | InvalidUserIDException e2) {
+            } catch (InvalidIDException e2) {
                 System.out.println("Player already left or match doesn't exist anymore.");
             }
 

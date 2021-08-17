@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.*;
 import shared.DTOs.Responses.DesignQuestionResponseBody;
 import shared.DTOs.Responses.MatchDataResponseBody;
+import shared.constants.IDType;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
 import shared.DTOs.Responses.GameDataResponseBody;
@@ -131,7 +132,7 @@ public class GameRequestHandler extends RequestHandler {
         try {
             prevAL = gameManager.getPreviousAccessLevel(body.gameID).name();
             sendResponse(exchange, 204, prevAL);
-        } catch (InvalidGameIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 404, "The game ID is invalid.");
         }
     }
@@ -141,7 +142,7 @@ public class GameRequestHandler extends RequestHandler {
         try {
             gameManager.undoSetGameAccessLevel(body.gameID);
             sendResponse(exchange, 204, null);
-        } catch (InvalidGameIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 404, "The game ID is invalid.");
         }
 
@@ -152,7 +153,7 @@ public class GameRequestHandler extends RequestHandler {
         try {
             gameManager.setGameAccessLevel(body.gameID, body.accessLevel);
             sendResponse(exchange, 204, null);
-        } catch (InvalidGameIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 404, "The game ID is invalid.");
         }
     }
@@ -162,10 +163,11 @@ public class GameRequestHandler extends RequestHandler {
         try {
             matchManager.removePlayer(body.userID, body.matchID);
             sendResponse(exchange, 204, null);
-        } catch (InvalidMatchIDException e) {
-            sendResponse(exchange, 404, "Invalid ID.");
-        } catch (InvalidUserIDException e) {
-            sendResponse(exchange, 400, "Match doesn't contain this user.");
+        } catch (InvalidIDException e) {
+            if (e.getIDType() == IDType.MATCH)
+                sendResponse(exchange, 404, "Invalid Match ID.");
+            else if (e.getIDType() == IDType.USER)
+                sendResponse(exchange, 400, "Match doesn't contain this user.");
         }
     }
 
@@ -175,14 +177,15 @@ public class GameRequestHandler extends RequestHandler {
             matchManager.addPlayer(body.userID, userManager.getUsername(body.userID), body.matchID);
             ClientSocketSeeker clientSeeker = new ClientSocketSeeker(matchManager, serverSocket, body.userID, body.matchID);
             clientSeeker.start();
-        } catch (InvalidMatchIDException e) {
-            sendResponse(exchange, 403, "Match already started or the given ID is invalid.");
+        } catch (InvalidIDException e) {
+            if (e.getIDType() == IDType.MATCH)
+                sendResponse(exchange, 403, "Match already started or the given ID is invalid.");
+            else if (e.getIDType() == IDType.USER)
+                sendResponse(exchange, 404, "The user ID is invalid.");
         } catch (DuplicateUserIDException e) {
             sendResponse(exchange, 400, "The user is already in this match.");
         } catch (MaxPlayerReachedException e) {
             sendResponse(exchange, 403, "The max number of players is reached.");
-        } catch (InvalidUserIDException e) {
-            sendResponse(exchange, 404, "The user ID is invalid.");
         }
     }
 
@@ -205,11 +208,11 @@ public class GameRequestHandler extends RequestHandler {
                         gameManager.buildTemporaryGame(body.userID) : gameManager.buildGame(body.userID);
                 userManager.addOwnedGameID(body.userID, gameID);
                 sendResponse(exchange, 201, "Success!");
-            } catch (InsufficientInputException e) {
+            } catch (NotReadyException e) {
                 DesignQuestionResponseBody res = new DesignQuestionResponseBody();
                 res.designQuestion = gameManager.getDesignQuestion(body.userID);
                 sendResponse(exchange, 200, gson.toJson(res));
-            } catch (InvalidUserIDException e) {
+            } catch (InvalidIDException e) {
                 throw new RuntimeException("user id is invalid. This should never happen.");
             }
         } catch (NoCreationInProgressException e) {
@@ -231,10 +234,8 @@ public class GameRequestHandler extends RequestHandler {
             sendResponse(exchange, 204, null); // Telling the client that match is successfully created.
             ClientSocketSeeker clientSeeker = new ClientSocketSeeker(matchManager, serverSocket, body.userID, matchID);
             clientSeeker.start();
-        } catch (InvalidUserIDException | InvalidIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "One of the provided IDs is invalid.");
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -281,7 +282,7 @@ public class GameRequestHandler extends RequestHandler {
                     data.genre = gameManager.getGenre(gameID);
                     dataSet.add(data);
                 }
-            } catch (InvalidGameIDException | InvalidUserIDException e) {
+            } catch (InvalidIDException e) {
                 throw new RuntimeException("Invalid game ID from the list of public games. This should never happen.");
             }
         }
@@ -307,10 +308,11 @@ public class GameRequestHandler extends RequestHandler {
                 data.maxPlayers = matchManager.getPlayerCountLimit(id);
                 data.genre = gameManager.getGenre(gameId);
                 dataSet.add(data);
-            } catch (InvalidMatchIDException e) {
-                throw new RuntimeException("The match ID returned from match manager doesn't exist anymore");
-            } catch (InvalidGameIDException e) {
-                throw new RuntimeException("The game ID or host ID got from match is invalid.");
+            } catch (InvalidIDException e) {
+                if (e.getIDType() == IDType.MATCH)
+                    throw new RuntimeException("The match ID returned from match manager doesn't exist anymore");
+                else if (e.getIDType() == IDType.GAME)
+                    throw new RuntimeException("The game ID or host ID got from match is invalid.");
             }
         }
 
@@ -328,7 +330,7 @@ public class GameRequestHandler extends RequestHandler {
             return;
         try {
             sendResponse(exchange, 200, getAvailableGameDataByUserID(ownerID));
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             System.out.println("inv");
             sendResponse(exchange, 400, "Invalid User ID.");
         }
@@ -341,7 +343,7 @@ public class GameRequestHandler extends RequestHandler {
             return;
         try {
             sendResponse(exchange, 200, getOwnedGamesData(userID));
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid User ID.");
         }
     }
@@ -352,12 +354,12 @@ public class GameRequestHandler extends RequestHandler {
             return;
         try {
             sendResponse(exchange, 200, getPublicOwnedGamesData(userID));
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid User ID.");
         }
     }
 
-    private String getPublicOwnedGamesData(String userID) throws InvalidUserIDException {
+    private String getPublicOwnedGamesData(String userID) throws InvalidIDException {
         Set<String> ownedIds = userManager.getOwnedGamesID(userID);
         Set<GameDataResponseBody> dataSet = new HashSet<>();
         for (String id : ownedIds) {
@@ -372,8 +374,10 @@ public class GameRequestHandler extends RequestHandler {
                     data.genre = gameManager.getGenre(id);
                     dataSet.add(data);
                 }
-            } catch (InvalidGameIDException e) {
-                throw new RuntimeException("Fatal Error: The user contains an invalid game ID.");
+            } catch (InvalidIDException e) {
+                if (e.getIDType() == IDType.GAME)
+                    throw new RuntimeException("Fatal Error: The user contains an invalid game ID.");
+                else throw new InvalidIDException(IDType.USER);
             }
         }
 
@@ -381,7 +385,7 @@ public class GameRequestHandler extends RequestHandler {
     }
 
 
-    private String getOwnedGamesData(String userID) throws InvalidUserIDException {
+    private String getOwnedGamesData(String userID) throws InvalidIDException {
 
         Set<String> ownedIds = userManager.getOwnedGamesID(userID);
         Set<GameDataResponseBody> dataSet = new HashSet<>();
@@ -394,8 +398,10 @@ public class GameRequestHandler extends RequestHandler {
                 data.accessLevel = gameManager.getAccessLevel(id);
                 data.previousAccessLevel = gameManager.getPreviousAccessLevel(id);
                 data.genre = gameManager.getGenre(id);
-            } catch (InvalidGameIDException e) {
-                throw new RuntimeException("Game ID from owned list is invalid.");
+            } catch (InvalidIDException e) {
+                if (e.getIDType() == IDType.GAME)
+                    throw new RuntimeException("Fatal Error: The user contains an invalid game ID.");
+                else throw new InvalidIDException(IDType.USER);
             }
             dataSet.add(data);
         }
@@ -403,7 +409,7 @@ public class GameRequestHandler extends RequestHandler {
         return gson.toJson(dataSet);
     }
 
-    private String getAvailableGameDataByUserID(String userID) throws InvalidUserIDException {
+    private String getAvailableGameDataByUserID(String userID) throws InvalidIDException {
         Set<GameDataResponseBody> dataSet = new HashSet<>();
         //duplicates will be take cared by built in
         Set<String> availableGameIDs = new HashSet<>();
@@ -435,7 +441,7 @@ public class GameRequestHandler extends RequestHandler {
                 game.accessLevel = gameManager.getAccessLevel(id);
                 game.previousAccessLevel = gameManager.getPreviousAccessLevel(id);
                 game.genre = gameManager.getGenre(id);
-            } catch (InvalidGameIDException | InvalidUserIDException e) {
+            } catch (InvalidIDException e) {
                 throw new RuntimeException("Game ID or user ID got from public game list is invalid.");
             }
 

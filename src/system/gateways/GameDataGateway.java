@@ -1,7 +1,7 @@
 package system.gateways;
 
 import shared.exceptions.entities_exception.UnknownGameTypeException;
-import shared.exceptions.use_case_exceptions.InvalidGameIDException;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import system.entities.game.Game;
 
 import java.io.IOException;
@@ -26,16 +26,16 @@ public interface GameDataGateway {
      * @param game the game to update
      * @throws IOException if there is a problem reading or writing to the database
      */
-    void updateGame(Game game) throws InvalidGameIDException, IOException, UnknownGameTypeException;
+    void updateGame(Game game) throws InvalidIDException, IOException, UnknownGameTypeException;
 
     /**
      * Deletes the input Game from the database.
      *
      * @param gameID the gameId of the object to delete
      * @throws IOException              if there is a problem deleting the file
-     * @throws InvalidGameIDException   if the input Game does not exist in the database
+     * @throws InvalidIDException   if the input Game does not exist in the database
      */
-    void deleteGame(String gameID) throws IOException, InvalidGameIDException;
+    void deleteGame(String gameID) throws IOException, InvalidIDException;
 
     /**
      * Returns a set of all Games in the database

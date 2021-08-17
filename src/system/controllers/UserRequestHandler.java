@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.*;
 import shared.DTOs.Responses.GeneralUserInfoResponseBody;
 import shared.DTOs.Responses.LoginResponseBody;
+import shared.constants.IDType;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
 import system.use_cases.managers.GameManager;
@@ -131,7 +132,7 @@ public class UserRequestHandler extends RequestHandler {
         try {
             userManager.editPassword(body.userID,body.oldPassword,body.newPassword);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 404, "Invalid user ID.");
         }catch (IncorrectPasswordException e) {
             sendResponse(exchange, 403, "Incorrect password.");
@@ -145,7 +146,7 @@ public class UserRequestHandler extends RequestHandler {
         try {
             userManager.editUsername(body.userID,body.newUsername);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         } catch (DuplicateUsernameException e){
             sendResponse(exchange, 403, "Duplicate username.");
@@ -157,7 +158,7 @@ public class UserRequestHandler extends RequestHandler {
         try {
             userManager.editEmail(body.userId, body.newEmail);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
@@ -169,7 +170,7 @@ public class UserRequestHandler extends RequestHandler {
             userManager.removeFriend(body.senderID, body.receiverID);
             userManager.removeFriend(body.receiverID, body.senderID);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
@@ -179,7 +180,7 @@ public class UserRequestHandler extends RequestHandler {
         try {
             userManager.removePendingFriend(body.receiverID, body.senderID);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
@@ -191,7 +192,7 @@ public class UserRequestHandler extends RequestHandler {
             userManager.addFriend(body.senderID, body.receiverID);
             userManager.addFriend(body.receiverID, body.senderID);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
@@ -201,7 +202,7 @@ public class UserRequestHandler extends RequestHandler {
         try {
             userManager.removePendingFriend(body.senderID, body.receiverID);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
@@ -216,7 +217,7 @@ public class UserRequestHandler extends RequestHandler {
                 return;
             try {
                 sendResponse(exchange, 200, gson.toJson(getAllMembersExcludeFriendsOf(userID)));
-            } catch (InvalidUserIDException e) {
+            } catch (InvalidIDException e) {
                 sendResponse(exchange, 400, "Invalid user ID.");
             }
         }
@@ -232,7 +233,7 @@ public class UserRequestHandler extends RequestHandler {
                 if (userManager.getUserRole(uid)!= UserRole.MEMBER)
                     continue;
                 user.username = userManager.getUsername(uid);
-            } catch (InvalidUserIDException e) {
+            } catch (InvalidIDException e) {
                 throw new RuntimeException("The user id got from the set of all user ids is invalid.");
             }
             allMem.add(user);
@@ -240,7 +241,7 @@ public class UserRequestHandler extends RequestHandler {
         return allMem;
     }
 
-    private Set<GeneralUserInfoResponseBody> getAllMembersExcludeFriendsOf(String targetUser) throws InvalidUserIDException {
+    private Set<GeneralUserInfoResponseBody> getAllMembersExcludeFriendsOf(String targetUser) throws InvalidIDException {
         Set<String> AllIDs = userManager.getAllUserIDs();
         Set<String> friendIDs = userManager.getFriendList(targetUser);
         Set<GeneralUserInfoResponseBody> allMem = new HashSet<>();
@@ -253,7 +254,7 @@ public class UserRequestHandler extends RequestHandler {
                 if (userManager.getUserRole(uid)!= UserRole.MEMBER || uid.equals(targetUser))
                     continue;
                 user.username = userManager.getUsername(uid);
-            } catch (InvalidUserIDException e) {
+            } catch (InvalidIDException e) {
                 throw new RuntimeException("The user id got from the set of all user ids is invalid.");
             }
             allMem.add(user);
@@ -266,7 +267,7 @@ public class UserRequestHandler extends RequestHandler {
         try {
             userManager.addPendingFriend(body.receiverID, body.senderID);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
@@ -280,7 +281,7 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 204, null);
         } catch (InvalidUsernameException | InvalidEmailException e) {
             sendResponse(exchange, 403, "Invalid username or email");
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             throw new RuntimeException("Corrupted data: Invalid Email");
         }
     }
@@ -290,7 +291,7 @@ public class UserRequestHandler extends RequestHandler {
         try {
             userManager.deleteUser(body.userID);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }
     }
@@ -314,10 +315,11 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 412, "Password isn't strong enough.");
         } catch (InvalidEmailException e) {
             sendResponse(exchange, 400, "Invalid email.");
-        } catch (InvalidUserIDException e) {
-            sendResponse(exchange, 404, "Invalid user ID");
-        } catch (InvalidGameIDException e) {
-            throw new RuntimeException("Fatal: the game ID got from user data is invalid.");
+        } catch (InvalidIDException e) {
+            if (e.getIDType() == IDType.USER)
+                sendResponse(exchange, 404, "Invalid user ID");
+            else if (e.getIDType() == IDType.GAME)
+                throw new RuntimeException("Fatal: the game ID got from user data is invalid.");
         }
     }
 
@@ -336,13 +338,13 @@ public class UserRequestHandler extends RequestHandler {
             sendResponse(exchange, 200, gson.toJson(resBody));
         } catch (InvalidUsernameException | IncorrectPasswordException | ExpiredUserException e) {
             sendResponse(exchange, 400, "User doesn't exist, is expired, or the password is incorrect.");
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             throw new RuntimeException("Invalid user ID. This should never happen.");
         } catch (BannedUserException e) {
             try {
                 sendResponse(exchange, 403, "This account has been suspended. Last suspension date: " +
                         userManager.getBanLiftingDate(userManager.getUserId(body.username)));
-            } catch (InvalidUserIDException | InvalidUsernameException exc) {
+            } catch (InvalidIDException | InvalidUsernameException exc) {
                 throw new RuntimeException("Fatal: Banned user has invalid user ID or username.");
             }
         }
@@ -353,7 +355,7 @@ public class UserRequestHandler extends RequestHandler {
         try {
             userManager.logout(body.userID);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 404, "Invalid user ID.");
         }
     }
@@ -373,8 +375,7 @@ public class UserRequestHandler extends RequestHandler {
                 frb.username = userManager.getUsername(id);
                 dataSet.add(frb);
             }
-
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             throw new RuntimeException("A friend ID in the friend list is invalid. This should never happen.");
         }
         //send response
@@ -397,7 +398,7 @@ public class UserRequestHandler extends RequestHandler {
                 frb.username = userManager.getUsername(id);
                 dataSet.add(frb);
             }
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             throw new RuntimeException("A user in this pending list has an invalid ID. This means illegal datum.");
         }
         //send response
@@ -434,8 +435,8 @@ public class UserRequestHandler extends RequestHandler {
             body.userID = userID;
             body.email = userManager.getEmail(userID);
             sendResponse(exchange, 200, gson.toJson(body));
-        } catch (InvalidUserIDException | InvalidUsernameException e) {
-            e.printStackTrace();
+        } catch (InvalidIDException e) {
+            sendResponse(exchange, 400, "Invalid User ID provided.");
         }
     }
 
@@ -445,8 +446,8 @@ public class UserRequestHandler extends RequestHandler {
             return;
         try {
             sendResponse(exchange, 200, "{\"username\":\"" + userManager.getUsername(userID)+"\"}");
-        } catch (InvalidUserIDException e) {
-            e.printStackTrace();
+        } catch (InvalidIDException e) {
+            sendResponse(exchange, 400, "Invalid user ID");
         }
     }
 
@@ -457,7 +458,7 @@ public class UserRequestHandler extends RequestHandler {
                 return;
             userManager.banUser(body.adminID, body.userID, body.banLength);
             sendResponse(exchange, 204, null);
-        } catch (InvalidUserIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid user ID.");
         }
     }

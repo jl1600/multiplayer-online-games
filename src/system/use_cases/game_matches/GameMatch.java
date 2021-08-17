@@ -2,8 +2,8 @@ package system.use_cases.game_matches;
 
 import shared.constants.MatchStatus;
 import shared.exceptions.use_case_exceptions.DuplicateUserIDException;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
-import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import shared.exceptions.use_case_exceptions.MaxPlayerReachedException;
 
 import java.util.Map;
@@ -137,17 +137,17 @@ public abstract class GameMatch extends Observable {
      * Remove a player from the match.
      *
      * @param playerID The unique string identifier of the player.
-     * @throws InvalidUserIDException if the input playerID is not found in the match.
+     * @throws InvalidIDException if the input playerID is not found in the match.
      */
-    public abstract void removePlayer(String playerID) throws InvalidUserIDException;
+    public abstract void removePlayer(String playerID) throws InvalidIDException;
 
     /**
      * Play a game move. Do nothing if the match status is finished.
      *
      * @param playerID The unique string identifier of the player.
      * @param move     The string representing the player input
-     * @throws InvalidUserIDException if the input player's userID is not found
+     * @throws InvalidIDException if the input player's userID is not found
      * @throws InvalidInputException  if the input move is not recognized.
      */
-    public abstract void playMove(String playerID, String move) throws InvalidUserIDException, InvalidInputException;
+    public abstract void playMove(String playerID, String move) throws InvalidIDException, InvalidInputException;
 }

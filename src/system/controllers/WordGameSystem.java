@@ -1,7 +1,7 @@
 package system.controllers;
 
 import com.sun.net.httpserver.HttpServer;
-import shared.exceptions.use_case_exceptions.InvalidUserIDException;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import system.gateways.*;
 import system.use_cases.managers.*;
 import system.utilities.EmailService;
@@ -22,9 +22,9 @@ public class WordGameSystem {
     /**
      * Constructor of WordGameSystem
      * @throws IOException issue detected regarding input-output
-     * @throws InvalidUserIDException the user id responsible for this exception is not in the userManager's user list
+     * @throws InvalidIDException the user id responsible for this exception is not in the userManager's user list
      */
-    public WordGameSystem() throws IOException, InvalidUserIDException{
+    public WordGameSystem() throws IOException, InvalidIDException {
 
         GameDataGateway gameGateway = new GameDataMapper();
         GameManager gm = new GameManager(gameGateway);
@@ -71,7 +71,7 @@ public class WordGameSystem {
             server.run();
         } catch (IOException e) {
             throw new RuntimeException("Problem connecting to the database.");
-        }  catch (InvalidUserIDException e) {
+        }  catch (InvalidIDException e) {
             throw new RuntimeException("User ID not found in database");
         }
     }

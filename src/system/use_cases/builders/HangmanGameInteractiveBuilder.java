@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import shared.constants.GameAccessLevel;
-import shared.exceptions.use_case_exceptions.InsufficientInputException;
+import shared.exceptions.use_case_exceptions.NotReadyException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.hangman.HangmanGame;
 import system.entities.template.HangmanTemplate;
@@ -188,13 +188,13 @@ public class HangmanGameInteractiveBuilder extends GameInteractiveBuilder {
      * build this game
      * @param id the gameID to be assigned to the game
      * @return the current built game
-     * @throws InsufficientInputException if there isn't enough inputs given to fulfills the least requirement to build yet
+     * @throws NotReadyException if there isn't enough inputs given to fulfills the least requirement to build yet
      */
     @Override
-    public HangmanGame build(String id) throws InsufficientInputException {
+    public HangmanGame build(String id) throws NotReadyException {
 
         if (!isReadyToBuild())
-            throw new InsufficientInputException();
+            throw new NotReadyException();
 
         currentGame.setID(id);
         return currentGame;

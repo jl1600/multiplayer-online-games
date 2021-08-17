@@ -1,6 +1,6 @@
 package system.controllers;
 
-import shared.exceptions.use_case_exceptions.InvalidMatchIDException;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import system.use_cases.managers.MatchManager;
 
 import javax.xml.bind.DatatypeConverter;
@@ -45,12 +45,12 @@ public class ClientSocketSeeker extends Thread {
     public void run() {
         try {
             acceptPlayerSocket();
-        } catch (IOException | InvalidMatchIDException e) {
+        } catch (IOException | InvalidIDException e) {
             e.printStackTrace();
         }
     }
 
-    private void acceptPlayerSocket() throws IOException, InvalidMatchIDException {
+    private void acceptPlayerSocket() throws IOException, InvalidIDException {
         Socket connection = serverSocket.accept();
         handShake(connection);
         String playerID = PlayerInputListener.readWSMessage(connection.getInputStream());

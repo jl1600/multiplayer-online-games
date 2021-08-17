@@ -1,6 +1,6 @@
 package system.use_cases.builders;
 
-import shared.exceptions.use_case_exceptions.InsufficientInputException;
+import shared.exceptions.use_case_exceptions.NotReadyException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.Game;
 
@@ -57,7 +57,7 @@ public abstract class GameInteractiveBuilder {
      * Returns the Game object this builder has been building.
      * @param id the gameID to be assigned to the game
      * @return the game object
-     * @throws InsufficientInputException if the game is not fully formed
+     * @throws NotReadyException if the game is not fully formed
      */
-    public abstract Game build(String id) throws InsufficientInputException;
+    public abstract Game build(String id) throws NotReadyException;
 }

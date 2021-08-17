@@ -7,7 +7,7 @@
     - Gson can be installed through Intellij Maven by going through
       File -> Project Structure -> modules -> Dependencies -> '+' -> libraries -> From Maven
       and type in com.google.code.gson:gson:2.8.7
-      
+
 ## Running instruction
 
 0. Make sure you don't have anything running on port 8080 and 8000

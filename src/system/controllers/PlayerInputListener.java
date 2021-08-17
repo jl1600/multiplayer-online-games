@@ -3,15 +3,14 @@ package system.controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import shared.DTOs.sockets.MatchInput;
+import shared.constants.IDType;
 import shared.constants.MatchStatus;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
-import shared.exceptions.use_case_exceptions.InvalidMatchIDException;
-import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import system.use_cases.managers.MatchManager;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 /**
  * PlayerInputListener Class
@@ -62,7 +61,7 @@ public class PlayerInputListener extends Thread {
                     } catch (JsonSyntaxException e) {
                         try {
                             manager.removePlayer(playerID, matchID);
-                        } catch (InvalidMatchIDException | InvalidUserIDException invalidMatchIDException) {
+                        } catch (InvalidIDException e2) {
                             System.out.println("Match no longer exist or player already removed.");
                         }
                         return; // Terminate this thread.
@@ -77,25 +76,24 @@ public class PlayerInputListener extends Thread {
                         manager.playGameMove(playerID, matchID, inData.gameMove);
                     }
                 }
-            } catch (InvalidMatchIDException e) {
-                throw new RuntimeException("Match ID is invalid. This should never happen.");
+            } catch (InvalidIDException e) {
+                throw new RuntimeException("Match ID or Player ID is invalid. This should never happen.");
+
             } catch (InvalidInputException e) {
                 try {
                     MatchOutputDispatcher.sendWSMessage(outStream, "Invalid input.");
                 } catch (IOException ioException) {
                     try {
                         manager.removePlayer(playerID, matchID);
-                    } catch (InvalidMatchIDException | InvalidUserIDException invalidMatchIDException) {
+                    } catch (InvalidIDException e3) {
                         System.out.println("Match no longer exist or player already removed.");
                     }
                     return; // Terminate this thread.
                 }
-            } catch (InvalidUserIDException e) {
-                throw new RuntimeException("Invalid player ID. This should never happen.");
             } catch (IOException e) {
                 try {
                     manager.removePlayer(playerID, matchID);
-                } catch (InvalidMatchIDException | InvalidUserIDException invalidMatchIDException) {
+                } catch (InvalidIDException e4) {
                     System.out.println("Match no longer exist or player already removed.");
                 }
             }

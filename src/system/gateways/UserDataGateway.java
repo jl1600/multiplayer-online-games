@@ -1,11 +1,9 @@
 package system.gateways;
 
-import shared.exceptions.use_case_exceptions.InvalidUserIDException;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import system.entities.User;
 
 import java.io.*;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -26,9 +24,9 @@ public interface UserDataGateway {
      *
      * @param user user to update.
      * @throws IOException            if the database is not found
-     * @throws InvalidUserIDException if the user does not exist
+     * @throws InvalidIDException if the user does not exist
      */
-    void updateUser(User user) throws IOException, InvalidUserIDException;
+    void updateUser(User user) throws IOException, InvalidIDException;
 
     /**
      * Deletes the user with the specified userId from the database.

@@ -1,6 +1,7 @@
 package system.use_cases.managers;
 
 import shared.constants.GameGenre;
+import shared.constants.IDType;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.template.Template;
 import system.gateways.TemplateDataGateway;
@@ -77,9 +78,9 @@ public class TemplateManager {
     /**
      * Returns the genre, a.k.a the type of the template
      * */
-    public GameGenre getGenre(String templateID) throws InvalidTemplateIDException {
+    public GameGenre getGenre(String templateID) throws InvalidIDException {
         if (!templates.containsKey(templateID))
-            throw new InvalidTemplateIDException();
+            throw new InvalidIDException(IDType.TEMPLATE);
 
         return templates.get(templateID).getGenre();
     }
@@ -91,13 +92,13 @@ public class TemplateManager {
      * @param templateID the specified template's id
      * @throws NoSuchAttributeException specified attribute is in template's attribute last or attribute is null
      * @throws InvalidInputException when parameters are illegal and passed a null value
-     * @throws InvalidTemplateIDException specified template id is not in template list or id is null
+     * @throws InvalidIDException specified template id is not in template list or id is null
      */
     public void editTemplate(Map<String, String> attrMap, String templateID) throws
-            NoSuchAttributeException, InvalidInputException, InvalidTemplateIDException {
+            NoSuchAttributeException, InvalidInputException, InvalidIDException {
 
         if (!templates.containsKey(templateID))
-            throw new InvalidTemplateIDException();
+            throw new InvalidIDException(IDType.TEMPLATE);
 
         TemplateEditorFactory factory = new TemplateEditorFactory();
         TemplateEditor editor = factory.getTemplateEditor(templates.get(templateID));
@@ -116,12 +117,12 @@ public class TemplateManager {
      * get a specified templateID's attribute map
      * @param templateID the specified template's id
      * @return that specified template's attribute map
-     * @throws InvalidTemplateIDException specified template id is not in template list or id is null
+     * @throws InvalidIDException specified template id is not in template list or id is null
      */
-    public Map<String, String> getAttributeMap(String templateID) throws InvalidTemplateIDException {
+    public Map<String, String> getAttributeMap(String templateID) throws InvalidIDException {
 
         if (!templates.containsKey(templateID))
-            throw new InvalidTemplateIDException();
+            throw new InvalidIDException(IDType.TEMPLATE);
 
         TemplateEditorFactory factory = new TemplateEditorFactory();
         TemplateEditor editor = factory.getTemplateEditor(templates.get(templateID));
@@ -153,7 +154,7 @@ public class TemplateManager {
      */
     public Template getTemplate(String id) throws InvalidIDException {
         if (!templates.containsKey(id))
-            throw new InvalidIDException();
+            throw new InvalidIDException(IDType.TEMPLATE);
 
         return templates.get(id);
     }

@@ -2,6 +2,7 @@ package system.use_cases.managers;
 
 import shared.constants.GameAccessLevel;
 import shared.constants.GameGenre;
+import shared.constants.IDType;
 import shared.exceptions.entities_exception.IDNotYetSetException;
 import shared.exceptions.use_case_exceptions.*;
 
@@ -117,17 +118,17 @@ public class GameManager {
      *
      * @param creatorID The string identifier of the user that is building this game.
      * @throws NoCreationInProgressException No such user with such ID is building any game.
-     * @throws InsufficientInputException    Game is not ready to be built. Need more input.
+     * @throws NotReadyException    Game is not ready to be built. Need more input.
      */
     public String buildGame(String creatorID)
-            throws NoCreationInProgressException, InsufficientInputException {
+            throws NoCreationInProgressException, NotReadyException {
 
         if (!gameBuilders.containsKey(creatorID)) {
             throw new NoCreationInProgressException();
         }
 
         if (!gameBuilders.get(creatorID).isReadyToBuild())
-            throw new InsufficientInputException();
+            throw new NotReadyException();
 
         String id;
         try {
@@ -150,17 +151,17 @@ public class GameManager {
      *
      * @param creatorID The string identifier of the user that is building this game.
      * @throws NoCreationInProgressException No such user with such ID is building any game.
-     * @throws InsufficientInputException    Game is not ready to be built. Need more input.
+     * @throws NotReadyException    Game is not ready to be built. Need more input.
      */
     public String buildTemporaryGame(String creatorID)
-            throws NoCreationInProgressException, InsufficientInputException {
+            throws NoCreationInProgressException, NotReadyException {
 
         if (!gameBuilders.containsKey(creatorID)) {
             throw new NoCreationInProgressException();
         }
 
         if (!gameBuilders.get(creatorID).isReadyToBuild())
-            throw new InsufficientInputException();
+            throw new NotReadyException();
 
         String id;
         try {
@@ -178,9 +179,9 @@ public class GameManager {
     /**
      * Save the temporary game with the given ID to the database.
      */
-    public void saveTemporaryGame(String gameID) throws InvalidGameIDException {
+    public void saveTemporaryGame(String gameID) throws InvalidIDException {
         if (!temporaryGames.containsKey(gameID))
-            throw new InvalidGameIDException();
+            throw new InvalidIDException(IDType.GAME);
         try {
             gateway.addGame(temporaryGames.remove(gameID));
         } catch (IOException e) {
@@ -196,7 +197,7 @@ public class GameManager {
      */
     public Game getGame(String id) throws InvalidIDException {
         if (!games.containsKey(id))
-            throw new InvalidIDException();
+            throw new InvalidIDException(IDType.GAME);
         return games.get(id);
     }
 
@@ -226,9 +227,9 @@ public class GameManager {
      * @param gameID          The ID of the game.
      * @param gameAccessLevel The value representing whether the game is public, private, friends only, deleted
      */
-    public void setGameAccessLevel(String gameID, GameAccessLevel gameAccessLevel) throws InvalidGameIDException {
+    public void setGameAccessLevel(String gameID, GameAccessLevel gameAccessLevel) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
-            throw new InvalidGameIDException();
+            throw new InvalidIDException(IDType.GAME);
         }
         if (gameAccessLevel != null) {
             games.get(gameID).setGameAccessLevel(gameAccessLevel);
@@ -246,9 +247,9 @@ public class GameManager {
      * Revert the publicity status of the game based on its stored value
      * @param gameID The ID of the game.
      * */
-    public void undoSetGameAccessLevel(String gameID) throws InvalidGameIDException {
+    public void undoSetGameAccessLevel(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
-            throw new InvalidGameIDException();
+            throw new InvalidIDException(IDType.GAME);
         }
         GameAccessLevel currentAC = games.get(gameID).getGameAccessLevel();
         GameAccessLevel prevAC = games.get(gameID).getPreviousGameAccessLevel();
@@ -269,9 +270,9 @@ public class GameManager {
      *
      * @param gameID The unique string identifier of the game
      */
-    public boolean checkIsPublic(String gameID) throws InvalidGameIDException {
+    public boolean checkIsPublic(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
-            throw new InvalidGameIDException();
+            throw new InvalidIDException(IDType.GAME);
         }
         return games.get(gameID).isPublic();
     }
@@ -279,9 +280,9 @@ public class GameManager {
     /**
      * Returns the genre of the game.
      */
-    public GameGenre getGenre(String gameID) throws InvalidGameIDException {
+    public GameGenre getGenre(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
-            throw new InvalidGameIDException();
+            throw new InvalidIDException(IDType.GAME);
         }
         return games.get(gameID).getGenre();
     }
@@ -291,9 +292,9 @@ public class GameManager {
      *
      * @param gameID The unique string identifier of the game
      */
-    public String getGameTitle(String gameID) throws InvalidGameIDException {
+    public String getGameTitle(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
-            throw new InvalidGameIDException();
+            throw new InvalidIDException(IDType.GAME);
         }
         return games.get(gameID).getTitle();
     }
@@ -303,9 +304,9 @@ public class GameManager {
      *
      * @param gameID The unique string identifier of the game
      */
-    public String getTemplateID(String gameID) throws InvalidGameIDException {
+    public String getTemplateID(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
-            throw new InvalidGameIDException();
+            throw new InvalidIDException(IDType.GAME);
         }
         return games.get(gameID).getTemplateID();
     }
@@ -315,9 +316,9 @@ public class GameManager {
      *
      * @param gameID The unique string identifier of the game
      */
-    public String getOwnerID(String gameID) throws InvalidGameIDException {
+    public String getOwnerID(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
-            throw new InvalidGameIDException();
+            throw new InvalidIDException(IDType.GAME);
         }
         return games.get(gameID).getOwnerId();
     }
@@ -326,11 +327,11 @@ public class GameManager {
      * get a specified game's access level
      * @param gameID the inputted game id
      * @return the access level of the parameter game id
-     * @throws InvalidGameIDException if gameID is not in the current games list or is null
+     * @throws InvalidIDException if gameID is not in the current games list or is null
      */
-    public GameAccessLevel getAccessLevel(String gameID) throws InvalidGameIDException {
+    public GameAccessLevel getAccessLevel(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
-            throw new InvalidGameIDException();
+            throw new InvalidIDException(IDType.GAME);
         }
         return games.get(gameID).getGameAccessLevel();
     }
@@ -339,11 +340,11 @@ public class GameManager {
      * get a specified game's previous access level
      * @param gameID the inputted game id
      * @return the access level of the parameter game id
-     * @throws InvalidGameIDException if gameID is not in the current games list or is null
+     * @throws InvalidIDException if gameID is not in the current games list or is null
      */
-    public GameAccessLevel getPreviousAccessLevel(String gameID) throws InvalidGameIDException {
+    public GameAccessLevel getPreviousAccessLevel(String gameID) throws InvalidIDException {
         if (!games.containsKey(gameID)) {
-            throw new InvalidGameIDException();
+            throw new InvalidIDException(IDType.GAME);
         }
         return games.get(gameID).getPreviousGameAccessLevel();
     }
@@ -374,7 +375,6 @@ public class GameManager {
      */
     public Set<String> getOwnedFriendOnlyGameID(String userID) {
         Set<String> friendOnlyGameIDs = new HashSet<>();
-
         for (String id : games.keySet()) {
             //if owner id match and game is FRIEND only
             String ownerID = games.get(id).getOwnerId();

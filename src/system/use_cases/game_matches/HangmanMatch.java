@@ -2,6 +2,7 @@ package system.use_cases.game_matches;
 
 import java.lang.String;
 
+import shared.constants.IDType;
 import shared.constants.MatchStatus;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.game.hangman.HangmanGame;
@@ -162,16 +163,16 @@ public class HangmanMatch extends GameMatch {
     /**
      * remove a player from the current match
      * @param playerID The unique string identifier of the player.
-     * @throws InvalidUserIDException this user does not exist in system's list of users or is null
+     * @throws InvalidIDException this user does not exist in system's list of users or is null
      */
     @Override
-    public void removePlayer(String playerID) throws InvalidUserIDException {
+    public void removePlayer(String playerID) throws InvalidIDException {
         if (players.contains(playerID)) {
             players.remove(playerID);
             setChanged();
             notifyObservers();
         } else {
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         }
     }
 

@@ -1,6 +1,8 @@
 package system.use_cases.managers;
 
 import java.util.*;
+
+import shared.constants.IDType;
 import shared.constants.OnlineStatus;
 import shared.constants.UserRole;
 import shared.exceptions.entities_exception.IDAlreadySetException;
@@ -22,7 +24,7 @@ public class UserManager {
     private final IdManager idManager;
     private final UserDataGateway gateway;
 
-    public UserManager(UserDataGateway gateway) throws IOException, InvalidUserIDException {
+    public UserManager(UserDataGateway gateway) throws IOException, InvalidIDException {
         users = new HashMap<>();
         userIds = new HashMap<>();
         this.gateway = gateway;
@@ -54,15 +56,15 @@ public class UserManager {
         return userIds.get(username);
     }
 
-    public String getEmail(String userID) throws InvalidUsernameException, InvalidUserIDException {
+    public String getEmail(String userID) throws InvalidIDException {
         if (!users.containsKey(userID))
-            throw new InvalidUsernameException();
+            throw new InvalidIDException(IDType.USER);
 
         return getUser(userID).getEmail();
     }
 
-    private boolean isPasswordIncorrect(String userId, String password) throws InvalidUserIDException {
-        if (!users.containsKey(userId)) throw new InvalidUserIDException();
+    private boolean isPasswordIncorrect(String userId, String password) throws InvalidIDException {
+        if (!users.containsKey(userId)) throw new InvalidIDException(IDType.USER);
 
         return !getUser(userId).isPassword(password);
     }
@@ -70,11 +72,11 @@ public class UserManager {
     /**
      * @param userId the id of the user to retrieve
      * @return the user with the specified id
-     * @throws InvalidUserIDException if no user has the specified id
+     * @throws InvalidIDException if no user has the specified id
      */
-    public User getUser(String userId) throws InvalidUserIDException {
+    public User getUser(String userId) throws InvalidIDException {
         if (!users.containsKey(userId))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
 
         return users.get(userId);
     }
@@ -82,11 +84,11 @@ public class UserManager {
     /**
      * @param userId the id of the user
      * @return the role of the user with the specified id
-     * @throws InvalidUserIDException if no user has the specified id
+     * @throws InvalidIDException if no user has the specified id
      */
-    public UserRole getUserRole(String userId) throws InvalidUserIDException {
+    public UserRole getUserRole(String userId) throws InvalidIDException {
         if (!users.containsKey(userId))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
 
         return users.get(userId).getRole();
     }
@@ -246,7 +248,7 @@ public class UserManager {
                 throw new ExpiredUserException();
             }
             getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
-        } catch (InvalidUserIDException e1) {
+        } catch (InvalidIDException e1) {
             throw new RuntimeException("System failure: The database ID associated with this user is invalid.");
         }
         return userId;
@@ -262,7 +264,7 @@ public class UserManager {
         return false;
     }
 
-    private boolean isBanned(String userId) throws InvalidUserIDException {
+    private boolean isBanned(String userId) throws InvalidIDException {
         Date currentTime = Calendar.getInstance().getTime();
 
         if (getUser(userId).getOnlineStatus().equals(OnlineStatus.BANNED)){//if banned go in bracket
@@ -275,15 +277,15 @@ public class UserManager {
 
     /**
      *
-     * @throws InvalidUserIDException when the user is not banned or there is no such user.
+     * @throws InvalidIDException when the user is not banned or there is no such user.
      */
-    public Date getBanLiftingDate(String userID) throws InvalidUserIDException {
+    public Date getBanLiftingDate(String userID) throws InvalidIDException {
         if (!users.containsKey(userID) || users.get(userID).getOnlineStatus() != OnlineStatus.BANNED)
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         return users.get(userID).getLastBanDate();
     }
 
-    private boolean isExpiredUser(String userId) throws InvalidUserIDException {
+    private boolean isExpiredUser(String userId) throws InvalidIDException {
         Date currentTime = Calendar.getInstance().getTime();
         //getTime return a long that is total millisec since Jan 1st 1970
         //add 30 days in millisec gives the expiration date
@@ -295,11 +297,11 @@ public class UserManager {
     /**
      * Logs out the user with the specified id
      * @param userId id of the user to log out
-     * @throws InvalidUserIDException if no user has the specified userId
+     * @throws InvalidIDException if no user has the specified userId
      */
-    public void logout(String userId) throws InvalidUserIDException, IOException {
+    public void logout(String userId) throws InvalidIDException, IOException {
         if (!users.containsKey(userId))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         if (getUser(userId).getOnlineStatus() != OnlineStatus.BANNED){
             getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
         }
@@ -314,9 +316,9 @@ public class UserManager {
 
     }
 
-    public String getUsername(String userId) throws InvalidUserIDException {
+    public String getUsername(String userId) throws InvalidIDException {
         if (!users.containsKey(userId))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         return users.get(userId).getUsername();
     }
 
@@ -326,12 +328,12 @@ public class UserManager {
      * @param userId id of the user
      * @param oldPassword current password of the user to confirm the action
      * @param newPassword the password to change into
-     * @throws InvalidUserIDException if no user has the specified userId
+     * @throws InvalidIDException if no user has the specified userId
      * @throws IncorrectPasswordException if oldPassword does not match the user's current password
      * @throws WeakPasswordException if the password is too weak
      */
     public void editPassword(String userId, String oldPassword, String newPassword) throws
-            IncorrectPasswordException, InvalidUserIDException, WeakPasswordException {
+            IncorrectPasswordException, InvalidIDException, WeakPasswordException {
         if (isPasswordIncorrect(userId, oldPassword) && isTempPasswordIncorrect(userId, newPassword)){
             throw new IncorrectPasswordException();
         }
@@ -358,12 +360,12 @@ public class UserManager {
      * @param userId id of the trial user
      * @param username username of the user to create
      * @param password password of the user to create
-     * @throws InvalidUserIDException if no user has the specified userId
+     * @throws InvalidIDException if no user has the specified userId
      * @throws DuplicateUsernameException if the username is already taken
      * @throws UnaccountedUserRoleException if the user specified user is not a trial user
      */
     public void promoteTrialUser(String userId, String username, String email, UserRole role, String password) throws
-            InvalidUserIDException, DuplicateUsernameException, UnaccountedUserRoleException {
+            InvalidIDException, DuplicateUsernameException, UnaccountedUserRoleException {
         if (userIds.containsKey(username)) throw new DuplicateUsernameException();
 
         User user = getUser(userId);
@@ -388,11 +390,11 @@ public class UserManager {
      * @param userId id of the user
      * @param newUsername the username to change into
      * @throws IDAlreadySetException if the username is already taken
-     * @throws InvalidUserIDException if no user has the specified userId
+     * @throws InvalidIDException if no user has the specified userId
      */
-    public void editUsername(String userId, String newUsername) throws InvalidUserIDException, DuplicateUsernameException {
+    public void editUsername(String userId, String newUsername) throws InvalidIDException, DuplicateUsernameException {
         if (!users.containsKey(userId))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         if (userIds.containsKey(newUsername) && !newUsername.equals(getUser(userId).getUsername()))
             throw new DuplicateUsernameException();
 
@@ -409,9 +411,9 @@ public class UserManager {
     }
 
 
-    public void editEmail(String userId, String newEmail) throws IOException, InvalidUserIDException {
+    public void editEmail(String userId, String newEmail) throws IOException, InvalidIDException {
         if (!users.containsKey(userId))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
 
         User user = getUser(userId);
         user.setEmail(newEmail);
@@ -421,9 +423,9 @@ public class UserManager {
     /**
      * Delete the user with the specified id from this class and the database
      * @param userId id of the user to delete
-     * @throws InvalidUserIDException if no user has the specified userId
+     * @throws InvalidIDException if no user has the specified userId
      */
-    public void deleteUser(String userId) throws InvalidUserIDException {
+    public void deleteUser(String userId) throws InvalidIDException {
             String username = users.get(userId).getUsername();
             users.remove(userId);
             userIds.remove(username);
@@ -439,9 +441,9 @@ public class UserManager {
      * @param userID The ID of the user.
      * @param gameID The Id of the game.
      * */
-    public void addOwnedGameID(String userID, String gameID) throws InvalidUserIDException, IOException {
+    public void addOwnedGameID(String userID, String gameID) throws InvalidIDException, IOException {
         if (!users.containsKey(userID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
 
         User user = users.get(userID);
         user.addGameID(gameID);
@@ -455,35 +457,35 @@ public class UserManager {
      * Returns the set of all game IDs created by this user.
      * @param userID The ID of the user.
      * */
-    public Set<String> getOwnedGamesID(String userID) throws InvalidUserIDException {
+    public Set<String> getOwnedGamesID(String userID) throws InvalidIDException {
         if (!users.containsKey(userID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
 
         return users.get(userID).getGameCreationSet();
     }
 
 
-    public Set<String> getFriendList(String userID) throws InvalidUserIDException {
+    public Set<String> getFriendList(String userID) throws InvalidIDException {
         if (!users.containsKey(userID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
 
         return users.get(userID).getFriendList();
     }
 
 
-    public Set<String> getPendingFriendList(String userID) throws InvalidUserIDException {
+    public Set<String> getPendingFriendList(String userID) throws InvalidIDException {
         if (!users.containsKey(userID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
 
         return users.get(userID).getPendingFriendList();
     }
 
-    public void addPendingFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
+    public void addPendingFriend(String ownerID, String subjectID) throws InvalidIDException, IOException {
         if (!users.containsKey(subjectID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
 
         if (!users.containsKey(ownerID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
 
         if (!users.get(ownerID).getPendingFriendList().contains(subjectID)){//to avoid duplicate sends
             users.get(ownerID).addPendingFriend(subjectID);
@@ -496,39 +498,39 @@ public class UserManager {
         return new HashSet<>(users.keySet());
     }
 
-    public void removePendingFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
+    public void removePendingFriend(String ownerID, String subjectID) throws InvalidIDException, IOException {
         if (!users.containsKey(subjectID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         if (!users.containsKey(ownerID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         users.get(ownerID).removePendingFriend(subjectID);
         gateway.updateUser(users.get(ownerID));
     }
 
-    public void addFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
+    public void addFriend(String ownerID, String subjectID) throws InvalidIDException, IOException {
         if (!users.containsKey(subjectID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         if (!users.containsKey(ownerID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         users.get(ownerID).addFriend(subjectID);
         gateway.updateUser(users.get(ownerID));
 
     }
 
-    public void removeFriend(String ownerID, String subjectID) throws InvalidUserIDException, IOException {
+    public void removeFriend(String ownerID, String subjectID) throws InvalidIDException, IOException {
         if (!users.containsKey(subjectID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         if (!users.containsKey(ownerID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         users.get(ownerID).removeFriend(subjectID);
         gateway.updateUser(users.get(ownerID));
 
     }
 
-    public void banUser(String adminID, String subjectID, int duration) throws InvalidUserIDException, IOException{
+    public void banUser(String adminID, String subjectID, int duration) throws InvalidIDException, IOException{
 
         if (!users.containsKey(subjectID) || !users.containsKey(adminID))
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
 
         if (users.get(adminID).getRole() != UserRole.ADMIN)
             throw new InsufficientPrivilegeException();

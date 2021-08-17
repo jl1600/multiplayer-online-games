@@ -101,7 +101,7 @@ public class TemplateRequestHandler extends RequestHandler {
             sendResponse(exchange, 204, null);
         } catch (NoSuchAttributeException | InvalidInputException e) {
             sendResponse(exchange, 400, "Invalid attribute name or attribute value.");
-        } catch (InvalidTemplateIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 404, "Invalid template ID.");
         }
     }
@@ -115,7 +115,7 @@ public class TemplateRequestHandler extends RequestHandler {
             body.templateID = templateID;
             body.attrMap = templateManager.getAttributeMap(templateID);
             sendResponse(exchange, 200, gson.toJson(body));
-        } catch (InvalidTemplateIDException e) {
+        } catch (InvalidIDException e) {
             sendResponse(exchange, 400, "Invalid Template ID.");
         }
     }
@@ -131,7 +131,7 @@ public class TemplateRequestHandler extends RequestHandler {
                 datum.templateID = id;
                 datum.title = templateManager.getTemplateTitle(id);
                 dataSet.add(datum);
-            } catch (InvalidTemplateIDException e) {
+            } catch (InvalidIDException e) {
                throw new RuntimeException("System failure: The template ID got from template manager is invalid");
             }
         }

@@ -1,7 +1,7 @@
 package system.entities.game.hangman;
 
 import shared.constants.GameGenre;
-import shared.exceptions.use_case_exceptions.InsufficientInputException;
+import shared.exceptions.use_case_exceptions.NotReadyException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.Game;
 
@@ -35,7 +35,7 @@ public class HangmanGame extends Game {
      *
      * @param answer the puzzle to be added
      * @param prompt the prompt of the puzzle
-     * @throws InsufficientInputException when parameters are illegal and passed a null value
+     * @throws NotReadyException when parameters are illegal and passed a null value
      */
     public void addPuzzle(String answer, String prompt) throws InvalidInputException {
         if (answer == null | prompt == null) {

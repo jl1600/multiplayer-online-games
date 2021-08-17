@@ -1,9 +1,10 @@
 package system.use_cases.game_matches;
 
+import shared.constants.IDType;
 import shared.constants.MatchStatus;
 import shared.exceptions.use_case_exceptions.DuplicateUserIDException;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
-import shared.exceptions.use_case_exceptions.InvalidUserIDException;
 import shared.exceptions.use_case_exceptions.MaxPlayerReachedException;
 import system.entities.game.quiz.QuizGame;
 import system.entities.template.QuizTemplate;
@@ -152,16 +153,16 @@ public class QuizGameMatch extends GameMatch {
     /**
      * remove a player from current match
      * @param playerID The unique string identifier of the player.
-     * @throws InvalidUserIDException if user id is not in current player list or is null
+     * @throws InvalidIDException if user id is not in current player list or is null
      */
     @Override
-    public void removePlayer(String playerID) throws InvalidUserIDException {
+    public void removePlayer(String playerID) throws InvalidIDException {
         if (playerStats.containsKey(playerID)) {
             this.playerStats.remove(playerID);
             setChanged();
             notifyObservers();
         }
-        else throw  new InvalidUserIDException();
+        else throw  new InvalidIDException(IDType.USER);
     }
 
     private boolean containPlayer(String playerID) {
@@ -305,14 +306,14 @@ public class QuizGameMatch extends GameMatch {
      * play a move based on appropriate parameters
      * @param playerID The unique string identifier of the player.
      * @param move     The string representing the player input
-     * @throws InvalidUserIDException If the user id is not in current user list or is null
+     * @throws InvalidIDException If the user id is not in current user list or is null
      * @throws InvalidInputException when parameters are illegal and passed a null value
      */
     @Override
-    public void playMove(String playerID, String move) throws InvalidUserIDException, InvalidInputException {
+    public void playMove(String playerID, String move) throws InvalidIDException, InvalidInputException {
 
         if (!containPlayer(playerID)) {
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         }
 
         if (getStatus() == MatchStatus.PREPARING) {

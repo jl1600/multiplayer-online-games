@@ -2,7 +2,8 @@ package system.gateways;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import shared.exceptions.use_case_exceptions.InvalidUserIDException;
+import shared.constants.IDType;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import system.entities.User;
 
 import java.io.*;
@@ -39,11 +40,11 @@ public class UserDataMapper implements UserDataGateway {
     /**
      * {@inheritDoc}
      */
-    public void updateUser(User user) throws InvalidUserIDException, IOException {
+    public void updateUser(User user) throws InvalidIDException, IOException {
         try {
             deleteUser(user.getUserId());
         } catch (IOException e) {
-            throw new InvalidUserIDException();
+            throw new InvalidIDException(IDType.USER);
         }
         addUser(user, false);
     }
