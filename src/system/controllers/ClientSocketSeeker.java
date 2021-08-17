@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -84,7 +83,7 @@ public class ClientSocketSeeker extends Thread {
                 + "Upgrade: websocket\r\n"
                 + "Sec-WebSocket-Accept: "
                 + encode(key)
-                + "\r\n\r\n").getBytes("UTF-8");
+                + "\r\n\r\n").getBytes(StandardCharsets.UTF_8);
         out.write(response, 0, response.length);
         out.flush();
     }

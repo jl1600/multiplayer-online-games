@@ -251,7 +251,6 @@ public class UserManager {
 
         if (!userIds.containsKey(username))
             throw new InvalidUsernameException();
-        System.out.println(password);
         String userId = getUserId(username);
         try {
             if (isPasswordIncorrect(userId, password) && isTempPasswordIncorrect(userId, password))
