@@ -10,7 +10,6 @@ function signup(username, password, confirmPassword, email, userType) {
 	xhr.open("POST", "http://localhost:8000/user/register");
 
 	xhr.onreadystatechange = () => {
-	    console.log(xhr.status)
 		if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 204) {
 			window.location = "http://localhost:8080/pages/login.html";
 		} else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
@@ -22,13 +21,6 @@ function signup(username, password, confirmPassword, email, userType) {
          }
 	};
 
-    console.log(JSON.stringify({
-                	    userID: sessionStorage.getItem("userId"),
-                	    username,
-                	    password,
-                	    email,
-                	    role: userType
-                	}))
 	xhr.send(JSON.stringify({
 	    userID: sessionStorage.getItem("userId"),
 	    username,
@@ -63,7 +55,7 @@ function passwordStrengthChecker(password){
 }
 
 function hasCharacters(password) {
-    if (password.match(/([a-z].*[A-Z])/) || password.match(/([A-Z].*[a-z])/)){
+    if (password.match(/[a-z]/) && password.match(/[A-Z]/)){
         addCheck("characters");
         return true;
     } else {

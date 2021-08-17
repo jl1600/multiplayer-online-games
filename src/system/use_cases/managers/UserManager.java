@@ -107,7 +107,7 @@ public class UserManager {
             throw new UnaccountedUserRoleException();
         if (userIds.containsKey(username))
             throw new DuplicateUsernameException();
-        if (!checkPasswordStrength(password))
+        if (!isPasswordString(password))
             throw new WeakPasswordException();
         if (!isValidEmail(email))
             throw new InvalidEmailException();
@@ -188,28 +188,14 @@ public class UserManager {
         return randomPassword.toString();
     }
 
-    private boolean checkPasswordStrength(String password){
-        boolean characters = false;
-        boolean hasNumbers = false;
-        boolean hasSpecialChar = false;
+    private boolean isPasswordString(String password){
+        boolean hasUpperChar = password.matches(".*[A-Z].*");
+        boolean hasLowerChar = password.matches(".*[a-z].*");
+        boolean hasNumbers = password.matches(".*\\d+.*");
+        boolean hasSpecialChar = password.matches(".*[!@#$%^&*()_~?,.<>/;:].*");
         boolean isLong = password.length() >= 6;
 
-        Pattern characterPattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z]).+$");
-        Matcher characterMatcher = characterPattern.matcher(password);
-        if (characterMatcher.find()){
-            characters = true;
-        }
-
-        if (password.matches(".*\\d+.*")){
-            hasNumbers = true;
-        }
-
-        Pattern specialRegex = Pattern.compile("[$&+,:;=?@#|!]");
-        Matcher specialMatcher = specialRegex.matcher(password);
-        if (specialMatcher.find()){
-            hasSpecialChar = true;
-        }
-        return characters && hasNumbers && hasSpecialChar && isLong;
+        return hasUpperChar && hasLowerChar && hasNumbers && hasSpecialChar && isLong;
     }
 
     /**
@@ -353,7 +339,7 @@ public class UserManager {
             throw new IncorrectPasswordException();
         }
 
-        if (!checkPasswordStrength(newPassword)){
+        if (!isPasswordString(newPassword)){
             throw new WeakPasswordException();
         }
 
