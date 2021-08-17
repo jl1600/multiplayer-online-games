@@ -66,6 +66,8 @@ public class HangmanMatch extends GameMatch {
         this.currentPuzzleIndex = 0;
         this.loadPuzzle();
         output = this.simpleOutput();
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -381,6 +383,8 @@ public class HangmanMatch extends GameMatch {
 
         if (livingPlayers.contains(players.get(nextPlayerIndex))) {
             activePlayerId = players.get(nextPlayerIndex);
+            setChanged();
+            notifyObservers();
         } else {
             nextActivePlayer(players.get(nextPlayerIndex));
         }
