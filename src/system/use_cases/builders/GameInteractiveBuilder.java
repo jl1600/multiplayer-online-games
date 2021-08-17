@@ -33,8 +33,8 @@ public abstract class GameInteractiveBuilder {
 
     /**
      * Fulfill the design input that this builder is currently looking for.
-     *
      * @param designChoice A String that represents the user input for the design of the creation.
+     * @throws InvalidInputException When parameters are illegal and passed a null value
      * */
     public abstract void makeDesignChoice(String designChoice) throws InvalidInputException;
 
