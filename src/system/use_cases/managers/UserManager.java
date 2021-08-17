@@ -6,7 +6,7 @@ import shared.constants.IDType;
 import shared.constants.OnlineStatus;
 import shared.constants.UserRole;
 import shared.exceptions.entities_exception.IDAlreadySetException;
-import shared.exceptions.entities_exception.UnaccountedUserRoleException;
+import shared.exceptions.entities_exception.UnaccountedEnumException;
 import shared.exceptions.use_case_exceptions.*;
 import system.entities.User;
 import system.gateways.UserDataGateway;
@@ -104,9 +104,9 @@ public class UserManager {
      * @throws DuplicateUsernameException if the username is already taken
      */
     public void createUser(String username, String password, String email, UserRole role)
-            throws DuplicateUsernameException, UnaccountedUserRoleException, WeakPasswordException, InvalidEmailException {
+            throws DuplicateUsernameException, UnaccountedEnumException, WeakPasswordException, InvalidEmailException {
         if (role.equals(UserRole.TRIAL))
-            throw new UnaccountedUserRoleException();
+            throw new UnaccountedEnumException();
         if (userIds.containsKey(username))
             throw new DuplicateUsernameException();
         if (!isPasswordString(password))
@@ -362,14 +362,14 @@ public class UserManager {
      * @param password password of the user to create
      * @throws InvalidIDException if no user has the specified userId
      * @throws DuplicateUsernameException if the username is already taken
-     * @throws UnaccountedUserRoleException if the user specified user is not a trial user
+     * @throws UnaccountedEnumException if the user specified user is not a trial user
      */
     public void promoteTrialUser(String userId, String username, String email, UserRole role, String password) throws
-            InvalidIDException, DuplicateUsernameException, UnaccountedUserRoleException {
+            InvalidIDException, DuplicateUsernameException, UnaccountedEnumException {
         if (userIds.containsKey(username)) throw new DuplicateUsernameException();
 
         User user = getUser(userId);
-        if (user.getRole() != UserRole.TRIAL) throw new UnaccountedUserRoleException();
+        if (user.getRole() != UserRole.TRIAL) throw new UnaccountedEnumException();
 
         user.setUsername(username);
         user.setPassword(password);
@@ -532,8 +532,6 @@ public class UserManager {
         if (!users.containsKey(subjectID) || !users.containsKey(adminID))
             throw new InvalidIDException(IDType.USER);
 
-        if (users.get(adminID).getRole() != UserRole.ADMIN)
-            throw new InsufficientPrivilegeException();
 
         Calendar date = Calendar.getInstance();
         date.add(Calendar.DAY_OF_YEAR, duration);

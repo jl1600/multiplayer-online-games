@@ -6,7 +6,7 @@ import shared.constants.IDType;
  * InvalidIDException Class
  */
 public class InvalidIDException extends Exception{
-    private IDType type;
+    private final IDType type;
     public InvalidIDException(IDType type) {
         this.type = type;
     }

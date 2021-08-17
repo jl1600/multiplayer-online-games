@@ -6,7 +6,6 @@ import java.util.Set;
 
 import shared.constants.GameGenre;
 import system.entities.game.Game;
-import shared.exceptions.entities_exception.game_exceptions.NoScoreCategoryException;
 
 /** QuizGame Class
  *
@@ -29,34 +28,12 @@ public class QuizGame extends Game {
         /**
          * Score Category Constructor
          * @param name Score Category Name
-         * @param weight Score Category Weight
-         * @param minAcceptable Score Category minimum acceptable
-         * @param endingMessage Score Category ending message
-         */
-        public ScoreCategory(String name, Double weight, Double minAcceptable, String endingMessage) {
-            this.name = name;
-            this.weight = weight;
-            this.minAcceptable = minAcceptable;
-            this.endingMessage = endingMessage;
-        }
-
-        /**
-         * Score Category Constructor
-         * @param name Score Category Name
          */
         public ScoreCategory(String name) {
             this.name = name;
             this.weight = 1.0;
             this.minAcceptable = 0.0;
             this.endingMessage = "Quiz Game Finished.";
-        }
-
-        /**
-         *
-         * @return Score Category Parameter
-         */
-        public String dataString() {
-            return "" + this.weight + "|" + this.name + "|" + this.minAcceptable + "|" + this.endingMessage;
         }
 
         /**
@@ -112,16 +89,6 @@ public class QuizGame extends Game {
     }
 
     /**
-     * @param category category for the quiz game
-     * @param weight weight of the score category
-     * @param minAcceptable minimum acceptable for the score category
-     * @param finalMessage final message for the score category
-     */
-    public void addScoreCategory(String category, Double weight, Double minAcceptable, String finalMessage) {
-        this.scoreCategories.put(category, new ScoreCategory(category, weight, minAcceptable, finalMessage));
-    }
-
-    /**
      * Add new score category
      * @param category Category that needs to be added to score category
      */
@@ -138,20 +105,6 @@ public class QuizGame extends Game {
             this.scoreCategories.get(scoreCategory).endingMessage = message;
     }
 
-    /**
-     * set minimum score for minimum acceptable
-     * @param scoreCategory Score Category that needs to be minimum score is assigned to
-     * @param minAcceptable Minimum Score value
-     * @throws NoScoreCategoryException when scoreCategory isn't valid
-     */
-    public void setScoreMinAcceptable(String scoreCategory, Double minAcceptable)
-            throws NoScoreCategoryException {
-        if (this.scoreCategories.containsKey(scoreCategory)) {
-            this.scoreCategories.get(scoreCategory).minAcceptable = minAcceptable;
-        } else {
-            throw new NoScoreCategoryException();
-        }
-    }
 
     /**
      * Add question for the Quiz Game
@@ -212,22 +165,6 @@ public class QuizGame extends Game {
         return scoreCategories.get(scoreCategory).getEndingMessage();
     }
 
-    /**
-     * @return a copy the mapping of category names to ScoreCategory objects of this game.
-     */
-    public HashMap<String, ScoreCategory> getScoreCategoryData() {
-        HashMap<String, ScoreCategory> copy = new HashMap<>();
-        copy.putAll(this.scoreCategories);
-        return copy;
-    }
-
-    /**
-     *
-     * @return the Quiz's questions
-     */
-    public ArrayList<QuizQuestion> getQuestionData() {
-        return this.questions;
-    }
 
 
 }

@@ -74,7 +74,7 @@ public class TemplateRequestHandler extends RequestHandler {
         try {
             templateManager.createTemplate(body.attrMap, body.genre);
             sendResponse(exchange, 201, "Success!");
-        } catch (NoSuchAttributeException | InvalidInputException e) {
+        } catch (InvalidInputException e) {
             sendResponse(exchange, 400, "Invalid attribute name or attribute value.");
         }
     }
@@ -99,7 +99,7 @@ public class TemplateRequestHandler extends RequestHandler {
             System.out.println(body.attrMap);
             templateManager.editTemplate(body.attrMap, body.templateID);
             sendResponse(exchange, 204, null);
-        } catch (NoSuchAttributeException | InvalidInputException e) {
+        } catch (InvalidInputException e) {
             sendResponse(exchange, 400, "Invalid attribute name or attribute value.");
         } catch (InvalidIDException e) {
             sendResponse(exchange, 404, "Invalid template ID.");

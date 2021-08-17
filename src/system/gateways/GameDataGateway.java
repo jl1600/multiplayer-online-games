@@ -1,6 +1,6 @@
 package system.gateways;
 
-import shared.exceptions.entities_exception.UnknownGameTypeException;
+import shared.exceptions.entities_exception.UnaccountedEnumException;
 import shared.exceptions.use_case_exceptions.InvalidIDException;
 import system.entities.game.Game;
 
@@ -18,7 +18,7 @@ public interface GameDataGateway {
      * @param game the game to add
      * @throws IOException if there is a problem saving to the database
      */
-    void addGame(Game game) throws IOException, UnknownGameTypeException;
+    void addGame(Game game) throws IOException, UnaccountedEnumException;
 
     /**
      * Updates the input game in the database.
@@ -26,7 +26,7 @@ public interface GameDataGateway {
      * @param game the game to update
      * @throws IOException if there is a problem reading or writing to the database
      */
-    void updateGame(Game game) throws InvalidIDException, IOException, UnknownGameTypeException;
+    void updateGame(Game game) throws InvalidIDException, IOException, UnaccountedEnumException;
 
     /**
      * Deletes the input Game from the database.

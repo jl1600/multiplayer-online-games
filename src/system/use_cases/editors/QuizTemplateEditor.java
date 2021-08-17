@@ -1,7 +1,6 @@
 package system.use_cases.editors;
 
 import shared.exceptions.use_case_exceptions.InvalidInputException;
-import shared.exceptions.use_case_exceptions.NoSuchAttributeException;
 import system.entities.template.QuizTemplate;
 import system.entities.template.Template;
 
@@ -34,11 +33,10 @@ public class QuizTemplateEditor extends TemplateEditor {
      * @param attributeName The name of the attribute
      * @param value The string representation of the value
      * @throws InvalidInputException when parameters are illegal and passed a null value
-     * @throws NoSuchAttributeException when there does not exist a case to handle this attribute name
      */
     @Override
     public void editAttribute(String attributeName, String value)
-            throws InvalidInputException, NoSuchAttributeException {
+            throws InvalidInputException {
         switch (attributeName)
         {
             case "title":   // String has to match the actual instance variable name.
@@ -59,7 +57,7 @@ public class QuizTemplateEditor extends TemplateEditor {
             case "hasScoreWeight":
                 break;
             default:
-                throw new NoSuchAttributeException();
+                throw new InvalidInputException();
         }
     }
 

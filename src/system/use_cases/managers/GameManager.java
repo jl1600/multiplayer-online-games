@@ -4,6 +4,7 @@ import shared.constants.GameAccessLevel;
 import shared.constants.GameGenre;
 import shared.constants.IDType;
 import shared.exceptions.entities_exception.IDNotYetSetException;
+import shared.exceptions.entities_exception.UnaccountedEnumException;
 import shared.exceptions.use_case_exceptions.*;
 
 import system.entities.template.Template;

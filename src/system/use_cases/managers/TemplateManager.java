@@ -52,7 +52,7 @@ public class TemplateManager {
      * Create a default template, save it, and returns the template ID.
      * */
     public void createTemplate(Map<String, String> attrMap, GameGenre type) throws
-            NoSuchAttributeException, InvalidInputException {
+            InvalidInputException {
 
         Template temp =  new TemplateFactory().getTemplate(type);
         temp.setID(idManager.getNextId());
@@ -90,12 +90,11 @@ public class TemplateManager {
      * edit a specified template by specified attribute values
      * @param attrMap a map of specified attribute vlaues
      * @param templateID the specified template's id
-     * @throws NoSuchAttributeException specified attribute is in template's attribute last or attribute is null
      * @throws InvalidInputException when parameters are illegal and passed a null value
      * @throws InvalidIDException specified template id is not in template list or id is null
      */
     public void editTemplate(Map<String, String> attrMap, String templateID) throws
-            NoSuchAttributeException, InvalidInputException, InvalidIDException {
+            InvalidInputException, InvalidIDException {
 
         if (!templates.containsKey(templateID))
             throw new InvalidIDException(IDType.TEMPLATE);

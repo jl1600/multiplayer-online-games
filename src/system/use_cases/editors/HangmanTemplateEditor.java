@@ -2,7 +2,6 @@ package system.use_cases.editors;
 
 
 import shared.exceptions.use_case_exceptions.InvalidInputException;
-import shared.exceptions.use_case_exceptions.NoSuchAttributeException;
 import system.entities.template.HangmanTemplate;
 import system.entities.template.Template;
 
@@ -34,11 +33,10 @@ public class HangmanTemplateEditor extends TemplateEditor {
      * edit template attribute appropriately
      * @param attributeName The name of the attribute
      * @param value The string representation of the value
-     * @throws NoSuchAttributeException if attribute name is not one of the cases
      * @throws InvalidInputException when parameters are illegal and passed a null value
      */
     @Override
-    public void editAttribute(String attributeName, String value) throws NoSuchAttributeException, InvalidInputException {
+    public void editAttribute(String attributeName, String value) throws InvalidInputException {
         switch (attributeName) {
             case "title": // String has to match the actual instance variable name.
                 editTitle(value);
@@ -47,7 +45,7 @@ public class HangmanTemplateEditor extends TemplateEditor {
                 editHasHints(value);
                 break;
             default:
-                throw new NoSuchAttributeException();
+                throw new InvalidInputException();
         }
 
     }

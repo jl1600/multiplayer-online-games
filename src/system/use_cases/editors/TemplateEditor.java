@@ -3,7 +3,6 @@ package system.use_cases.editors;
 import com.google.gson.Gson;
 import com.sun.istack.internal.NotNull;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
-import shared.exceptions.use_case_exceptions.NoSuchAttributeException;
 import system.entities.template.Template;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -26,7 +25,7 @@ public abstract class TemplateEditor {
      * @param value The string representation of the value
      * */
     public abstract void editAttribute(@NotNull String attributeName, @NotNull String value)
-            throws NoSuchAttributeException, InvalidInputException;
+            throws InvalidInputException;
 
     /**
      * Returns a mapping of attribute names to string representations of attribute values.
