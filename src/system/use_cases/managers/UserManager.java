@@ -235,17 +235,18 @@ public class UserManager {
             throws InvalidUsernameException, BannedUserException, IncorrectPasswordException,
              ExpiredUserException {
 
-        if (!userIds.containsKey(username))
-            throw new InvalidUsernameException();
+        System.out.println(1);
+        if (!userIds.containsKey(username)) throw new InvalidUsernameException();
+        System.out.println(2);
         String userId = getUserId(username);
+
         try {
             if (isPasswordIncorrect(userId, password) && isTempPasswordIncorrect(userId, password))
                 throw new IncorrectPasswordException();
+                System.out.println(3);
             if (isBanned(userId)) throw new BannedUserException();
-            if (getUserRole(userId) == UserRole.TEMP){
-                if (isExpiredUser(userId)){
-                    throw new ExpiredUserException();
-                }
+            if (getUserRole(userId) == UserRole.TEMP && isExpiredUser(userId)) {
+                throw new ExpiredUserException();
             }
             getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
         } catch (InvalidUserIDException e1) {
@@ -366,20 +367,17 @@ public class UserManager {
      */
     public void promoteTrialUser(String userId, String username, String email, UserRole role, String password) throws
             InvalidUserIDException, DuplicateUsernameException, UnaccountedUserRoleException {
-        if (userIds.containsKey(userId))
-            throw new InvalidUserIDException();
-        if (userIds.containsKey(username))
-            throw new DuplicateUsernameException();
+        if (userIds.containsKey(username)) throw new DuplicateUsernameException();
 
         User user = getUser(userId);
-        if (user.getRole() != UserRole.TRIAL)
-            throw new UnaccountedUserRoleException();
+        if (user.getRole() != UserRole.TRIAL) throw new UnaccountedUserRoleException();
 
         user.setUsername(username);
         user.setPassword(password);
         user.setEmail(email);
         user.setRole(role);
         try {
+            userIds.put(username, userId);
             gateway.addUser(user);
         } catch (IOException e) {
             throw new RuntimeException("System failure: Can't connect to the database");
