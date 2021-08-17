@@ -22,6 +22,9 @@ public class PseudoEmailComposer implements EmailService {
 
     private final Map<TemplateTag, String> emailTemplates;
 
+    /**
+     * PseudoEmailComposer Constructor
+     */
     public PseudoEmailComposer() {
         Gson gson = new Gson();
         try {
@@ -34,6 +37,9 @@ public class PseudoEmailComposer implements EmailService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void sendResetPasswordEmail(String receiverEmail, String receiverName, String tempPassword) {
         String text = emailTemplates.get(TemplateTag.RESET_PASSWORD) + tempPassword;
         try {

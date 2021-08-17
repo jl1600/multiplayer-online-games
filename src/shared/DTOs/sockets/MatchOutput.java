@@ -23,6 +23,5 @@ public class MatchOutput {
     /**
      * A mapping of username to game specific stats
      */
-
     public Map<String, String> playerStats;
 }

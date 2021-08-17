@@ -1,5 +1,8 @@
 package shared.constants;
 
+/**
+ *  MatchStatus Constants
+ */
 public enum MatchStatus {
     /**
      * the match is preparing

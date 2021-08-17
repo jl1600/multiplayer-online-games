@@ -1,5 +1,8 @@
 package shared.constants;
 
+/**
+ * GameAccessLevel Constants
+ */
 public enum GameAccessLevel {
     /**
      * public game accessible by everyone

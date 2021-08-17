@@ -1,7 +1,6 @@
 package system.entities.game.quiz;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
