@@ -100,5 +100,12 @@ also allows server to send data to client without client making a request. This 
 Online multiplayer games can be tested by having two accounts on two different tabs.
 
 
-## Response to Phase 1's feedbacks
+## A Response to the Phase 1 Feedback
 
+We really appreciate the time from the teaching team to give us helpful feedbacks on how to improve on Phase 1.
+
+All of the bugs addressed in the feedback was taken care of. We also implemented a RESTful API, making the program a
+web-based application. In addition, we tried to eliminate a good number of exceptions. However, since the program
+is quite large and many new features were getting added, it's a bit tricky to remain with as few exceptions as possible.
+Also, we didn't take much of `security` in to measure, but we hope we can receive more advices on how to tackle these sort
+of problems and how to improve in general, to hopefully someday have a program that is good enough for actual deployment.
