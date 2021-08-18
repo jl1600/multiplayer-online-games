@@ -103,13 +103,50 @@ also allows server to send data to client without client making a request. This 
 
 Online multiplayer games can be tested by having two accounts on two different tabs.
 
+## Special behaviours
+- There is no "trial" option at the sign up page. This is because by vising the
+  site, we automatically initialize a trial user. This trial user is saved
+  until the end of the session, meaning that closing and reopening the tab
+  would log you in as a new trial user.
+- For all users except for trial users, you can log out by visiting the "My
+  account" tab on the top right corner after signing in, and clicking on the
+  "Log out" button. For all users including the trial users, you are logged out
+  when you close the tab in your browser (this is the only way to log out as a
+  trial user).
+- When a trial user signs up for a temporary or normal user, we call
+  `UserManager.promoteTrialUser` instead of `UserManager.createUser`, which
+  preserves all of the trial user's data. This means that if you create some
+  games as a trial user before signing up, you will still own all your games
+  after you signed up
+- The front-end is merely a gui. Due to the timing and the expectation of the
+  project, we did not implement any security checks from the client. This means
+  that you are discouraged from entering links to your browser manually. For
+  example, a trial user does not have access to the "edit template" page, and
+  the way we hide that from a trial user is to never display the button that
+  redirects the them to the "edit template" page. While you can just type up
+  `http://localhost:8080/pages/edit-template.html` in your browser, you should
+  expect weird behaviours from the client if you do. However, the java
+  backend is implemented with security checks
+- As an extension to the previous point, you are also discouraged from force
+  exiting the page by switching your URL. The only action that the client takes
+  when you exit the site is to send a request to the server to log you out. If
+  you are in the middle of building a game or a template and would like to
+  cancel, you must use the reset button we created for you, rather than just
+  force exiting the page.
 
 ## A Response to the Phase 1 Feedback
-
 We really appreciate the time from the teaching team to give us helpful feedbacks on how to improve upon Phase 1.
 
-All of the bugs addressed in the feedback was taken care of. We also implemented a RESTful API, making the program a
-web-based application. In addition, we tried to eliminate a good number of exceptions. However, since the program
-is quite large and many new features were getting added, it's a bit tricky to remain with as few exceptions as possible.
-Also, we didn't take much of `security` in to measure, but we hope we can receive more advices on how to tackle these sort
-of problems and how to improve in general, to hopefully someday have a program that is good enough for actual deployment.
+All of the bugs addressed in the feedback was taken care of. We also
+implemented a RESTful API, making the program a web-based application. In
+addition, we tried to eliminate a good number of exceptions. However, since the
+program is quite large and many new features were getting added, we felt that
+it was necessary to keep the number of exceptions to better distinguish the
+errors during development. We also felt that this would be appropriate since
+exceptions are just empty classes that don't depend on anything. They have
+little to no impact on the maintenance and the architecture of the program.
+Also, as mentioned in ##special-behaviours, we didn't have many _security_
+measures on the client side since they are not the focus of the project, but we
+hope we can receive more advices on how to tackle these sort of problems and
+how to improve in general, to hopefully someday have a program that is good
+enough for actual deployment.
