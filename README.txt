@@ -79,7 +79,7 @@ the superclass which can be treated the same by the rest of the program.
  options that dictates how a game is built and how it is played. The system currently support two game genres:
  Quiz and Hangman. With respect to each game genre, templates can be created by admins using the GUI.
 
-- New user type: Temporary User.
+- New user type: Temporary User. This user type can be selected on Signup.
 
 - Change at least one template from phase 1: Changes to any of the template attribute from QuizTemplate will change how
 a game with that template is played. An example is changing Exact answer quiz template to Multiple choice.
@@ -88,7 +88,10 @@ a game with that template is played. An example is changing Exact answer quiz te
 - Admin can ban / suspend users.
 
 #### Optional features
-- Password strength system
+- Password strength system. Password must be sufficiently long, contain both uppercase, lowercase, and special characters.
+- We also created the 'forgot password' password feature. A user needs to provide his username and the email address with
+which he used to register in order to recover password. If he succeeds, a temporary password is created and is sent through
+"email" (a txt file). The temporary lasts for 24 hours or until the system shuts down.
 - Users can modify/Delete creations, public/private/friends only.
 - Graphical User Interface: using HTML/CSS/JavaScript. This is a functional application which can be deployed on the
 web platform.
@@ -102,7 +105,7 @@ Online multiplayer games can be tested by having two accounts on two different t
 
 ## A Response to the Phase 1 Feedback
 
-We really appreciate the time from the teaching team to give us helpful feedbacks on how to improve on Phase 1.
+We really appreciate the time from the teaching team to give us helpful feedbacks on how to improve upon Phase 1.
 
 All of the bugs addressed in the feedback was taken care of. We also implemented a RESTful API, making the program a
 web-based application. In addition, we tried to eliminate a good number of exceptions. However, since the program
