@@ -1,7 +1,6 @@
 if (typeof xhr === "undefined") xhr = new XMLHttpRequest();
 
 document.addEventListener("DOMContentLoaded", createGameBuilder, false);
-window.addEventListener("beforeunload", resetQuestions);
 
 function createGameBuilder() {
 	xhr.open("POST", "http://localhost:8000/game/create-builder");
