@@ -79,7 +79,8 @@ the superclass which can be treated the same by the rest of the program.
  options that dictates how a game is built and how it is played. The system currently support two game genres:
  Quiz and Hangman. With respect to each game genre, templates can be created by admins using the GUI.
 
-- New user type: Temporary User. This user type can be selected on Signup.
+- New user type: Temporary User. This user type can be selected on Signup and can be used only for a period of time. After
+that, attempting to log in will result in an error message: "account is expired".
 
 - Change at least one template from phase 1: Changes to any of the template attribute from QuizTemplate will change how
 a game with that template is played. An example is changing Exact answer quiz template to Multiple choice.
