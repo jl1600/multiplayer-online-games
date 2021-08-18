@@ -1,15 +1,12 @@
 ## Installation
-
-# Project dependencies:
-
-    - This project use the Gson library from Google to read and write data in the JSON
-    format.
-    - Gson can be installed through Intellij by going through
-      File -> Project Structure -> modules -> Dependencies -> '+' -> libraries -> From Maven
-      and type in com.google.code.gson:gson:2.8.7
+#### Project dependencies:
+  - This project use the Gson library from Google to read and write data in the JSON
+  format.
+  - Gson can be installed through Intellij by going through
+    File -> Project Structure -> modules -> Dependencies -> '+' -> libraries -> From Maven
+    and type in com.google.code.gson:gson:2.8.7
 
 ## Running instruction
-
 0. Make sure you don't have anything running on port 8080 and 8000
 1. In your command line/terminal, navigate to phase2/src/client
   Enter command `python -m http.server 8080` on windows
@@ -133,23 +130,36 @@ Online multiplayer games can be tested by having two accounts on two different t
   you are in the middle of building a game or a template and would like to
   cancel, you must use the reset button we created for you, rather than just
   force exiting the page.
+- The multiplayer mode starts by having a user creating a match. Once the match
+  is created, it is displayed on the "Join a match" page for other users. If
+  there are still spaces available for the match, other users can join the
+  match (you can test this by opening a separate tab). The user who created the
+  match has a green "Start" button that the rest of the users don't have. When
+  the match creator presses the start button, the match is removed from the
+  "Join a match" page so new players can't join, and the match will start for
+  all users in the match. Questions are asked one at a time so you can't answer
+  the next question until all players have answered the current one
+- It's okay to leave an ongoing match by closing the tab, but don't do this if
+  you are a trial user who created the match, because you won't be able to log
+  back in as the same trial user, and you'll access as the match creator so no
+  one can start the game
 
 ## A Response to the Phase 1 Feedback
 We really appreciate the time from the teaching team to give us helpful feedbacks on how to improve upon Phase 1.
 
-All of the bugs addressed in the feedback was taken care of. We also
-implemented a RESTful API, making the program a web-based application. In
-addition, we tried to eliminate a good number of exceptions. However, since the
-program is quite large and many new features were getting added, we felt that
-it was necessary to keep the number of exceptions to better distinguish the
-errors during development. We also felt that this would be appropriate since
+All of the bugs addressed in the feedback was taken care of. We also implemented
+a RESTful API, making the program a web-based application. In addition, we
+tried to eliminate a good number of exceptions. However, since the program is
+quite large and many new features were getting added, we felt that it was
+necessary to keep the number of exceptions to better distinguish the errors
+during development. We also felt that this would be appropriate since
 exceptions are just empty classes that don't depend on anything. They have
 little to no impact on the maintenance and the architecture of the program.
 That being said, we still merged some exceptions that were similar to each
 other, such as `InvalidGameIDException`, `InvalidUserIDException`, and
 `InvalidIDException`... etc.
 
-Also, as mentioned in ##special-behaviours, we didn't have many _security_
+Also, as mentioned in Special Behaviours, we didn't have many _security_
 measures on the client side since they are not the focus of the project, but we
 hope we can receive more advices on how to tackle these sort of problems and
 how to improve in general, to hopefully someday have a program that is good
