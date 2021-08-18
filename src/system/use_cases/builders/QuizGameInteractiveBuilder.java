@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import shared.constants.GameAccessLevel;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import shared.exceptions.use_case_exceptions.NotReadyException;
 import shared.exceptions.use_case_exceptions.InvalidInputException;
 import system.entities.game.quiz.QuizAnswer;
@@ -124,18 +125,12 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
     }
 
     private String handleCorrectAnswersDesignChoice(String designChoice) throws InvalidInputException {
-        try {
-            String[] choices = designChoice.split(" ");
-            for (String choice: choices) {
-                    int answerIndex = Integer.parseInt(choice) - 1;
-                    if (answerIndex >= numAnswerEachQ || answerIndex < 0)
-                        throw new InvalidInputException();
-                currentQuizQuestion.getAnswer(answerIndex).setCategoryScore("General", 1.0);
-                }
-            return handleIsEnoughQuestions();
-        } catch (NumberFormatException e) {
-            throw new InvalidInputException();
+        String[] choices = designChoice.split(" ");
+        for (String choice: choices) {
+            int answerIndex = getQuantityFromStr(designChoice);
+            currentQuizQuestion.getAnswer(answerIndex).setCategoryScore("General", 1.0);
         }
+        return handleIsEnoughQuestions();
     }
 
     private String handleIsPublicDesignChoice(String designChoice) throws InvalidInputException{
@@ -153,17 +148,14 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
 
 
     private String handleCorrectAnswerDesignChoice(String designChoice) throws InvalidInputException {
-        try {
-            int correctAnsIndex = Integer.parseInt(designChoice);
-            if (correctAnsIndex > numAnswerEachQ || correctAnsIndex < 1){
-                throw new InvalidInputException();
-            } else {
-                currentQuizQuestion.getAnswer(correctAnsIndex - 1).setCategoryScore("General", 1.0);
-                return handleIsEnoughQuestions();
-            }
-        } catch (NumberFormatException e) {
+        int correctAnsIndex = getQuantityFromStr(designChoice);
+        if (correctAnsIndex > numAnswerEachQ || correctAnsIndex < 1){
             throw new InvalidInputException();
+        } else {
+            currentQuizQuestion.getAnswer(correctAnsIndex - 1).setCategoryScore("General", 1.0);
+            return handleIsEnoughQuestions();
         }
+
     }
 
 
@@ -171,14 +163,13 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
         if (designChoice.equals("yes")) {
             readyToBuild = true;
             currentDesignSubject = DesignSubject.NULL;
-            return designQuestions.get(currentDesignSubject);
         }
         else {
             // abort the current game, make a new one
             currentGame = new QuizGame("", currentGame.getCreatorName());
             currentDesignSubject =  DesignSubject.TITLE;
-            return designQuestions.get(currentDesignSubject);
         }
+        return designQuestions.get(currentDesignSubject);
     }
 
     private String handleQuizAnswerDesignChoice(String designChoice) {
@@ -262,8 +253,9 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
         return designQuestions.get(currentDesignSubject) + "1:";
     }
 
-    private String handleMaxAttemptDesignChoice(String designChoice) {
-        currentGame.setMaxAttempts(Integer.parseInt(designChoice));
+    private String handleMaxAttemptDesignChoice(String designChoice) throws InvalidInputException {
+        int numAtt = getQuantityFromStr(designChoice);
+        currentGame.setMaxAttempts(numAtt);
         currentDesignSubject = DesignSubject.QUIZ_QUESTION;
         return designQuestions.get(currentDesignSubject) + "1:";
     }
@@ -299,43 +291,41 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
         }
     }
 
-    private String handleCategoryNumDesignChoice(String designChoice) {
-        numScoreCategories = Integer.parseInt(designChoice);
+    private String handleCategoryNumDesignChoice(String designChoice) throws InvalidInputException {
+        numScoreCategories = getQuantityFromStr(designChoice);
         currentDesignSubject = DesignSubject.CATEGORY_NAME;
         return designQuestions.get(currentDesignSubject) + "1:";
     }
 
-    private String handleAnswerNumDesignChoice(String designChoice) {
-        numAnswerEachQ = Integer.parseInt(designChoice);
+    private String handleAnswerNumDesignChoice(String designChoice) throws InvalidInputException {
+        numAnswerEachQ = getQuantityFromStr(designChoice);
+        if (numAnswerEachQ < 1)
+            throw new InvalidInputException();
         if (chosenTemplate.hasMultipleScoreCategories()) {
             currentDesignSubject = DesignSubject.CATEGORIES_NUM;
+        } else {
+            currentGame.addScoreCategory("General");
+            currentDesignSubject = DesignSubject.MAX_ATTEMPTS;
+        }
+        return designQuestions.get(currentDesignSubject);
+    }
+
+    private String handleQuestionNumDesignChoice(String designChoice) throws InvalidInputException {
+        numQuestions = getQuantityFromStr(designChoice);
+        if (numQuestions < 1)
+            throw new InvalidInputException();
+        if (chosenTemplate.isMultipleChoice()) {
+            currentDesignSubject = DesignSubject.ANSWER_NUM;
             return designQuestions.get(currentDesignSubject);
         }
-        else {
+
+        else { // The case of Exact answer quiz
+            numAnswerEachQ = 1;
             currentGame.addScoreCategory("General");
             currentDesignSubject = DesignSubject.MAX_ATTEMPTS;
             return designQuestions.get(currentDesignSubject);
         }
-    }
 
-    private String handleQuestionNumDesignChoice(String designChoice) throws InvalidInputException {
-        try {
-            numQuestions = Integer.parseInt(designChoice);
-            if (chosenTemplate.isMultipleChoice()) {
-                currentDesignSubject = DesignSubject.ANSWER_NUM;
-                return designQuestions.get(currentDesignSubject);
-            }
-
-            else { // The case of Exact answer quiz
-                numAnswerEachQ = 1;
-                currentGame.addScoreCategory("General");
-                currentDesignSubject = DesignSubject.MAX_ATTEMPTS;
-                return designQuestions.get(currentDesignSubject);
-            }
-        }
-        catch (NumberFormatException e) {
-            throw new InvalidInputException();
-        }
     }
 
 
@@ -365,4 +355,14 @@ public class QuizGameInteractiveBuilder extends GameInteractiveBuilder {
         return currentGame;
     }
 
+    private int getQuantityFromStr(String input) throws InvalidInputException {
+        try {
+            int res = Integer.parseInt(input);
+            if (res > 0)
+                return res;
+            else throw new InvalidInputException();
+        } catch (NumberFormatException e) {
+            throw new InvalidInputException();
+        }
+    }
 }
