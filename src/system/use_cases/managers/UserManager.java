@@ -158,6 +158,7 @@ public class UserManager {
     }
 
     public boolean isValidEmail(String email){
+        // The following email regex pattern is inspired by https://stackoverflow.com/a/16625335/10254049
         Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$");
         final Matcher matcher = emailPattern.matcher(email);
         return matcher.matches();

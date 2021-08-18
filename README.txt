@@ -38,12 +38,6 @@ caller. This allows the user to specify the game objects in steps rather than
 all at once, and avoids the use of a long constructor to fully define game
 entities with many parameters.
 
-#### Dependency Injection
-`IdManager`, all managers
-
-The IdManagers are passed into the managers from WordGameSystem using
-dependency injection
-
 #### Observer
 `GameMatch`, `QuizGameMatch`, `HangmanMatch` `MatchOutputDispatcher`
 
@@ -62,6 +56,12 @@ available ID  that can be assigned. We could change how IDs are formed and
 incremented without modifying any of the code in the Managers themselves. The
 code can be reused or the strategy class can be replaced with a different
 strategy without changing anything in the managers
+
+#### Dependency Injection
+`IdManager`, all managers
+
+The IdManagers are passed into the managers from WordGameSystem using
+dependency injection
 
 #### Factory
 `GameBuilderFactory`, `GameMatchFactory`, `TemplateEditorFactory`, `TemplateFactory`
@@ -86,14 +86,14 @@ that, attempting to log in will result in an error message: "account is expired"
 a game with that template is played. An example is changing Exact answer quiz template to Multiple choice.
 - Allow admin user to set any of the user's creation access level from public to private and vice versa.
 - Admin users can see all creations and delete them. The deletes are soft-deletes, which can be recovered.
-- Admin can ban / suspend users.
+- Admin can ban / suspend users for a given number of days
 
 #### Optional features
 - Password strength system. Password must be sufficiently long, contain both uppercase, lowercase, and special characters.
 - We also created the 'forgot password' password feature. A user needs to provide his username and the email address with
 which he used to register in order to recover password. If he succeeds, a temporary password is created and is sent through
 "email" (a txt file). The temporary lasts for 24 hours or until the system shuts down.
-- Users can modify/Delete creations, public/private/friends only.
+- Users can modify/delete creations, or set them to public/private/friends only.
 - Graphical User Interface: using HTML/CSS/JavaScript. This is a functional application which can be deployed on the
 web platform.
 
