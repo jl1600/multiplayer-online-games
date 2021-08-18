@@ -52,7 +52,7 @@ MatchOutputDispatcher.
 `IdManager`, all managers
 
 All managers user IdManager as a strategy to count IDs and get the next
-available ID  that can be assigned. We could change how IDs are formed and
+available ID that can be assigned. We could change how IDs are formed and
 incremented without modifying any of the code in the Managers themselves. The
 code can be reused or the strategy class can be replaced with a different
 strategy without changing anything in the managers
@@ -145,6 +145,10 @@ it was necessary to keep the number of exceptions to better distinguish the
 errors during development. We also felt that this would be appropriate since
 exceptions are just empty classes that don't depend on anything. They have
 little to no impact on the maintenance and the architecture of the program.
+That being said, we still merged some exceptions that were similar to each
+other, such as `InvalidGameIDException`, `InvalidUserIDException`, and
+`InvalidIDException`... etc.
+
 Also, as mentioned in ##special-behaviours, we didn't have many _security_
 measures on the client side since they are not the focus of the project, but we
 hope we can receive more advices on how to tackle these sort of problems and

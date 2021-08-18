@@ -40,7 +40,7 @@ public class TemplateManager {
     }
 
     /**
-     * get the title of a specified template
+     * Gets the title of a specified template
      * @param templateID the specified template's id
      * @return the specified template's title
      */
@@ -49,8 +49,12 @@ public class TemplateManager {
     }
 
     /**
-     * Create a default template, save it, and returns the template ID.
-     * */
+     * Creates a default template, save it, and returns the template ID
+     * @param attrMap a map of template design questions to the choices that the user inputed/selected
+     * @param type the genre of the game
+     * @throws InvalidInputException if the template id does not exist. This should never be raised because
+     *                               we just created the template
+     */
     public void createTemplate(Map<String, String> attrMap, GameGenre type) throws
             InvalidInputException {
 
@@ -66,7 +70,7 @@ public class TemplateManager {
     }
 
     /**
-     * Returns the default version of a template attribute map.
+     * @return the default version of a template attribute map
      * */
     public Map<String, String> getDefaultAttrMap(GameGenre type) {
         Template temp =  new TemplateFactory().getTemplate(type);
@@ -76,8 +80,12 @@ public class TemplateManager {
     }
 
     /**
-     * Returns the genre, a.k.a the type of the template
-     * */
+     * Gets the genre of the game given its template
+     *
+     * @param templateID the template that the game implements
+     * @return the genre, a.k.a the type of the template
+     * @throws InvalidIDException if the template id does not exist
+     */
     public GameGenre getGenre(String templateID) throws InvalidIDException {
         if (!templates.containsKey(templateID))
             throw new InvalidIDException(IDType.TEMPLATE);
@@ -87,8 +95,9 @@ public class TemplateManager {
 
 
     /**
-     * edit a specified template by specified attribute values
-     * @param attrMap a map of specified attribute vlaues
+     * Edits a specified template by specified attribute values
+     *
+     * @param attrMap a map of specified attribute values
      * @param templateID the specified template's id
      * @throws InvalidInputException when parameters are illegal and passed a null value
      * @throws InvalidIDException specified template id is not in template list or id is null
@@ -113,7 +122,8 @@ public class TemplateManager {
     }
 
     /**
-     * get a specified templateID's attribute map
+     * Gets a specified templateID's attribute map
+     *
      * @param templateID the specified template's id
      * @return that specified template's attribute map
      * @throws InvalidIDException specified template id is not in template list or id is null
@@ -138,7 +148,6 @@ public class TemplateManager {
     }
 
     /**
-     * get all template ids
      * @return all template ids in a set
      */
     public Set<String> getAllTemplateIDs() {
@@ -146,7 +155,8 @@ public class TemplateManager {
     }
 
     /**
-     * get specific template based on specified id
+     * Gets specific template based on specified id
+     *
      * @param id the specified id
      * @return the specific template
      * @throws InvalidIDException id is not in template list or id is null

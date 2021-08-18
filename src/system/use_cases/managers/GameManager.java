@@ -48,7 +48,7 @@ public class GameManager {
 
     /**
      * Starts the process of building a game.
-     * <p>
+     *
      * This method will create an Interactive builder, which can be accessed by user ID. A game is gradually
      * built using this builder.
      *
