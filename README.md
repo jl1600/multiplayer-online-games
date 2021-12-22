@@ -6,7 +6,7 @@ a variety of games collaboratively or competitively.
 In _Intellij_, go to File -> Project Structure -> modules -> Dependencies -> `+`
 -> libraries -> From Maven -> type in `com.google.code.gson:gson:2.8.7`
 
-## Running instruction
+## Running instructions
 0. Make sure you don't have anything running on port 8080 and 8000
 1. Navigate to `phase2/src/client` in the terminal, then start a server using
 	- `python -m http.server 8080` on windows
