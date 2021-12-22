@@ -1,6 +1,6 @@
 # Multiplayer online games
-The server and client of an online web platform where users can create and play
-a variety of games collaboratively or competitively.
+An online web platform to create and play a variety of games, or compete or
+collaborate with other players live.
 
 ## Installation
 In _Intellij_, go to File -> Project Structure -> modules -> Dependencies -> `+`
