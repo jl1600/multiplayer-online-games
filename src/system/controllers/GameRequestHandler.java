@@ -81,6 +81,8 @@ public class GameRequestHandler extends RequestHandler {
                 handleGetPrevAccessLevel(exchange);
             case "available-games":
                 handleGetAvailableGamesByUserID(exchange);
+            case "available-rooms":
+                handleGetAvailableRoomsByUserID(exchange);
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
@@ -335,6 +337,19 @@ public class GameRequestHandler extends RequestHandler {
 
     }
 
+    private void handleGetAvailableRoomsByUserID(HttpExchange exchange) throws IOException {
+        String ownerID = getQueryArgFromGET(exchange);
+        if (ownerID == null)
+            return;
+        try {
+            sendResponse(exchange, 200, getAvailableRoomsByUserID(ownerID));
+        } catch (InvalidIDException e) {
+            System.out.println("inv");
+            sendResponse(exchange, 400, "Invalid User ID.");
+        }
+
+    }
+
     private void handleGetAllOwnedGames(HttpExchange exchange) throws IOException {
         String userID = getQueryArgFromGET(exchange);
         if (userID == null)
@@ -453,5 +468,46 @@ public class GameRequestHandler extends RequestHandler {
         Set<GameDataResponseBody> dataSet = new HashSet<>();
         Set<String> publicGames = gameManager.getAllPublicGamesID();
         return getJsonDataFromGameIDs(dataSet, publicGames);
+    }
+
+    private String getAvailableRoomsByUserID(String userID) throws IOException, InvalidIDException {
+        Set<GameDataResponseBody> dataSet = new HashSet<>();
+        //duplicates will be take cared by built in
+        Set<String> availableGameIDs = new HashSet<>();
+
+        if (userManager.getUserRole(userID).equals(UserRole.ADMIN)) {
+            availableGameIDs = gameManager.getAllGameIDs();
+        } else {
+            Set<String> userFriendList = userManager.getFriendList(userID);
+            //Step 1: get all public games
+            availableGameIDs.addAll(gameManager.getAllPublicGamesID());
+            //Step 2: get all owned creations that are not DELETED
+            availableGameIDs.addAll(gameManager.getOwnedNotDeletedGameID(userID));
+            //Step 3: for every friend, get all of their friend only games
+            for (String friendID : userFriendList) {
+                availableGameIDs.addAll(gameManager.getOwnedFriendOnlyGameID(friendID));
+            }
+        }
+
+        return getJsonDataFromRoomIDs(dataSet, availableGameIDs);
+    }
+
+    private String getJsonDataFromRoomIDs(Set<RoomDataResponseBody> dataSet, Set<String> availableRoomIDs) {
+        for (String id : availableRoomIDs) {
+            RoomDataResponseBody room = new RoomDataResponseBody();
+            room.id = id;
+            try {
+                room.title = roomManager.getRoomTitle(id);
+                room.ownerName = userManager.getUsername(roomManager.getOwnerID(id));
+                room.accessLevel = roomManager.getAccessLevel(id);
+                room.previousAccessLevel = roomManager.getPreviousAccessLevel(id);
+                room.genre = roomManager.getGenre(id);
+            } catch (InvalidIDException e) {
+                throw new RuntimeException("Game ID or user ID got from public game list is invalid.");
+            }
+
+            dataSet.add(room);
+        }
+        return gson.toJson(dataSet);
     }
 }
