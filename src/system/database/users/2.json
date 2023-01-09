@@ -1,8 +1,8 @@
 {
   "userId": "2",
-  "username": "charlie",
-  "password": "abcd",
-  "role": "MEMBER",
+  "username": "2",
+  "password": "2",
+  "role": "HOST",
   "onlineStatus": "OFFLINE",
   "gameCreations": [
     "0",

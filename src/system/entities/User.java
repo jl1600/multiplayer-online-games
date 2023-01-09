@@ -1,7 +1,6 @@
 package system.entities;
 
-import shared.constants.OnlineStatus;
-import shared.constants.UserRole;
+import shared.constants.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;

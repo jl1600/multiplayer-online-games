@@ -5,19 +5,15 @@ package shared.constants;
  */
 public enum UserRole {
     /**
-     * Member Role
+     * Player Role
      */
-    MEMBER,
+    PLAYER,
     /**
-     * Trial Role
+     * Host Role
      */
-    TRIAL,
+    HOST,
     /**
      * Admin Role
      */
     ADMIN,
-    /**
-     * Temporary Role
-     */
-    TEMP
 }

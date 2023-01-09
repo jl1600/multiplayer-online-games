@@ -204,8 +204,7 @@ public class GameRequestHandler extends RequestHandler {
         try {
             gameManager.makeDesignChoice(body.userID, body.designChoice);
             try {
-                String gameID = (userManager.getUserRole(body.userID) == UserRole.TRIAL) ?
-                        gameManager.buildTemporaryGame(body.userID) : gameManager.buildGame(body.userID);
+                String gameID = gameManager.buildGame(body.userID);
                 userManager.addOwnedGameID(body.userID, gameID);
                 sendResponse(exchange, 201, "Success!");
             } catch (NotReadyException e) {

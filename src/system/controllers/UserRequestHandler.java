@@ -60,7 +60,7 @@ public class UserRequestHandler extends RequestHandler {
                 handleGetPendingFriends(exchange);
                 break;
             case "all-members":
-                handleGetAllMembers(exchange);
+                handleGetAllPlayers(exchange);
                 break;
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
@@ -81,9 +81,6 @@ public class UserRequestHandler extends RequestHandler {
                 break;
             case "logout":
                 handleLogout(exchange);
-                break;
-            case "trial":
-                handleTrial(exchange);
                 break;
             case "register":
                 handleRegister(exchange);
@@ -209,30 +206,30 @@ public class UserRequestHandler extends RequestHandler {
         }
     }
 
-    private void handleGetAllMembers(HttpExchange exchange) throws IOException {
+    private void handleGetAllPlayers(HttpExchange exchange) throws IOException {
         if (exchange.getRequestURI().getQuery() == null) {
-            sendResponse(exchange, 200, gson.toJson(getAllMembers()));
+            sendResponse(exchange, 200, gson.toJson(getAllPlayers()));
         }
         else {
             String userID = getQueryArgFromGET(exchange);
             if (userID == null)
                 return;
             try {
-                sendResponse(exchange, 200, gson.toJson(getAllMembersExcludeFriendsOf(userID)));
+                sendResponse(exchange, 200, gson.toJson(getAllPlayersExcludeFriendsOf(userID)));
             } catch (InvalidIDException e) {
                 sendResponse(exchange, 400, "Invalid user ID.");
             }
         }
     }
 
-    private Set<GeneralUserInfoResponseBody> getAllMembers() {
+    private Set<GeneralUserInfoResponseBody> getAllPlayers() {
         Set<String> IDs = userManager.getAllUserIDs();
         Set<GeneralUserInfoResponseBody> allMem = new HashSet<>();
         for (String uid: IDs) {
             GeneralUserInfoResponseBody user = new GeneralUserInfoResponseBody();
             user.userID = uid;
             try {
-                if (userManager.getUserRole(uid)!= UserRole.MEMBER)
+                if (userManager.getUserRole(uid)!= UserRole.PLAYER)
                     continue;
                 user.username = userManager.getUsername(uid);
             } catch (InvalidIDException e) {
@@ -243,7 +240,7 @@ public class UserRequestHandler extends RequestHandler {
         return allMem;
     }
 
-    private Set<GeneralUserInfoResponseBody> getAllMembersExcludeFriendsOf(String targetUser) throws InvalidIDException {
+    private Set<GeneralUserInfoResponseBody> getAllPlayersExcludeFriendsOf(String targetUser) throws InvalidIDException {
         Set<String> AllIDs = userManager.getAllUserIDs();
         Set<String> friendIDs = userManager.getFriendList(targetUser);
         Set<GeneralUserInfoResponseBody> allMem = new HashSet<>();
@@ -253,7 +250,7 @@ public class UserRequestHandler extends RequestHandler {
             GeneralUserInfoResponseBody user = new GeneralUserInfoResponseBody();
             user.userID = uid;
             try {
-                if (userManager.getUserRole(uid)!= UserRole.MEMBER || uid.equals(targetUser))
+                if (userManager.getUserRole(uid)!= UserRole.PLAYER || uid.equals(targetUser))
                     continue;
                 user.username = userManager.getUsername(uid);
             } catch (InvalidIDException e) {
@@ -302,7 +299,6 @@ public class UserRequestHandler extends RequestHandler {
         RegisterRequestBody body = gson.fromJson(getRequestBody(exchange), RegisterRequestBody.class);
         try {
             if (body.role != UserRole.ADMIN) {
-                userManager.promoteTrialUser(body.userID, body.username, body.email, body.role, body.password);
                 Set<String> gameIDs = userManager.getOwnedGamesID(body.userID);
                 for (String id: gameIDs) {
                     gameManager.saveTemporaryGame(id);
@@ -324,11 +320,6 @@ public class UserRequestHandler extends RequestHandler {
                 throw new RuntimeException("Fatal: the game ID got from user data is invalid.");
             }
         }
-    }
-
-    private void handleTrial(HttpExchange exchange) throws IOException {
-        String trialID = userManager.createTrialUser();
-        sendResponse(exchange, 200, "{\"userID\":\"" + trialID+"\"}");
     }
 
     private void handleLogin(HttpExchange exchange) throws IOException {

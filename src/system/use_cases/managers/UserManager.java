@@ -1,7 +1,5 @@
 package system.use_cases.managers;
 
-import java.util.*;
-
 import shared.constants.IDType;
 import shared.constants.OnlineStatus;
 import shared.constants.UserRole;
@@ -12,6 +10,7 @@ import system.entities.User;
 import system.gateways.UserDataGateway;
 
 import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -105,8 +104,6 @@ public class UserManager {
      */
     public void createUser(String username, String password, String email, UserRole role)
             throws DuplicateUsernameException, UnaccountedEnumException, WeakPasswordException, InvalidEmailException {
-        if (role.equals(UserRole.TRIAL))
-            throw new UnaccountedEnumException();
         if (userIds.containsKey(username))
             throw new DuplicateUsernameException();
         if (!isPasswordString(password))
@@ -206,13 +203,13 @@ public class UserManager {
      * The user is stored within the class but not in the database
      * @return id of the trial user created
      */
-    public String createTrialUser() {
+    public String createPlayerUser() {
         String userId = idManager.getNextId();
         String username = "TrialUser" + userId;
 
         Date currentTime = Calendar.getInstance().getTime();
 
-        User user = new User(userId, username, null, null, UserRole.TRIAL, currentTime);
+        User user = new User(userId, username, null, null, UserRole.PLAYER, currentTime);
 
         userIds.put(username, userId);
         users.put(userId, user);
@@ -245,9 +242,6 @@ public class UserManager {
             if (isPasswordIncorrect(userId, password) && isTempPasswordIncorrect(userId, password))
                 throw new IncorrectPasswordException();
             if (isBanned(userId)) throw new BannedUserException();
-            if (getUserRole(userId) == UserRole.TEMP && isExpiredUser(userId)) {
-                throw new ExpiredUserException();
-            }
             getUser(userId).setOnlineStatus(OnlineStatus.ONLINE);
         } catch (InvalidIDException e1) {
             throw new RuntimeException("System failure: The database ID associated with this user is invalid.");
@@ -303,13 +297,7 @@ public class UserManager {
             getUser(userId).setOnlineStatus(OnlineStatus.OFFLINE);
         }
 
-        if (getUserRole(userId).equals(UserRole.TRIAL)){
-            String username = users.get(userId).getUsername();
-            users.remove(userId);
-            userIds.remove(username);
-        } else {
-            gateway.updateUser(getUser(userId));
-        }
+        gateway.updateUser(getUser(userId));
 
     }
 
@@ -343,38 +331,6 @@ public class UserManager {
             gateway.updateUser(getUser(userId));
         } catch (IOException e) {
             throw new RuntimeException("Fatal error: Can't connect to the database.");
-        }
-    }
-
-
-    /**
-     * Changes a trial user to a normal user with the specified username and password
-     * and keeps their game creations.
-     * The username must not be taken already.
-     * This stores the created user in the database
-     * @param userId id of the trial user
-     * @param username username of the user to create
-     * @param password password of the user to create
-     * @throws InvalidIDException if no user has the specified userId
-     * @throws DuplicateUsernameException if the username is already taken
-     * @throws UnaccountedEnumException if the user specified user is not a trial user
-     */
-    public void promoteTrialUser(String userId, String username, String email, UserRole role, String password) throws
-            InvalidIDException, DuplicateUsernameException, UnaccountedEnumException {
-        if (userIds.containsKey(username)) throw new DuplicateUsernameException();
-
-        User user = getUser(userId);
-        if (user.getRole() != UserRole.TRIAL) throw new UnaccountedEnumException();
-
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setEmail(email);
-        user.setRole(role);
-        try {
-            userIds.put(username, userId);
-            gateway.addUser(user);
-        } catch (IOException e) {
-            throw new RuntimeException("System failure: Can't connect to the database");
         }
     }
 
@@ -445,10 +401,7 @@ public class UserManager {
 
         User user = users.get(userID);
         user.addGameID(gameID);
-
-        if (user.getRole() != UserRole.TRIAL) {
-            gateway.updateUser(user);
-        }
+        gateway.updateUser(user);
     }
 
     /**

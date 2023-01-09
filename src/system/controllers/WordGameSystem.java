@@ -13,6 +13,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
+ * 三步走
+ * 1. 实现房间
+ * 1.1 实现用户
+ * 1.2 实现房间
+ * 2. 实现聊天
+ * 3. 实现地图
+ * 4. 实现卡
+ */
+
+
+
+/**
  * WordGameSystem Class
  */
 public class WordGameSystem {
@@ -26,15 +38,21 @@ public class WordGameSystem {
      */
     public WordGameSystem() throws IOException, InvalidIDException {
 
+        // room
+
+        // game
         GameDataGateway gameGateway = new GameDataMapper();
         GameManager gm = new GameManager(gameGateway);
 
+        // template is completely useless
         TemplateDataGateway templateDataGateway = new TemplateDataMapper();
         TemplateManager tm = new TemplateManager(templateDataGateway);
 
+        // user now has player and host and admin
         UserDataGateway userGateway = new UserDataMapper();
         UserManager um = new UserManager(userGateway);
 
+        //
         MatchManager mm = new MatchManager();
 
         GameRequestHandler gameRH = new GameRequestHandler(gm, tm, um, mm);

@@ -2,12 +2,10 @@ package system.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import shared.DTOs.sockets.MatchInput;
-import shared.constants.IDType;
-import shared.constants.MatchStatus;
-import shared.exceptions.use_case_exceptions.InvalidIDException;
-import shared.exceptions.use_case_exceptions.InvalidInputException;
-import system.use_cases.managers.MatchManager;
+import shared.DTOs.sockets.*;
+import shared.constants.*;
+import shared.exceptions.use_case_exceptions.*;
+import system.use_cases.managers.*;
 
 import java.io.*;
 import java.net.Socket;

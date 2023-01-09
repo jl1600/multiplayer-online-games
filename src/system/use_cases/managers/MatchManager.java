@@ -1,12 +1,11 @@
 package system.use_cases.managers;
 
-import shared.constants.IDType;
-import shared.constants.MatchStatus;
+import shared.constants.*;
 import shared.exceptions.use_case_exceptions.*;
-import system.entities.game.Game;
-import system.use_cases.game_matches.GameMatch;
-import system.entities.template.Template;
-import system.use_cases.factories.GameMatchFactory;
+import system.entities.game.*;
+import system.use_cases.game_matches.*;
+import system.entities.template.*;
+import system.use_cases.factories.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,6 +1,6 @@
 package shared.DTOs.sockets;
 
-import shared.constants.MatchStatus;
+import shared.constants.*;
 
 import java.util.Map;
 
