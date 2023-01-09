@@ -39,6 +39,8 @@ public class WordGameSystem {
     public WordGameSystem() throws IOException, InvalidIDException {
 
         // room
+        RoomDataGateway roomGateway = new RoomDataMapper();
+        RoomManager rm = new RoomManager(roomGateway);
 
         // game
         GameDataGateway gameGateway = new GameDataMapper();
@@ -55,7 +57,7 @@ public class WordGameSystem {
         //
         MatchManager mm = new MatchManager();
 
-        GameRequestHandler gameRH = new GameRequestHandler(gm, tm, um, mm);
+        GameRequestHandler gameRH = new GameRequestHandler(gm, tm, um, mm, rm);
         TemplateRequestHandler templateRH = new TemplateRequestHandler(tm);
 
         EmailService eService = new PseudoEmailComposer();

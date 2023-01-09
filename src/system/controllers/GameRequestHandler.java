@@ -3,18 +3,14 @@ package system.controllers;
 import com.sun.net.httpserver.HttpExchange;
 import shared.DTOs.Requests.*;
 import shared.DTOs.Responses.DesignQuestionResponseBody;
+import shared.DTOs.Responses.GameDataResponseBody;
 import shared.DTOs.Responses.MatchDataResponseBody;
 import shared.constants.IDType;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
-import shared.DTOs.Responses.GameDataResponseBody;
-import system.use_cases.managers.GameManager;
-import system.use_cases.managers.MatchManager;
-import system.use_cases.managers.TemplateManager;
-import system.use_cases.managers.UserManager;
+import system.use_cases.managers.*;
 
-import java.io.*;
-
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +25,7 @@ public class GameRequestHandler extends RequestHandler {
     private final TemplateManager templateManager;
     private final UserManager userManager;
     private final MatchManager matchManager;
+    private final RoomManager roomManager;
     private final ServerSocket serverSocket;
 
     /**
@@ -42,11 +39,13 @@ public class GameRequestHandler extends RequestHandler {
     public GameRequestHandler(GameManager gameManager,
                               TemplateManager templateManager,
                               UserManager userManager,
-                              MatchManager matchManager) {
+                              MatchManager matchManager,
+                              RoomManager roomManager) {
         this.gameManager = gameManager;
         this.templateManager = templateManager;
         this.userManager = userManager;
         this.matchManager = matchManager;
+        this.roomManager = roomManager;
         try {
             serverSocket = new ServerSocket(PORT);
         } catch (IOException e) {
