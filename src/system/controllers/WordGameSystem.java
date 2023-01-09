@@ -39,12 +39,14 @@ public class WordGameSystem {
     public WordGameSystem() throws IOException, InvalidIDException {
 
         // room
-        RoomDataGateway roomGateway = new RoomDataMapper();
-        RoomManager rm = new RoomManager(roomGateway);
+
 
         // game
         GameDataGateway gameGateway = new GameDataMapper();
         GameManager gm = new GameManager(gameGateway);
+
+        RoomDataGateway roomGateway = new RoomDataMapper();
+        RoomManager rm = new RoomManager(roomGateway);
 
         // template is completely useless
         TemplateDataGateway templateDataGateway = new TemplateDataMapper();

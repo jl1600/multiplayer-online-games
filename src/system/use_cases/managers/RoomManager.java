@@ -16,9 +16,9 @@ public class RoomManager {
         rooms = new HashMap<>();
         this.gateway = gateway;
 
-        for (Room room : this.gateway.getAllRooms()) {
-            rooms.put(room.getRoomID(), room);
-        }
+//        for (Room room : this.gateway.getAllRooms()) {
+//            rooms.put(room.getRoomID(), room);
+//        }
         this.idManager = new IdManager(gateway.getRoomCount() + 1);
     }
 

@@ -2,6 +2,8 @@ package system.gateways;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import shared.constants.IDType;
+import shared.exceptions.use_case_exceptions.InvalidIDException;
 import system.entities.room.Room;
 
 import java.io.*;
@@ -12,39 +14,25 @@ import java.util.Set;
 
 public class RoomDataMapper implements RoomDataGateway{
     private final String PATH = System.getProperty("user.dir");
-    private final String ROOM_FOLDER = PATH + "/src/system/database//";
+    private final String ROOM_FOLDER = PATH + "/src/system/database/rooms/";
     private final File ROOM_COUNT_FILE = new File(PATH + "/src/system/database/countFiles/room.txt");
-    private final String[] SUBFOLDERS = {"quiz/", "hangman/"};
     private final String SUFFIX = ".json";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+
     /**
      * {@inheritDoc}
      */
-    public void addRoom(Room room) throws IOException {
-        addRoom(room, true);
+    public void addRoom(Room Room) throws IOException {
+        addRoom(Room, true);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void updateRoom(Room room) throws IOException {
-        deleteRoom(room.getRoomID());
-        addRoom(room, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void deleteRoom(String roomID) throws IOException {
-        boolean deleted = false;
-        for (String subfolder : SUBFOLDERS) {
-            File file = new File(ROOM_FOLDER + subfolder + roomID + SUFFIX);
-            if (file.delete()) {
-                deleted = true;
-            }
-        }
-        if (!deleted) {
+    public void deleteRoom(String RoomId) throws IOException {
+        File file = new File(ROOM_FOLDER + RoomId + SUFFIX);
+        if (!file.delete()) {
             throw new IOException();
         }
     }
@@ -52,19 +40,29 @@ public class RoomDataMapper implements RoomDataGateway{
     /**
      * {@inheritDoc}
      */
+    public void updateRoom(Room Room) throws InvalidIDException, IOException {
+        try {
+            deleteRoom(Room.getRoomID());
+        } catch (IOException e) {
+            throw new InvalidIDException(IDType.ROOM);
+        }
+        addRoom(Room, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public Set<Room> getAllRooms() throws IOException {
-        HashSet<Room> rooms = new HashSet<>();
-        for (String subfolder : SUBFOLDERS) {
-            File folder = new File(ROOM_FOLDER + subfolder);
-            for (File file : Objects.requireNonNull(folder.listFiles())) {
-                if (file.getName().endsWith(SUFFIX)) {
-                    String roomString = String.join("\n", Files.readAllLines(file.toPath()));
-                    Room room = jsonToRoom(roomString, subfolder);
-                    rooms.add(room);
-                }
+        File folder = new File(ROOM_FOLDER);
+        HashSet<Room> Rooms = new HashSet<>();
+        for (File file : Objects.requireNonNull(folder.listFiles())) {
+            if (file.getName().endsWith(SUFFIX)) {
+                String RoomString = String.join("\n", Files.readAllLines(file.toPath()));
+                Room Room = jsonToRoom(RoomString);
+                Rooms.add(Room);
             }
         }
-        return rooms;
+        return Rooms;
     }
 
     /**
@@ -75,21 +73,10 @@ public class RoomDataMapper implements RoomDataGateway{
         return new Integer(rd.readLine());
     }
 
-    private void addRoom(Room room, boolean increment) throws IOException {
-        String subfolder;
-        subfolder = SUBFOLDERS[0];
-
-        File roomFile = new File(ROOM_FOLDER + subfolder + room.getRoomID() + SUFFIX);
-        Writer wr = new FileWriter(roomFile);
-        wr.write(roomToJson(room));
-        wr.close();
-
-        if (increment) {
-            incrementRoomCount();
-        }
-    }
-
-    private void incrementRoomCount() throws IOException {
+    /**
+     * {@inheritDoc}
+     */
+    public void incrementRoomCount() throws IOException {
         BufferedReader rd = new BufferedReader(new FileReader(ROOM_COUNT_FILE));
         int count = Integer.parseInt(rd.readLine()) + 1;
         rd.close();
@@ -99,17 +86,22 @@ public class RoomDataMapper implements RoomDataGateway{
         wr.close();
     }
 
-    private String roomToJson(Room room) {
-        return gson.toJson(room);
+    private void addRoom(Room Room, boolean increment) throws IOException {
+        File RoomFile = new File(ROOM_FOLDER + Room.getRoomID() + SUFFIX);
+        Writer wr = new FileWriter(RoomFile);
+        wr.write(RoomToJson(Room));
+        wr.close();
+
+        if (increment) {
+            incrementRoomCount();
+        }
     }
 
-    /**
-     * Converts Json string to Room
-     * @param roomString the room string details to convert
-     * @param subfolder indicating which room type folder it is from
-     * @return Room object from the json string
-     */
-    public Room jsonToRoom(String roomString, String subfolder) {
-        return gson.fromJson(roomString, Room.class);
+    private Room jsonToRoom(String RoomString) {
+        return gson.fromJson(RoomString, Room.class);
+    }
+
+    private String RoomToJson(Room Room) {
+        return gson.toJson(Room);
     }
 }
