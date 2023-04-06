@@ -5,6 +5,7 @@ import shared.DTOs.Requests.*;
 import shared.DTOs.Responses.DesignQuestionResponseBody;
 import shared.DTOs.Responses.GameDataResponseBody;
 import shared.DTOs.Responses.MatchDataResponseBody;
+import shared.DTOs.Responses.RoomDataResponseBody;
 import shared.constants.IDType;
 import shared.constants.UserRole;
 import shared.exceptions.use_case_exceptions.*;
@@ -25,7 +26,7 @@ public class GameRequestHandler extends RequestHandler {
     private final TemplateManager templateManager;
     private final UserManager userManager;
     private final MatchManager matchManager;
-    private final RoomManager roomManager;
+//    private final RoomManager roomManager;
     private final ServerSocket serverSocket;
 
     /**
@@ -39,13 +40,13 @@ public class GameRequestHandler extends RequestHandler {
     public GameRequestHandler(GameManager gameManager,
                               TemplateManager templateManager,
                               UserManager userManager,
-                              MatchManager matchManager,
-                              RoomManager roomManager) {
+                              MatchManager matchManager
+                              ) {
         this.gameManager = gameManager;
         this.templateManager = templateManager;
         this.userManager = userManager;
         this.matchManager = matchManager;
-        this.roomManager = roomManager;
+//        this.roomManager = roomManager;
         try {
             serverSocket = new ServerSocket(PORT);
         } catch (IOException e) {
@@ -81,8 +82,8 @@ public class GameRequestHandler extends RequestHandler {
                 handleGetPrevAccessLevel(exchange);
             case "available-games":
                 handleGetAvailableGamesByUserID(exchange);
-            case "available-rooms":
-                handleGetAvailableRoomsByUserID(exchange);
+//            case "available-rooms":
+//                handleGetAvailableRoomsByUserID(exchange);
             default:
                 sendResponse(exchange, 404, "Unidentified Request.");
         }
@@ -336,19 +337,19 @@ public class GameRequestHandler extends RequestHandler {
         }
 
     }
-
-    private void handleGetAvailableRoomsByUserID(HttpExchange exchange) throws IOException {
-        String ownerID = getQueryArgFromGET(exchange);
-        if (ownerID == null)
-            return;
-        try {
-            sendResponse(exchange, 200, getAvailableRoomsByUserID(ownerID));
-        } catch (InvalidIDException e) {
-            System.out.println("inv");
-            sendResponse(exchange, 400, "Invalid User ID.");
-        }
-
-    }
+//
+//    private void handleGetAvailableRoomsByUserID(HttpExchange exchange) throws IOException {
+//        String ownerID = getQueryArgFromGET(exchange);
+//        if (ownerID == null)
+//            return;
+//        try {
+//            sendResponse(exchange, 200, getAvailableRoomsByUserID(ownerID));
+//        } catch (InvalidIDException e) {
+//            System.out.println("inv");
+//            sendResponse(exchange, 400, "Invalid User ID.");
+//        }
+//
+//    }
 
     private void handleGetAllOwnedGames(HttpExchange exchange) throws IOException {
         String userID = getQueryArgFromGET(exchange);
@@ -470,44 +471,44 @@ public class GameRequestHandler extends RequestHandler {
         return getJsonDataFromGameIDs(dataSet, publicGames);
     }
 
-    private String getAvailableRoomsByUserID(String userID) throws IOException, InvalidIDException {
-        Set<GameDataResponseBody> dataSet = new HashSet<>();
-        //duplicates will be take cared by built in
-        Set<String> availableGameIDs = new HashSet<>();
+//    private String getAvailableRoomsByUserID(String userID) throws IOException, InvalidIDException {
+//        Set<GameDataResponseBody> dataSet = new HashSet<>();
+//        //duplicates will be take cared by built in
+//        Set<String> availableGameIDs = new HashSet<>();
+//
+//        if (userManager.getUserRole(userID).equals(UserRole.ADMIN)) {
+//            availableGameIDs = gameManager.getAllGameIDs();
+//        } else {
+//            Set<String> userFriendList = userManager.getFriendList(userID);
+//            //Step 1: get all public games
+//            availableGameIDs.addAll(gameManager.getAllPublicGamesID());
+//            //Step 2: get all owned creations that are not DELETED
+//            availableGameIDs.addAll(gameManager.getOwnedNotDeletedGameID(userID));
+//            //Step 3: for every friend, get all of their friend only games
+//            for (String friendID : userFriendList) {
+//                availableGameIDs.addAll(gameManager.getOwnedFriendOnlyGameID(friendID));
+//            }
+//        }
+//
+//        return getJsonDataFromRoomIDs(dataSet, availableGameIDs);
+//    }
 
-        if (userManager.getUserRole(userID).equals(UserRole.ADMIN)) {
-            availableGameIDs = gameManager.getAllGameIDs();
-        } else {
-            Set<String> userFriendList = userManager.getFriendList(userID);
-            //Step 1: get all public games
-            availableGameIDs.addAll(gameManager.getAllPublicGamesID());
-            //Step 2: get all owned creations that are not DELETED
-            availableGameIDs.addAll(gameManager.getOwnedNotDeletedGameID(userID));
-            //Step 3: for every friend, get all of their friend only games
-            for (String friendID : userFriendList) {
-                availableGameIDs.addAll(gameManager.getOwnedFriendOnlyGameID(friendID));
-            }
-        }
-
-        return getJsonDataFromRoomIDs(dataSet, availableGameIDs);
-    }
-
-    private String getJsonDataFromRoomIDs(Set<RoomDataResponseBody> dataSet, Set<String> availableRoomIDs) {
-        for (String id : availableRoomIDs) {
-            RoomDataResponseBody room = new RoomDataResponseBody();
-            room.id = id;
-            try {
-                room.title = roomManager.getRoomTitle(id);
-                room.ownerName = userManager.getUsername(roomManager.getOwnerID(id));
-                room.accessLevel = roomManager.getAccessLevel(id);
-                room.previousAccessLevel = roomManager.getPreviousAccessLevel(id);
-                room.genre = roomManager.getGenre(id);
-            } catch (InvalidIDException e) {
-                throw new RuntimeException("Game ID or user ID got from public game list is invalid.");
-            }
-
-            dataSet.add(room);
-        }
-        return gson.toJson(dataSet);
-    }
+//    private String getJsonDataFromRoomIDs(Set<GameDataResponseBody> dataSet, Set<String> availableRoomIDs) {
+//        for (String id : availableRoomIDs) {
+//            RoomDataResponseBody room = new RoomDataResponseBody();
+//            room.id = id;
+//            try {
+//                room.title = roomManager.getRoomTitle(id);
+//                room.ownerName = userManager.getUsername(roomManager.getOwnerID(id));
+//                room.accessLevel = roomManager.getAccessLevel(id);
+//                room.previousAccessLevel = roomManager.getPreviousAccessLevel(id);
+//                room.genre = roomManager.getGenre(id);
+//            } catch (InvalidIDException e) {
+//                throw new RuntimeException("Game ID or user ID got from public game list is invalid.");
+//            }
+//
+//            dataSet.add(room);
+//        }
+//        return gson.toJson(dataSet);
+//    }
 }

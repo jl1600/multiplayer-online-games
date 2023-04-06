@@ -12,15 +12,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
- * 三步走
- * 1. 实现房间
- * 1.1 实现用户
- * 1.2 实现房间
- * 2. 实现聊天
- * 3. 实现地图
- * 4. 实现卡
- */
+
 
 
 
@@ -45,8 +37,8 @@ public class WordGameSystem {
         GameDataGateway gameGateway = new GameDataMapper();
         GameManager gm = new GameManager(gameGateway);
 
-        RoomDataGateway roomGateway = new RoomDataMapper();
-        RoomManager rm = new RoomManager(roomGateway);
+//        RoomDataGateway roomGateway = new RoomDataMapper();
+//        RoomManager rm = new RoomManager(roomGateway);
 
         // template is completely useless
         TemplateDataGateway templateDataGateway = new TemplateDataMapper();
@@ -59,7 +51,7 @@ public class WordGameSystem {
         //
         MatchManager mm = new MatchManager();
 
-        GameRequestHandler gameRH = new GameRequestHandler(gm, tm, um, mm, rm);
+        GameRequestHandler gameRH = new GameRequestHandler(gm, tm, um, mm);
         TemplateRequestHandler templateRH = new TemplateRequestHandler(tm);
 
         EmailService eService = new PseudoEmailComposer();
@@ -98,3 +90,4 @@ public class WordGameSystem {
         }
     }
 }
+
