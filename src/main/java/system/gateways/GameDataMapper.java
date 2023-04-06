@@ -16,8 +16,8 @@ import java.lang.String;
  */
 public class GameDataMapper implements GameDataGateway {
     private final String PATH = System.getProperty("user.dir");
-    private final String GAME_FOLDER = PATH + "/src/system/database/games/";
-    private final File GAME_COUNT_FILE = new File(PATH + "/src/system/database/countFiles/game.txt");
+    private final String GAME_FOLDER = PATH + "/src/main/java/system/database/games/";
+    private final File GAME_COUNT_FILE = new File(PATH + "/src/main/java/system/database/countFiles/game.txt");
     private final String[] SUBFOLDERS = {"quiz/", "hangman/"};
     private final String SUFFIX = ".json";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();

@@ -15,8 +15,8 @@ import java.util.*;
  */
 public class UserDataMapper implements UserDataGateway {
     private final String PATH = System.getProperty("user.dir");
-    private final String USER_FOLDER = PATH + "/src/system/database/users/";
-    private final File USER_COUNT_FILE = new File(PATH + "/src/system/database/countFiles/user.txt");
+    private final String USER_FOLDER = PATH + "/src/main/java/system/database/users/";
+    private final File USER_COUNT_FILE = new File(PATH + "/src/main/java/system/database/countFiles/user.txt");
     private final String SUFFIX = ".json";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 

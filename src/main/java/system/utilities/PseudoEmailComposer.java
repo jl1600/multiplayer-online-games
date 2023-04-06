@@ -29,7 +29,7 @@ public class PseudoEmailComposer implements EmailService {
         Gson gson = new Gson();
         try {
             JsonReader reader = new JsonReader(new FileReader(
-                    "src/system/configuration_files/email_templates.json"));
+                    "src/main/java/system/configuration_files/email_templates.json"));
             Type type = new TypeToken<Map<TemplateTag, String>>(){}.getType();
             emailTemplates = gson.fromJson(reader, type);
         } catch (FileNotFoundException e) {

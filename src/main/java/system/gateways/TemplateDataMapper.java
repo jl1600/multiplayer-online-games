@@ -15,8 +15,8 @@ import java.util.Set;
  */
 public class TemplateDataMapper implements TemplateDataGateway {
     private final String PATH = System.getProperty("user.dir");
-    private final String TEMPLATE_FOLDER = PATH + "/src/system/database/templates/";
-    private final File TEMPLATE_COUNT_FILE = new File(PATH + "/src/system/database/countFiles/template.txt");
+    private final String TEMPLATE_FOLDER = PATH + "/src/main/java/system/database/templates/";
+    private final File TEMPLATE_COUNT_FILE = new File(PATH + "/src/main/java/system/database/countFiles/template.txt");
     private final String[] SUBFOLDERS = {"quiz/", "hangman/"};
     private final String SUFFIX = ".json";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
